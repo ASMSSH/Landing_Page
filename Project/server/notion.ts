@@ -34,7 +34,7 @@ export async function subscribe(input: SubscribeInput, env: NotionEnv): Promise<
     return { status: 400, body: { ok: false, error: 'invalid_email', message: '이메일 형식이 올바르지 않아요.' } };
   }
   if (!env.token || !env.dataSourceId) {
-    return { status: 500, body: { ok: false, error: 'server_not_configured', message: 'NOTION_TOKEN / NOTION_DATA_SOURCE_ID 미설정' } };
+    return { status: 500, body: { ok: false, error: 'server_not_configured', message: 'NOTION_TOKEN / NOTION_SUBSCRIBE_DATA_SOURCE_ID 미설정' } };
   }
 
   const properties: Record<string, unknown> = {
