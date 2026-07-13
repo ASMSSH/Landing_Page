@@ -12,7 +12,7 @@ export async function POST(request: Request): Promise<Response> {
   }
   const result = await subscribe(input as Parameters<typeof subscribe>[0], {
     token: process.env.NOTION_TOKEN,
-    dataSourceId: process.env.NOTION_DATA_SOURCE_ID,
+    dataSourceId: process.env.NOTION_SUBSCRIBE_DATA_SOURCE_ID,
   });
   return Response.json(result.body, { status: result.status });
 }

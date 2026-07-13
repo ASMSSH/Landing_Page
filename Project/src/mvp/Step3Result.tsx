@@ -13,9 +13,6 @@ interface Props {
   surgery: boolean;
 }
 
-const INSURER_DOCUMENTS_URL =
-  "https://app.notion.com/p/39adbdcebb5e802bb823f2de78290b5b?v=e74dbdcebb5e8363b08e08c9cc70c289&source=copy_link";
-
 function ResultItem({ doc, icon }: { doc: ResultDoc; icon: string }) {
   return (
     <div className="res-item">
@@ -51,7 +48,11 @@ export default function Step3Result({ insurerLabel, fields, surgery }: Props) {
     fetch(`/api/claim-documents?${params.toString()}`, {
       signal: controller.signal,
     })
-      .then((response) => response.json())
+      .then((response) => {
+        // 아직 Notion 조회 미구현(501) 등 비정상 응답이면 자체 fallback 사용
+        if (!response.ok) throw new Error("claim-documents unavailable");
+        return response.json();
+      })
       .then((data: ClaimDocumentGuide) => setGuide(data))
       .catch(() => {
         if (!controller.signal.aborted) setGuide(FALLBACK_DOCUMENT_GUIDE);
@@ -96,14 +97,6 @@ export default function Step3Result({ insurerLabel, fields, surgery }: Props) {
 
       <div className="res-group-head">
         <span className="res-group-label">✍️ 직접 준비할 서류</span>
-        <a
-          className="download-doc"
-          href={INSURER_DOCUMENTS_URL}
-          target="_blank"
-          rel="noreferrer"
-        >
-          서류 다운로드 받기
-        </a>
         {(guide.downloads || []).map((file) => (
           <a
             className="download-doc"
