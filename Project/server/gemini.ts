@@ -18,6 +18,7 @@ export interface AnalyzeReceiptInput {
 export interface GeminiEnv {
   apiKey?: string;
   model?: string;
+  requestTimeoutMs?: number;
 }
 
 export interface GeminiAnalysis {
@@ -141,6 +142,8 @@ export async function analyzeReceipt(
   }
 
   const model = normalizeModel(env.model);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), env.requestTimeoutMs ?? 25_000);
   let response: Response;
   try {
     response = await fetch(`${GEMINI_API_BASE}/models/${encodeURIComponent(model)}:generateContent`, {
@@ -149,6 +152,7 @@ export async function analyzeReceipt(
         'Content-Type': 'application/json',
         'x-goog-api-key': env.apiKey,
       },
+      signal: controller.signal,
       body: JSON.stringify({
         contents: [{
           role: 'user',
@@ -164,8 +168,14 @@ export async function analyzeReceipt(
         },
       }),
     });
-  } catch {
-    return { status: 502, body: { error: '문서 분석 서비스에 연결하지 못했습니다.' } };
+  } catch (error) {
+    const timedOut = error instanceof Error && error.name === 'AbortError';
+    return {
+      status: timedOut ? 504 : 502,
+      body: { error: timedOut ? '문서 분석 시간이 초과되었습니다.' : '문서 분석 서비스에 연결하지 못했습니다.' },
+    };
+  } finally {
+    clearTimeout(timeout);
   }
 
   const payload = (await response.json().catch(() => ({}))) as {

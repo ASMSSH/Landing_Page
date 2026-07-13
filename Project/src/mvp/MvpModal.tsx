@@ -3,6 +3,7 @@ import { useMvp } from "./MvpContext";
 import { EXAMPLES } from "../data/examples";
 import { DEFAULT_INSURER } from "../data/insurers";
 import { analyzeReceiptWithGemini } from "../lib/geminiAnalyze";
+import type { ClaimType } from "../lib/claimType";
 import { extractFieldsFromImage } from "../lib/ocrFields";
 import { receiptSVG } from "../lib/receiptSVG";
 import {
@@ -28,15 +29,19 @@ export default function MvpModal() {
   const [fields, setFields] = useState<Fields>(EMPTY_FIELDS);
   const [aiAnalysis, setAiAnalysis] = useState<AiAnalysis | null>(null);
   const [surgery, setSurgery] = useState(false);
+  const [analysisClaimType, setAnalysisClaimType] = useState<ClaimType | null>(null);
   const [insurer, setInsurer] = useState(DEFAULT_INSURER);
 
   const timer = useRef<number | null>(null);
+  const analysisController = useRef<AbortController | null>(null);
   const clearTimer = () => {
     if (timer.current) window.clearTimeout(timer.current);
     timer.current = null;
   };
 
   const resetStep1 = useCallback(() => {
+    analysisController.current?.abort();
+    analysisController.current = null;
     clearTimer();
     setAnalyzing(false);
     setReady(false);
@@ -45,6 +50,7 @@ export default function MvpModal() {
     setFields(EMPTY_FIELDS);
     setAiAnalysis(null);
     setSurgery(false);
+    setAnalysisClaimType(null);
   }, []);
 
   /* Reset whole flow whenever the modal opens; lock body scroll + ESC to close. */
@@ -110,8 +116,11 @@ export default function MvpModal() {
   }
 
   function uploadFile(file: File) {
+    analysisController.current?.abort();
     const reader = new FileReader();
     reader.onload = async () => {
+      const controller = new AbortController();
+      analysisController.current = controller;
       const url = reader.result as string;
       setSelectedExample(null);
       clearTimer();
@@ -126,7 +135,8 @@ export default function MvpModal() {
 
       try {
         setUpload((u) => (u ? { ...u, status: "문서를 분석하고 있어요…" } : u));
-        const result = await analyzeReceiptWithGemini(url);
+        const result = await analyzeReceiptWithGemini(url, controller.signal);
+        if (controller.signal.aborted) return;
         setFields({
           docType: result.fields.docType || "진료비 영수증",
           date: result.fields.date,
@@ -134,6 +144,7 @@ export default function MvpModal() {
           cost: result.fields.cost,
         });
         setSurgery(result.surgery);
+        setAnalysisClaimType(result.claimType);
         setAiAnalysis({
           source: "gemini",
           summary: result.summary,
@@ -149,11 +160,13 @@ export default function MvpModal() {
             : u,
         );
       } catch {
+        if (controller.signal.aborted) return;
         try {
           setUpload((u) =>
             u ? { ...u, status: "분석을 다시 시도하고 있어요…" } : u,
           );
           const result = await extractFieldsFromImage(file);
+          if (controller.signal.aborted) return;
           setFields({
             docType: result.fields.docType || "진료비 영수증",
             date: result.fields.date,
@@ -161,6 +174,7 @@ export default function MvpModal() {
             cost: result.fields.cost,
           });
           setSurgery(result.surgery);
+          setAnalysisClaimType(null);
           setAiAnalysis({
             source: "tesseract",
             summary: "문서에서 읽은 내용으로 기본 필드를 채웠어요.",
@@ -178,6 +192,7 @@ export default function MvpModal() {
         } catch {
           setFields({ docType: "진료비 영수증", date: "", diag: "", cost: "" });
           setSurgery(false);
+          setAnalysisClaimType(null);
           setAiAnalysis({
             source: "tesseract",
             summary:
@@ -192,8 +207,13 @@ export default function MvpModal() {
           );
         }
       } finally {
-        setAnalyzing(false);
-        setReady(true);
+        if (!controller.signal.aborted) {
+          setAnalyzing(false);
+          setReady(true);
+        }
+        if (analysisController.current === controller) {
+          analysisController.current = null;
+        }
       }
     };
     reader.readAsDataURL(file);
@@ -256,10 +276,14 @@ export default function MvpModal() {
               onSelectExample={selectExample}
               onUploadFile={uploadFile}
               onRemove={resetStep1}
-              onFieldChange={(key, value) =>
-                setFields((f) => ({ ...f, [key]: value }))
-              }
-              onToggleSurgery={() => setSurgery((s) => !s)}
+              onFieldChange={(key, value) => {
+                setAnalysisClaimType(null);
+                setFields((f) => ({ ...f, [key]: value }));
+              }}
+              onToggleSurgery={() => {
+                setAnalysisClaimType(null);
+                setSurgery((s) => !s);
+              }}
             />
           )}
           {step === 2 && (
@@ -270,6 +294,7 @@ export default function MvpModal() {
               insurerLabel={insurer}
               fields={fields}
               surgery={surgery}
+              analysisClaimType={analysisClaimType}
             />
           )}
         </div>

@@ -4,13 +4,14 @@ import {
   type ClaimDocumentGuide,
   type ResultDoc,
 } from "../data/resultDocs";
-import { inferClaimType } from "../lib/claimType";
+import { inferClaimType, type ClaimType } from "../lib/claimType";
 import type { Fields } from "./types";
 
 interface Props {
   insurerLabel: string;
   fields: Fields;
   surgery: boolean;
+  analysisClaimType?: ClaimType | null;
 }
 
 function ResultItem({ doc, icon }: { doc: ResultDoc; icon: string }) {
@@ -26,11 +27,17 @@ function ResultItem({ doc, icon }: { doc: ResultDoc; icon: string }) {
   );
 }
 
-export default function Step3Result({ insurerLabel, fields, surgery }: Props) {
-  const claimType = useMemo(
+export default function Step3Result({
+  insurerLabel,
+  fields,
+  surgery,
+  analysisClaimType,
+}: Props) {
+  const inferredClaimType = useMemo(
     () => inferClaimType(fields, surgery),
     [fields, surgery],
   );
+  const claimType = analysisClaimType ?? inferredClaimType;
   const [guide, setGuide] = useState<ClaimDocumentGuide>(
     FALLBACK_DOCUMENT_GUIDE,
   );

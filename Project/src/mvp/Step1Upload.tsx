@@ -33,7 +33,8 @@ export default function Step1Upload({
 }: Props) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [drag, setDrag] = useState(false);
-  const isReceipt = fields.docType.trim() === "진료비 영수증";
+  const isReceiptWithoutDiagnosis =
+    fields.docType.trim() === "진료비 영수증" && !fields.diag.trim();
 
   return (
     <div className="modal-step">
@@ -206,14 +207,14 @@ export default function Step1Upload({
               <label>병명 / 진료 내용</label>
               <input
                 className="field"
-                disabled={isReceipt}
+                disabled={isReceiptWithoutDiagnosis}
                 placeholder={
-                  isReceipt ? "영수증에서는 확인 어려움" : "예: 슬개골 탈구"
+                  isReceiptWithoutDiagnosis ? "영수증에서는 확인 어려움" : "예: 슬개골 탈구"
                 }
-                value={isReceipt ? "" : fields.diag}
+                value={fields.diag}
                 onChange={(e) => onFieldChange("diag", e.target.value)}
               />
-              {isReceipt && (
+              {isReceiptWithoutDiagnosis && (
                 <span className="field-hint">
                   진료비 영수증에는 병명이나 진료 내용이 없는 경우가 많아요.
                 </span>
