@@ -304,7 +304,12 @@ footer .wm { font-family:var(--font-display); font-size:20px; color:var(--bg-app
 .download-doc { flex-shrink:0; margin-left:auto; border:1px solid var(--primary-300); border-radius:999px; padding:6px 12px; background:var(--primary-50); color:var(--primary-700); font-size:12px; font-weight:800; white-space:nowrap; }
 .download-doc:hover { background:var(--primary-100); }
 .res-item { display:flex; align-items:flex-start; gap:12px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; }
-.res-item .ic { width:30px; height:30px; border-radius:9px; background:var(--neutral-200); display:grid; place-items:center; font-size:14px; flex-shrink:0; }
+.res-item .ic { width:36px; height:36px; border-radius:11px; background:var(--neutral-200); display:grid; place-items:center; font-size:17px; flex-shrink:0; }
+.res-item .ic.coral { background:var(--primary-100); }
+.res-item .ic.orange { background:var(--secondary-100); }
+.res-item .ic.mint { background:var(--success-100); }
+.res-item .ic.blue { background:#E7F1FB; }
+.res-item .ic.yellow { background:#FFF4C9; }
 .res-item .txt { flex:1; display:flex; flex-direction:column; gap:3px; }
 .res-item .rn { font-size:14px; font-weight:700; }
 .res-item .rw { font-size:12px; line-height:1.5; color:var(--text-tertiary); }
