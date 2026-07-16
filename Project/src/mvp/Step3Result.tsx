@@ -27,6 +27,23 @@ function ResultItem({ doc, icon }: { doc: ResultDoc; icon: string }) {
   );
 }
 
+function ResultNote({ note }: { note: string }) {
+  const parts = note.split(/(https?:\/\/[^\s]+)/g);
+  return (
+    <p className="result-note">
+      {parts.map((part, index) =>
+        /^https?:\/\//.test(part) ? (
+          <a href={part} target="_blank" rel="noreferrer" key={`${part}-${index}`}>
+            출처 보기
+          </a>
+        ) : (
+          part
+        ),
+      )}
+    </p>
+  );
+}
+
 export default function Step3Result({
   insurerLabel,
   fields,
@@ -121,9 +138,7 @@ export default function Step3Result({
       ))}
 
       {guide.notes.map((note, i) => (
-        <p className="result-note" key={i}>
-          {note}
-        </p>
+        <ResultNote note={note} key={i} />
       ))}
     </div>
   );
