@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { FAQ } from '../data/faq';
+import Icon from './icons';
 
 function FaqRow({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -13,7 +14,7 @@ function FaqRow({ q, a, open, onToggle }: { q: string; a: string; open: boolean;
     <div className={`faq-item${open ? ' open' : ''}`}>
       <button className="faq-q" onClick={onToggle}>
         <span className="q">{q}</span>
-        <span className="ic">＋</span>
+        <Icon name="chevron-down" size={20} className="ic" />
       </button>
       <div className="faq-a" ref={ref} style={{ maxHeight: maxH }}>
         <p>{a}</p>
@@ -29,7 +30,7 @@ export default function Faq() {
       <div className="wrap">
         <div className="sec-head">
           <span className="sec-tag">자주 묻는 질문</span>
-          <h2 className="sec-h2">궁금한 점을 모았어요</h2>
+          <h2 className="sec-h2">궁금한 점, 미리 풀어드릴게요</h2>
         </div>
         <div className="faq-list">
           {FAQ.map((item, i) => (

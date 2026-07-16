@@ -1,30 +1,20 @@
 import { useState } from 'react';
 import { useMvp } from '../mvp/MvpContext';
-
-const INSURER_OPTIONS = [
-  '메리츠화재 펫퍼민트',
-  'DB손해보험 펫블리',
-  'KB손해보험 금쪽같은 펫보험',
-  '삼성화재 위풍당당',
-  '현대해상 굿앤굿우리펫',
-  '한화손해보험 펫투게더',
-  '롯데손해보험 마이펫보험',
-  'NH농협손해보험 펫앤미든든',
-  '기타 / 모름',
-];
+import { INSURERS, insurerLabel } from '../data/insurers';
 
 type Status = 'idle' | 'submitting' | 'done' | 'error';
 
 const ERROR_MESSAGES: Record<string, string> = {
-  invalid_email: '이메일 형식을 확인해 주세요.',
+  invalid_phone: '전화번호 형식을 확인해 주세요. (예: 01012345678)',
   server_not_configured: '서버 설정이 아직 완료되지 않았어요.',
   object_not_found: '연동 대상을 찾지 못했어요. 잠시 후 다시 시도해 주세요.',
 };
 
 export default function SignupCta() {
   const { open } = useMvp();
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [insurer, setInsurer] = useState('');
+  const [betaOptIn, setBetaOptIn] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
   const [errMsg, setErrMsg] = useState('');
 
@@ -36,7 +26,7 @@ export default function SignupCta() {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, insurer, source: 'landing-signup' }),
+        body: JSON.stringify({ phone, insurer, betaOptIn, source: 'landing-signup' }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
@@ -53,45 +43,62 @@ export default function SignupCta() {
 
   const done = status === 'done';
   const submitting = status === 'submitting';
+  const disabled = done || submitting;
 
   return (
     <section id="signup" style={{ paddingBottom: 90 }}>
       <div className="wrap">
         <div className="mvp-strip">
-          <span className="line">결과가 어떻게 나오는지, 먼저 체험해볼까요?</span>
+          <span className="line">청구가 얼마나 간단한지, 먼저 체험해볼까요?</span>
           <button className="btn btn-sage" onClick={open}>체험해보기 🐾</button>
         </div>
         <div className="signup-box">
-          <h2>가장 먼저 써보실래요?</h2>
-          <p className="sub">출시되면 제일 먼저 알려드릴게요. 이메일과 가입 보험사만 남겨주시면 준비 끝!</p>
+          <h2>출시되면 가장 먼저 알려드릴게요</h2>
+          <p className="sub">출시 소식을 놓치지 않게, 연락처와 가입 보험사만 남겨주세요. 준비되는 대로 가장 먼저 연락드릴게요.</p>
           <form className="signup-form" onSubmit={handleSubmit}>
             <div className="field-row">
               <input
                 className="field"
-                type="email"
-                placeholder="이메일 주소"
+                type="tel"
+                inputMode="tel"
+                placeholder="전화번호 (예: 01012345678)"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={done || submitting}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                disabled={disabled}
               />
               <select
                 className="field"
                 value={insurer}
                 onChange={(e) => setInsurer(e.target.value)}
                 style={{ color: insurer ? 'var(--text-primary)' : 'var(--text-tertiary)' }}
-                disabled={done || submitting}
+                disabled={disabled}
               >
                 <option value="">가입 보험사 (선택)</option>
-                {INSURER_OPTIONS.map((o) => (
-                  <option key={o}>{o}</option>
+                {INSURERS.map((ins) => (
+                  <option key={ins.company} value={ins.company}>{insurerLabel(ins)}</option>
                 ))}
               </select>
             </div>
+
+            <label className={`trial-optin${betaOptIn ? ' on' : ''}`}>
+              <input
+                type="checkbox"
+                checked={betaOptIn}
+                onChange={(e) => setBetaOptIn(e.target.checked)}
+                disabled={disabled}
+              />
+              <span className="trial-box">✓</span>
+              <span className="trial-text">
+                <span className="trial-title">🐾 사전 체험(무료 청구 대행)에도 참여할래요 (선택)</span>
+                <span className="trial-desc">영수증을 보내주시면 출시 전에 실제 청구를 무료로 대신 해드려요.</span>
+              </span>
+            </label>
+
             <button
               className="signup-submit"
               type="submit"
-              disabled={done || submitting}
+              disabled={disabled}
               style={done ? { background: 'var(--success-500)' } : undefined}
             >
               {done
@@ -104,7 +111,7 @@ export default function SignupCta() {
           {status === 'error' && (
             <p className="privacy" style={{ color: 'var(--error-500)' }}>⚠️ {errMsg}</p>
           )}
-          <p className="privacy">🔒 입력하신 정보는 출시 알림 용도로만 사용하고 안전하게 보관해요 · 개인정보 처리방침</p>
+          <p className="privacy">🔒 입력하신 정보는 출시 알림 용도로만 사용해요 · 사전 체험 신청 시 카카오톡으로 안내드려요</p>
         </div>
       </div>
     </section>

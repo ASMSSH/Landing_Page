@@ -25,7 +25,7 @@ function subscribeApi(env: Record<string, string>): PluginOption {
             const input = raw ? JSON.parse(raw) : {}
             const result = await subscribe(input, {
               token: env.NOTION_TOKEN,
-              dataSourceId: env.NOTION_DATA_SOURCE_ID,
+              dataSourceId: env.NOTION_SUBSCRIBE_DATA_SOURCE_ID,
             })
             send(result.status, result.body)
           } catch {
