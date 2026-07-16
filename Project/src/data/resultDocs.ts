@@ -5,7 +5,23 @@ export interface ResultDoc {
   tagKind: 'hospital' | 'self';
 }
 
-export const HOSPITAL_DOCS: ResultDoc[] = [
+export interface DocumentDownload {
+  name: string;
+  url: string;
+}
+
+export interface ClaimDocumentGuide {
+  claimType: string;
+  title: string;
+  source: 'notion' | 'fallback';
+  hospitalDocs: ResultDoc[];
+  selfDocs: ResultDoc[];
+  downloads?: DocumentDownload[];
+  notes: string[];
+  warning?: string;
+}
+
+export const FALLBACK_HOSPITAL_DOCS: ResultDoc[] = [
   {
     name: '진료 상세 내역서',
     desc: '진료 항목·금액을 확인하는 공통 서류예요. 영수증만으로는 부족할 수 있어요.',
@@ -38,7 +54,7 @@ export const HOSPITAL_DOCS: ResultDoc[] = [
   },
 ];
 
-export const SELF_DOCS: ResultDoc[] = [
+export const FALLBACK_SELF_DOCS: ResultDoc[] = [
   {
     name: '보험금청구서',
     desc: '삼성화재 홈페이지·앱에서 양식을 내려받아 작성해요.',
@@ -58,3 +74,12 @@ export const SELF_DOCS: ResultDoc[] = [
     tagKind: 'self',
   },
 ];
+
+export const FALLBACK_DOCUMENT_GUIDE: ClaimDocumentGuide = {
+  claimType: 'illness',
+  title: '질병 통원/진료비 청구 준비 서류',
+  source: 'fallback',
+  hospitalDocs: FALLBACK_HOSPITAL_DOCS,
+  selfDocs: FALLBACK_SELF_DOCS,
+  notes: ['참고용 안내예요. 최종 서류 요건은 가입 보험사 확인이 필요해요.'],
+};
