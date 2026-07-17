@@ -12,7 +12,7 @@ export default function Step2Insurer({ selected, onSelect }: Props) {
     <div className="modal-step">
       <div className="step-heading">
         <div className="st"><span className="n">2</span><h3>가입한 보험 고르기</h3></div>
-        <span className="sub">인기 상품 8개 · 없으면 '기타'</span>
+        <span className="sub">보험사 7곳 · 없으면 '기타'</span>
       </div>
       <div className="insurer-grid">
         {INSURERS.map((ins, i) => (

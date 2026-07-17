@@ -1,38 +1,46 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import { useMvp } from './MvpContext';
-import { EXAMPLES } from '../data/examples';
-import { DEFAULT_INSURER } from '../data/insurers';
-import { receiptSVG } from '../lib/receiptSVG';
-import { EMPTY_FIELDS, type Fields, type UploadInfo } from './types';
-import Step1Upload from './Step1Upload';
-import Step2Insurer from './Step2Insurer';
-import Step3Result from './Step3Result';
+import { Fragment, useCallback, useEffect, useState } from "react";
+import { useMvp } from "./MvpContext";
+import { EXAMPLES } from "../data/examples";
+import { DEFAULT_INSURER } from "../data/insurers";
+import { receiptSVG } from "../lib/receiptSVG";
+import {
+  EMPTY_FIELDS,
+  type Fields,
+  type UploadInfo,
+} from "./types";
+import Step1Upload from "./Step1Upload";
+import Step2Insurer from "./Step2Insurer";
+import Step3Result from "./Step3Result";
+import Step4Notification, { type SubscribeStatus } from "./Step4Notification";
+import { formatMobileNumber } from "../lib/phone";
 
-const STEP_LABELS = ['올리기', '보험 선택', '필요 서류'];
+const STEP_LABELS = ["영수증", "보험", "서류", "청구대행"];
+
+const SUBSCRIBE_ERROR_MESSAGES: Record<string, string> = {
+  invalid_phone: "휴대전화번호 형식을 확인해 주세요.",
+  server_not_configured: "서버 설정이 아직 완료되지 않았어요.",
+  object_not_found: "연동 대상을 찾지 못했어요. 잠시 후 다시 시도해 주세요.",
+};
 
 export default function MvpModal() {
   const { isOpen, close } = useMvp();
 
   const [step, setStep] = useState(1);
-  const [analyzing, setAnalyzing] = useState(false);
   const [ready, setReady] = useState(false);
-  const [selectedExample, setSelectedExample] = useState<number | null>(null);
+  const [selectedReceipt, setSelectedReceipt] = useState<number | null>(null);
   const [upload, setUpload] = useState<UploadInfo | null>(null);
   const [fields, setFields] = useState<Fields>(EMPTY_FIELDS);
   const [surgery, setSurgery] = useState(false);
   const [insurer, setInsurer] = useState(DEFAULT_INSURER);
-
-  const timer = useRef<number | null>(null);
-  const clearTimer = () => {
-    if (timer.current) window.clearTimeout(timer.current);
-    timer.current = null;
-  };
+  const [phone, setPhone] = useState("");
+  const [agreed, setAgreed] = useState(false);
+  const [claimAgencyOptIn, setClaimAgencyOptIn] = useState(false);
+  const [subscribeStatus, setSubscribeStatus] = useState<SubscribeStatus>("idle");
+  const [subscribeError, setSubscribeError] = useState("");
 
   const resetStep1 = useCallback(() => {
-    clearTimer();
-    setAnalyzing(false);
     setReady(false);
-    setSelectedExample(null);
+    setSelectedReceipt(null);
     setUpload(null);
     setFields(EMPTY_FIELDS);
     setSurgery(false);
@@ -43,83 +51,108 @@ export default function MvpModal() {
     if (!isOpen) return;
     setStep(1);
     setInsurer(DEFAULT_INSURER);
+    setPhone("");
+    setAgreed(false);
+    setClaimAgencyOptIn(false);
+    setSubscribeStatus("idle");
+    setSubscribeError("");
     resetStep1();
-    document.body.style.overflow = 'hidden';
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
-    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    document.addEventListener("keydown", onKey);
     return () => {
-      document.body.style.overflow = '';
-      document.removeEventListener('keydown', onKey);
-      clearTimer();
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", onKey);
     };
   }, [isOpen, close, resetStep1]);
 
-  function startAnalysis(info: Omit<UploadInfo, 'status'>, isExample: boolean, fill: Fields, fillSurgery: boolean) {
-    clearTimer();
-    setUpload({ ...info, status: '영수증을 분석 중이에요…' });
-    setAnalyzing(true);
-    setReady(false);
-    timer.current = window.setTimeout(() => {
-      setFields(fill);
-      setSurgery(fillSurgery);
-      setAnalyzing(false);
-      setReady(true);
-      setUpload((u) => (u ? { ...u, status: isExample ? '예시 이미지 · 분석 완료' : '분석 완료' } : u));
-    }, 1400);
-  }
-
-  function selectExample(i: number) {
+  function selectReceipt(i: number) {
     const ex = EXAMPLES[i];
-    setSelectedExample(i);
+    setSelectedReceipt(i);
     const url = receiptSVG(ex);
-    startAnalysis(
-      { name: ex.file, url, downloadName: ex.file.replace(/\.jpg$/, '.svg') },
-      true,
-      { docType: ex.docType, date: ex.date, diag: ex.diag, cost: ex.cost },
-      ex.surgery,
-    );
+    setUpload({
+      name: ex.file,
+      url,
+      downloadName: ex.file.replace(/\.jpg$/, ".svg"),
+      status: "영수증 선택 완료",
+    });
+    setFields({ docType: ex.docType, date: ex.date, diag: ex.diag, cost: ex.cost });
+    setSurgery(ex.surgery);
+    setReady(true);
   }
 
-  function uploadFile(file: File) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const url = reader.result as string;
-      setSelectedExample(null);
-      startAnalysis(
-        { name: file.name, url, downloadName: file.name },
-        false,
-        { docType: '진료비 영수증', date: '', diag: '', cost: '' },
-        false,
+  async function submitNotification(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubscribeStatus("submitting");
+    setSubscribeError("");
+
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone,
+          insurer: insurer === "공통 기준" ? "기타 / 모름" : insurer,
+          source: "mvp-result",
+          claimAgencyOptIn,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (response.ok && data.ok) {
+        setSubscribeStatus("done");
+        return;
+      }
+
+      setSubscribeStatus("error");
+      setSubscribeError(
+        SUBSCRIBE_ERROR_MESSAGES[data.error] ?? "신청에 실패했어요. 잠시 후 다시 시도해 주세요.",
       );
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      setSubscribeStatus("error");
+      setSubscribeError("네트워크 오류예요. 잠시 후 다시 시도해 주세요.");
+    }
   }
 
   if (!isOpen) return null;
 
-  const canNext = ready && !analyzing;
+  const canNext = ready;
 
   return (
-    <div className="modal-backdrop" onClick={(e) => { if (e.target === e.currentTarget) close(); }}>
-      <div className="modal" role="dialog" aria-modal="true" aria-label="보험찾개냥 체험하기">
+    <div
+      className="modal-backdrop"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) close();
+      }}
+    >
+      <div
+        className="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="보험찾개냥 체험하기"
+      >
         <div className="modal-head">
           <div className="modal-brand">
             <span className="paw">🐾</span>
             <span className="nm">보험찾개냥 체험하기</span>
             <span className="beta-badge">BETA</span>
           </div>
-          <button className="modal-close" onClick={close} aria-label="닫기">✕</button>
+          <button className="modal-close" onClick={close} aria-label="닫기">
+            ✕
+          </button>
         </div>
 
         <div className="stepper">
           {STEP_LABELS.map((label, idx) => {
             const n = idx + 1;
-            const cls = n === step ? 'active' : n < step ? 'done' : '';
+            const cls = n === step ? "active" : n < step ? "done" : "";
             return (
               <Fragment key={n}>
-                {idx > 0 && <div className={`step-line${step >= n ? ' done' : ''}`} />}
+                {idx > 0 && <div className="step-line" />}
                 <div className={`step-node ${cls}`.trim()}>
-                  <span className="step-dot">{n < step ? '✓' : n}</span>
+                  <span className="step-dot">{n < step ? "✓" : n}</span>
                   <span className="step-label">{label}</span>
                 </div>
               </Fragment>
@@ -130,51 +163,87 @@ export default function MvpModal() {
         <div className="modal-body" key={step}>
           {step === 1 && (
             <Step1Upload
-              selectedExample={selectedExample}
-              analyzing={analyzing}
-              ready={ready}
+              selectedReceipt={selectedReceipt}
               upload={upload}
-              fields={fields}
-              surgery={surgery}
-              onSelectExample={selectExample}
-              onUploadFile={uploadFile}
-              onRemove={resetStep1}
-              onFieldChange={(key, value) => setFields((f) => ({ ...f, [key]: value }))}
-              onToggleSurgery={() => setSurgery((s) => !s)}
+              onSelectReceipt={selectReceipt}
+              onChangeReceipt={resetStep1}
             />
           )}
-          {step === 2 && <Step2Insurer selected={insurer} onSelect={setInsurer} />}
-          {step === 3 && <Step3Result insurerLabel={insurer} />}
+          {step === 2 && (
+            <Step2Insurer selected={insurer} onSelect={setInsurer} />
+          )}
+          {step === 3 && (
+            <Step3Result
+              insurerLabel={insurer}
+              fields={fields}
+              surgery={surgery}
+            />
+          )}
+          {step === 4 && (
+            <Step4Notification
+              phone={phone}
+              agreed={agreed}
+              claimAgencyOptIn={claimAgencyOptIn}
+              status={subscribeStatus}
+              errorMessage={subscribeError}
+              onPhoneChange={(value) => setPhone(formatMobileNumber(value))}
+              onAgreementChange={setAgreed}
+              onClaimAgencyOptInChange={setClaimAgencyOptIn}
+              onSubmit={submitNotification}
+            />
+          )}
         </div>
 
         <div className={`modal-foot step-${step}`}>
-          <span className="step-count">{step} / 3 단계</span>
+          <span className="step-count">{step} / 4 단계</span>
           <div className="foot-btns">
             {step > 1 && (
-              <button className="mbtn ghost" onClick={() => setStep((s) => Math.max(1, s - 1))}>← 이전</button>
+              <button
+                className="mbtn ghost"
+                onClick={() => setStep((s) => Math.max(1, s - 1))}
+              >
+                ← 이전
+              </button>
             )}
             {step === 1 && (
               <button
                 className="mbtn primary"
                 disabled={!canNext}
-                title={analyzing ? '분석 중이에요' : !ready ? '먼저 영수증을 올리거나 예시를 선택해 주세요' : undefined}
+                title={!ready ? "먼저 영수증을 선택해 주세요" : undefined}
                 onClick={() => canNext && setStep(2)}
               >
                 다음 →
               </button>
             )}
             {step === 2 && (
-              <button className="mbtn primary" onClick={() => setStep(3)}>필요 서류 확인하기 →</button>
+              <button className="mbtn primary" onClick={() => setStep(3)}>
+                필요 서류 확인하기 →
+              </button>
             )}
             {step === 3 && (
               <button
                 className="mbtn primary"
-                onClick={() => {
-                  close();
-                  document.getElementById('signup')?.scrollIntoView({ behavior: 'smooth' });
-                }}
+                onClick={() => setStep(4)}
               >
-                출시 알림 받고 먼저 써보기 🐾
+                청구대행 서비스 알아보기 →
+              </button>
+            )}
+            {step === 4 && (
+              <button
+                className={`mbtn primary${subscribeStatus === "done" ? " done" : ""}`}
+                type="submit"
+                form="mvp-notification-form"
+                disabled={!agreed || subscribeStatus === "submitting" || subscribeStatus === "done"}
+              >
+                {subscribeStatus === "done"
+                  ? claimAgencyOptIn
+                    ? "사전 체험 신청 완료 ✓"
+                    : "알림 신청 완료 ✓"
+                  : subscribeStatus === "submitting"
+                    ? "신청 중…"
+                    : claimAgencyOptIn
+                      ? "청구대행 사전 체험 신청하기 →"
+                      : "출시 알림 신청하기 →"}
               </button>
             )}
           </div>

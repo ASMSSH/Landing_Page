@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="출시 알림 종 애니메이션">
+  <defs>
+    <linearGradient id="bellGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD46A"/>
+      <stop offset="100%" stop-color="#FF9F2E"/>
+    </linearGradient>
+    <filter id="shadow" x="-35%" y="-35%" width="170%" height="170%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#C97812" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <style>
+    .bell-group {
+      transform-box: fill-box;
+      transform-origin: 50% 15%;
+      animation: ring 1.8s ease-in-out infinite;
+    }
+    .clapper {
+      transform-box: fill-box;
+      transform-origin: 50% 0%;
+      animation: clapper 1.8s ease-in-out infinite;
+    }
+    .badge {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: pop 1.8s ease-in-out infinite;
+    }
+    .confetti {
+      animation: sparkle 1.8s ease-in-out infinite;
+    }
+    .confetti.delay1 { animation-delay: .12s; }
+    .confetti.delay2 { animation-delay: .24s; }
+    .confetti.delay3 { animation-delay: .36s; }
+
+    @keyframes ring {
+      0%, 16%, 100% { transform: rotate(0deg); }
+      24% { transform: rotate(-12deg); }
+      32% { transform: rotate(10deg); }
+      40% { transform: rotate(-7deg); }
+      48% { transform: rotate(5deg); }
+      58% { transform: rotate(0deg); }
+    }
+    @keyframes clapper {
+      0%, 16%, 100% { transform: rotate(0deg); }
+      24% { transform: rotate(18deg); }
+      32% { transform: rotate(-16deg); }
+      40% { transform: rotate(12deg); }
+      48% { transform: rotate(-8deg); }
+      58% { transform: rotate(0deg); }
+    }
+    @keyframes pop {
+      0%, 12%, 100% { transform: scale(1); }
+      24% { transform: scale(1.12); }
+      38% { transform: scale(.98); }
+      52% { transform: scale(1.05); }
+      68% { transform: scale(1); }
+    }
+    @keyframes sparkle {
+      0%, 18%, 100% { opacity: .35; transform: scale(.85); }
+      32% { opacity: 1; transform: scale(1.2); }
+      55% { opacity: .7; transform: scale(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bell-group, .clapper, .badge, .confetti { animation: none; }
+    }
+  </style>
+
+  <!-- 장식 -->
+  <g>
+    <circle class="confetti" cx="44" cy="82" r="5" fill="#FF7A59"/>
+    <circle class="confetti delay1" cx="210" cy="64" r="5" fill="#43B581"/>
+    <circle class="confetti delay2" cx="222" cy="122" r="4" fill="#FFD25A"/>
+    <path class="confetti delay3" d="M54 135 l10 5 -7 9 -9 -5z" fill="#6FA8FF"/>
+    <path class="confetti delay1" d="M191 144 l11 -4 4 10 -11 4z" fill="#FF7A59"/>
+    <path class="confetti delay2" d="M74 58 l4 12" stroke="#FFD25A" stroke-width="6" stroke-linecap="round"/>
+    <path class="confetti delay3" d="M187 82 l10 -8" stroke="#6FA8FF" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <!-- 흔들리는 종 -->
+  <g class="bell-group" filter="url(#shadow)">
+    <path d="M128 48
+             C92 48 72 73 72 109
+             V133
+             C72 147 66 159 55 169
+             C50 174 53 183 61 183
+             H195
+             C203 183 206 174 201 169
+             C190 159 184 147 184 133
+             V109
+             C184 73 164 48 128 48Z"
+          fill="url(#bellGrad)"/>
+    <rect x="112" y="33" width="32" height="24" rx="12" fill="#FFB43C"/>
+    <ellipse cx="128" cy="181" rx="70" ry="14" fill="#FFB23A" opacity="0.3"/>
+    <path d="M96 73 C82 87 80 111 82 130"
+          fill="none" stroke="#FFF2C6" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
+
+    <g class="clapper">
+      <path d="M108 188
+               C111 205 118 214 128 214
+               C138 214 145 205 148 188Z"
+            fill="#E88816"/>
+    </g>
+  </g>
+
+  <!-- NEW 배지 -->
+  <g class="badge" transform="translate(163 34)">
+    <circle cx="28" cy="28" r="28" fill="#FF5A36"/>
+    <text x="28" y="34" text-anchor="middle"
+          font-family="Arial, Helvetica, sans-serif"
+          font-size="17" font-weight="700" fill="#FFFFFF">NEW</text>
+  </g>
+</svg>

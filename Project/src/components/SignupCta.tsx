@@ -1,11 +1,22 @@
 import { useState } from 'react';
 import { useMvp } from '../mvp/MvpContext';
-import { INSURERS, insurerLabel } from '../data/insurers';
+import { formatMobileNumber } from '../lib/phone';
+
+const INSURER_OPTIONS = [
+  '메리츠화재 펫퍼민트',
+  'DB손해보험 펫블리',
+  'KB손해보험 금쪽같은 펫보험',
+  '삼성화재 위풍당당',
+  '현대해상 굿앤굿우리펫',
+  '카카오페이손해보험 펫보험',
+  '마이브라운 펫보험',
+  '기타 / 모름',
+];
 
 type Status = 'idle' | 'submitting' | 'done' | 'error';
 
 const ERROR_MESSAGES: Record<string, string> = {
-  invalid_phone: '전화번호 형식을 확인해 주세요. (예: 01012345678)',
+  invalid_phone: '휴대전화번호 형식을 확인해 주세요.',
   server_not_configured: '서버 설정이 아직 완료되지 않았어요.',
   object_not_found: '연동 대상을 찾지 못했어요. 잠시 후 다시 시도해 주세요.',
 };
@@ -14,7 +25,8 @@ export default function SignupCta() {
   const { open } = useMvp();
   const [phone, setPhone] = useState('');
   const [insurer, setInsurer] = useState('');
-  const [betaOptIn, setBetaOptIn] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const [claimAgencyOptIn, setClaimAgencyOptIn] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
   const [errMsg, setErrMsg] = useState('');
 
@@ -26,7 +38,7 @@ export default function SignupCta() {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, insurer, betaOptIn, source: 'landing-signup' }),
+        body: JSON.stringify({ phone, insurer, claimAgencyOptIn, source: 'landing-signup' }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
@@ -43,75 +55,93 @@ export default function SignupCta() {
 
   const done = status === 'done';
   const submitting = status === 'submitting';
-  const disabled = done || submitting;
 
   return (
     <section id="signup" style={{ paddingBottom: 90 }}>
       <div className="wrap">
         <div className="mvp-strip">
-          <span className="line">청구가 얼마나 간단한지, 먼저 체험해볼까요?</span>
+          <span className="line">결과가 어떻게 나오는지, 먼저 체험해볼까요?</span>
           <button className="btn btn-sage" onClick={open}>체험해보기 🐾</button>
         </div>
         <div className="signup-box">
-          <h2>출시되면 가장 먼저 알려드릴게요</h2>
-          <p className="sub">출시 소식을 놓치지 않게, 연락처와 가입 보험사만 남겨주세요. 준비되는 대로 가장 먼저 연락드릴게요.</p>
+          <h2>가장 먼저 써보실래요?</h2>
+          <p className="sub">청구대행 서비스가 준비되면 가장 먼저 연락드릴게요. 휴대전화번호만 남겨주세요.</p>
           <form className="signup-form" onSubmit={handleSubmit}>
             <div className="field-row">
               <input
                 className="field"
                 type="tel"
-                inputMode="tel"
-                placeholder="전화번호 (예: 01012345678)"
+                inputMode="numeric"
+                autoComplete="tel"
+                maxLength={13}
+                placeholder="010-1234-5678"
                 required
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                disabled={disabled}
+                onChange={(e) => setPhone(formatMobileNumber(e.target.value))}
+                disabled={done || submitting}
               />
               <select
                 className="field"
                 value={insurer}
                 onChange={(e) => setInsurer(e.target.value)}
                 style={{ color: insurer ? 'var(--text-primary)' : 'var(--text-tertiary)' }}
-                disabled={disabled}
+                disabled={done || submitting}
               >
                 <option value="">가입 보험사 (선택)</option>
-                {INSURERS.map((ins) => (
-                  <option key={ins.company} value={ins.company}>{insurerLabel(ins)}</option>
+                {INSURER_OPTIONS.map((o) => (
+                  <option key={o}>{o}</option>
                 ))}
               </select>
             </div>
-
-            <label className={`trial-optin${betaOptIn ? ' on' : ''}`}>
-              <input
-                type="checkbox"
-                checked={betaOptIn}
-                onChange={(e) => setBetaOptIn(e.target.checked)}
-                disabled={disabled}
-              />
-              <span className="trial-box">✓</span>
-              <span className="trial-text">
-                <span className="trial-title">🐾 사전 체험(무료 청구 대행)에도 참여할래요 (선택)</span>
-                <span className="trial-desc">영수증을 보내주시면 출시 전에 실제 청구를 무료로 대신 해드려요.</span>
-              </span>
-            </label>
-
+            <div className="signup-consents">
+              <label>
+                <input
+                  type="checkbox"
+                  required
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  disabled={done || submitting}
+                />
+                개인정보 수집 및 이용 동의 <b>(필수)</b>
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={claimAgencyOptIn}
+                  onChange={(e) => setClaimAgencyOptIn(e.target.checked)}
+                  disabled={done || submitting}
+                />
+                청구대행 서비스 사전 체험 신청 <b>(선택)</b>
+              </label>
+            </div>
             <button
               className="signup-submit"
               type="submit"
-              disabled={disabled}
+              disabled={done || submitting || !agreed}
               style={done ? { background: 'var(--success-500)' } : undefined}
             >
               {done
                 ? '신청 완료! 가장 먼저 알려드릴게요 🐾'
                 : submitting
                   ? '신청 중…'
-                  : '출시 알림 신청하기 🐾'}
+                  : claimAgencyOptIn
+                    ? '청구대행 사전 체험 신청하기 🐾'
+                    : '출시 알림 신청하기 🐾'}
             </button>
           </form>
           {status === 'error' && (
             <p className="privacy" style={{ color: 'var(--error-500)' }}>⚠️ {errMsg}</p>
           )}
-          <p className="privacy">🔒 입력하신 정보는 출시 알림 용도로만 사용해요 · 사전 체험 신청 시 카카오톡으로 안내드려요</p>
+          <p className="privacy">
+            🔒 입력하신 정보는 청구대행 안내 용도로만 사용하고 안전하게 보관해요 ·{' '}
+            <a
+              href="https://app.notion.com/p/39bdbdcebb5e80e6a2ffc34ff1c11a8f?source=copy_link"
+              target="_blank"
+              rel="noreferrer"
+            >
+              개인정보 처리방침
+            </a>
+          </p>
         </div>
       </div>
     </section>

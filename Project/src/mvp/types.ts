@@ -12,4 +12,11 @@ export interface Fields {
   cost: string;
 }
 
+export interface AiAnalysis {
+  summary: string;
+  evidence: string[];
+  warnings: string[];
+  source: 'gemini' | 'tesseract' | 'example';
+}
+
 export const EMPTY_FIELDS: Fields = { docType: '', date: '', diag: '', cost: '' };

@@ -1,6 +1,6 @@
 import type { Example } from '../data/examples';
 
-/** Builds a self-contained SVG receipt for an example and returns it as a data URL. */
+/** Builds a self-contained SVG receipt and returns it as a data URL. */
 export function receiptSVG(ex: Example): string {
   const r = ex.receipt;
   const W = 360;
@@ -40,7 +40,7 @@ export function receiptSVG(ex: Example): string {
   s += `<text x="${PAD}" y="${y}" font-size="10" fill="#A38F7D">결제 · 신용카드</text>`;
   s += `<text x="${W - PAD}" y="${y}" font-size="10" fill="#A38F7D" text-anchor="end">사업자 123-45-67890</text>`;
   y += 20;
-  s += `<text x="180" y="${y}" font-size="10" fill="#C9B49E" text-anchor="middle">※ 보험찾개냥 체험용 예시 영수증입니다</text>`;
+  s += `<text x="180" y="${y}" font-size="10" fill="#C9B49E" text-anchor="middle">※ 보험찾개냥 체험용 영수증입니다</text>`;
   const H = y + 18;
 
   const svg =
