@@ -24,7 +24,14 @@ function FaqRow({ q, a, open, onToggle }: { q: string; a: string; open: boolean;
 }
 
 export default function Faq() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openSet, setOpenSet] = useState<Set<number>>(() => new Set([0]));
+  const toggle = (i: number) =>
+    setOpenSet((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
   return (
     <section id="faq" className="faq">
       <div className="wrap">
@@ -38,8 +45,8 @@ export default function Faq() {
               key={i}
               q={item.q}
               a={item.a}
-              open={openIndex === i}
-              onToggle={() => setOpenIndex(openIndex === i ? null : i)}
+              open={openSet.has(i)}
+              onToggle={() => toggle(i)}
             />
           ))}
         </div>

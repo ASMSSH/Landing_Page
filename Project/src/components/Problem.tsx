@@ -13,6 +13,7 @@ export default function Problem() {
           {VOICES.map((v, i) => (
             <div className="voice-card" key={i}>
               <Icon name="quote" size={26} className="quote-mark" />
+              <h3 className="voice-title">{v.title}</h3>
               <p className="quote">“{v.quote}”</p>
               <div className="profile">
                 <span className="avatar">{v.emoji}</span>

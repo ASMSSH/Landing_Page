@@ -10,8 +10,7 @@ export default function Footer() {
           <nav className="foot-links">
             <a href="#problem">문제</a>
             <a href="#features">기능</a>
-            <a href="#problem">후기</a>
-            <a href="#faq">FAQ</a>
+            <a href="#faq">자주 묻는 질문</a>
             <a href="#signup">문의하기</a>
           </nav>
         </div>
