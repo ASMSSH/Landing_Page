@@ -14,16 +14,52 @@ interface Props {
   analysisClaimType?: ClaimType | null;
 }
 
-function ResultItem({ doc, icon }: { doc: ResultDoc; icon: string }) {
+function getDocumentVisual(doc: ResultDoc): { icon: string; tone: string } {
+  const name = doc.name.toLowerCase();
+
+  if (/영수증|진료비|상세|세부/.test(name)) return { icon: "🧾", tone: "coral" };
+  if (/진단|소견/.test(name)) return { icon: "🩺", tone: "mint" };
+  if (/x-ray|엑스레이|영상|mri|ct/.test(name)) return { icon: "🩻", tone: "blue" };
+  if (/수술|마취/.test(name)) return { icon: "🩹", tone: "orange" };
+  if (/입원|퇴원/.test(name)) return { icon: "🛏️", tone: "yellow" };
+  if (/청구서/.test(name)) return { icon: "✍️", tone: "blue" };
+  if (/개인정보|동의/.test(name)) return { icon: "🔐", tone: "mint" };
+  if (/통장|계좌/.test(name)) return { icon: "🏦", tone: "yellow" };
+  if (/신분|주민/.test(name)) return { icon: "🪪", tone: "coral" };
+
+  return doc.tagKind === "hospital"
+    ? { icon: "🏥", tone: "orange" }
+    : { icon: "📋", tone: "blue" };
+}
+
+function ResultItem({ doc }: { doc: ResultDoc }) {
+  const visual = getDocumentVisual(doc);
   return (
     <div className="res-item">
-      <span className="ic">{icon}</span>
+      <span className={`ic ${visual.tone}`} aria-hidden="true">{visual.icon}</span>
       <div className="txt">
         <span className="rn">{doc.name}</span>
         <span className="rw">{doc.desc}</span>
       </div>
       <span className={`tag ${doc.tagKind}`}>{doc.tag}</span>
     </div>
+  );
+}
+
+function ResultNote({ note }: { note: string }) {
+  const parts = note.split(/(https?:\/\/[^\s]+)/g);
+  return (
+    <p className="result-note">
+      {parts.map((part, index) =>
+        /^https?:\/\//.test(part) ? (
+          <a href={part} target="_blank" rel="noreferrer" key={`${part}-${index}`}>
+            출처 보기
+          </a>
+        ) : (
+          part
+        ),
+      )}
+    </p>
   );
 }
 
@@ -95,11 +131,7 @@ export default function Step3Result({
 
       <div className="res-group-label">🏥 병원에서 받아야 할 서류</div>
       {guide.hospitalDocs.map((doc, i) => (
-        <ResultItem
-          doc={doc}
-          icon={i === 0 ? "✓" : "📄"}
-          key={`${doc.name}-${i}`}
-        />
+        <ResultItem doc={doc} key={`${doc.name}-${i}`} />
       ))}
 
       <div className="res-group-head">
@@ -117,13 +149,11 @@ export default function Step3Result({
         ))}
       </div>
       {guide.selfDocs.map((doc, i) => (
-        <ResultItem doc={doc} icon="📝" key={`${doc.name}-${i}`} />
+        <ResultItem doc={doc} key={`${doc.name}-${i}`} />
       ))}
 
       {guide.notes.map((note, i) => (
-        <p className="result-note" key={i}>
-          {note}
-        </p>
+        <ResultNote note={note} key={i} />
       ))}
     </div>
   );

@@ -1,13 +1,14 @@
 // Notion 사전알람 연동 핸들러 (서버 전용 — 브라우저에서 import 금지).
 // Vite dev 미들웨어에서 쓰이고, 추후 서버리스/Node 래퍼에서도 그대로 재사용 가능.
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MOBILE_RE = /^01[016789]\d{7,8}$/;
 const NOTION_VERSION = '2025-09-03';
 
 export interface SubscribeInput {
-  email?: string;
+  phone?: string;
   insurer?: string;
   source?: string;
+  claimAgencyOptIn?: boolean;
 }
 
 export interface NotionEnv {
@@ -29,17 +30,19 @@ export function normalizeInsurer(value: string): string {
 }
 
 export async function subscribe(input: SubscribeInput, env: NotionEnv): Promise<SubscribeResult> {
-  const email = (input.email ?? '').trim();
-  if (!EMAIL_RE.test(email)) {
-    return { status: 400, body: { ok: false, error: 'invalid_email', message: '이메일 형식이 올바르지 않아요.' } };
+  const phone = (input.phone ?? '').replace(/\D/g, '');
+  if (!MOBILE_RE.test(phone)) {
+    return { status: 400, body: { ok: false, error: 'invalid_phone', message: '휴대전화번호 형식이 올바르지 않아요.' } };
   }
   if (!env.token || !env.dataSourceId) {
     return { status: 500, body: { ok: false, error: 'server_not_configured', message: 'NOTION_TOKEN / NOTION_SUBSCRIBE_DATA_SOURCE_ID 미설정' } };
   }
 
   const properties: Record<string, unknown> = {
-    이메일: { title: [{ text: { content: email } }] },
+    전화번호: { title: [{ text: { content: phone } }] },
     상태: { select: { name: '신규' } },
+    '사전 체험 동의 여부': { checkbox: Boolean(input.claimAgencyOptIn) },
+    '베타 참여': { checkbox: Boolean(input.claimAgencyOptIn) },
     // 유입경로 속성을 DB에 rich_text로 추가하면 아래 주석을 해제
     // 유입경로: { rich_text: [{ text: { content: input.source || 'landing-signup' } }] },
   };

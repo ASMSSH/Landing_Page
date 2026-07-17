@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMvp } from '../mvp/MvpContext';
+import { formatMobileNumber } from '../lib/phone';
 
 const INSURER_OPTIONS = [
   '메리츠화재 펫퍼민트',
@@ -7,24 +8,25 @@ const INSURER_OPTIONS = [
   'KB손해보험 금쪽같은 펫보험',
   '삼성화재 위풍당당',
   '현대해상 굿앤굿우리펫',
-  '한화손해보험 펫투게더',
-  '롯데손해보험 마이펫보험',
-  'NH농협손해보험 펫앤미든든',
+  '카카오페이손해보험 펫보험',
+  '마이브라운 펫보험',
   '기타 / 모름',
 ];
 
 type Status = 'idle' | 'submitting' | 'done' | 'error';
 
 const ERROR_MESSAGES: Record<string, string> = {
-  invalid_email: '이메일 형식을 확인해 주세요.',
+  invalid_phone: '휴대전화번호 형식을 확인해 주세요.',
   server_not_configured: '서버 설정이 아직 완료되지 않았어요.',
   object_not_found: '연동 대상을 찾지 못했어요. 잠시 후 다시 시도해 주세요.',
 };
 
 export default function SignupCta() {
   const { open } = useMvp();
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [insurer, setInsurer] = useState('');
+  const [agreed, setAgreed] = useState(false);
+  const [claimAgencyOptIn, setClaimAgencyOptIn] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
   const [errMsg, setErrMsg] = useState('');
 
@@ -36,7 +38,7 @@ export default function SignupCta() {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, insurer, source: 'landing-signup' }),
+        body: JSON.stringify({ phone, insurer, claimAgencyOptIn, source: 'landing-signup' }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
@@ -63,16 +65,19 @@ export default function SignupCta() {
         </div>
         <div className="signup-box">
           <h2>가장 먼저 써보실래요?</h2>
-          <p className="sub">출시되면 제일 먼저 알려드릴게요. 이메일과 가입 보험사만 남겨주시면 준비 끝!</p>
+          <p className="sub">청구대행 서비스가 준비되면 가장 먼저 연락드릴게요. 휴대전화번호만 남겨주세요.</p>
           <form className="signup-form" onSubmit={handleSubmit}>
             <div className="field-row">
               <input
                 className="field"
-                type="email"
-                placeholder="이메일 주소"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel"
+                maxLength={13}
+                placeholder="010-1234-5678"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={phone}
+                onChange={(e) => setPhone(formatMobileNumber(e.target.value))}
                 disabled={done || submitting}
               />
               <select
@@ -88,24 +93,47 @@ export default function SignupCta() {
                 ))}
               </select>
             </div>
+            <div className="signup-consents">
+              <label>
+                <input
+                  type="checkbox"
+                  required
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  disabled={done || submitting}
+                />
+                개인정보 수집 및 이용 동의 <b>(필수)</b>
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={claimAgencyOptIn}
+                  onChange={(e) => setClaimAgencyOptIn(e.target.checked)}
+                  disabled={done || submitting}
+                />
+                청구대행 서비스 사전 체험 신청 <b>(선택)</b>
+              </label>
+            </div>
             <button
               className="signup-submit"
               type="submit"
-              disabled={done || submitting}
+              disabled={done || submitting || !agreed}
               style={done ? { background: 'var(--success-500)' } : undefined}
             >
               {done
                 ? '신청 완료! 가장 먼저 알려드릴게요 🐾'
                 : submitting
                   ? '신청 중…'
-                  : '출시 알림 신청하기 🐾'}
+                  : claimAgencyOptIn
+                    ? '청구대행 사전 체험 신청하기 🐾'
+                    : '출시 알림 신청하기 🐾'}
             </button>
           </form>
           {status === 'error' && (
             <p className="privacy" style={{ color: 'var(--error-500)' }}>⚠️ {errMsg}</p>
           )}
           <p className="privacy">
-            🔒 입력하신 정보는 출시 알림 용도로만 사용하고 안전하게 보관해요 ·{' '}
+            🔒 입력하신 정보는 청구대행 안내 용도로만 사용하고 안전하게 보관해요 ·{' '}
             <a
               href="https://app.notion.com/p/39bdbdcebb5e80e6a2ffc34ff1c11a8f?source=copy_link"
               target="_blank"
