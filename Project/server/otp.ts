@@ -2,8 +2,8 @@
 // 발송(sendOtp)은 Solapi를 통해 실제 문자를 보내고, 검증(verifyOtp)은 토큰에 담긴 코드 해시와 비교한다.
 
 import { createHmac, randomBytes, randomInt } from 'node:crypto';
-import { normalizePhone } from './phone.ts';
-import { sign, timingSafeEqualStrings, verify } from './otpToken.ts';
+import { normalizePhone } from './phone.js';
+import { sign, timingSafeEqualStrings, verify } from './otpToken.js';
 
 const SOLAPI_BASE = 'https://api.solapi.com';
 const CODE_TTL_MS = 5 * 60 * 1000;

@@ -1,8 +1,8 @@
 // Notion 사전알람 연동 핸들러 (서버 전용 — 브라우저에서 import 금지).
 // Vite dev 미들웨어에서 쓰이고, 추후 서버리스/Node 래퍼에서도 그대로 재사용 가능.
 
-import { normalizePhone } from './phone.ts';
-import { isPhoneVerified } from './otp.ts';
+import { normalizePhone } from './phone.js';
+import { isPhoneVerified } from './otp.js';
 
 const NOTION_VERSION = '2025-09-03';
 
