@@ -13,14 +13,10 @@ import Step2Insurer from "./Step2Insurer";
 import Step3Result from "./Step3Result";
 import Step4Notification, { type SubscribeStatus } from "./Step4Notification";
 import { formatMobileNumber } from "../lib/phone";
+import { usePhoneVerification } from "../hooks/usePhoneVerification";
+import { SUBSCRIBE_ERROR_MESSAGES } from "../lib/errorMessages";
 
 const STEP_LABELS = ["영수증", "보험", "서류", "청구대행"];
-
-const SUBSCRIBE_ERROR_MESSAGES: Record<string, string> = {
-  invalid_phone: "휴대전화번호 형식을 확인해 주세요.",
-  server_not_configured: "서버 설정이 아직 완료되지 않았어요.",
-  object_not_found: "연동 대상을 찾지 못했어요. 잠시 후 다시 시도해 주세요.",
-};
 
 export default function MvpModal() {
   const { isOpen, close } = useMvp();
@@ -34,9 +30,11 @@ export default function MvpModal() {
   const [insurer, setInsurer] = useState(DEFAULT_INSURER);
   const [phone, setPhone] = useState("");
   const [agreed, setAgreed] = useState(false);
-  const [claimAgencyOptIn, setClaimAgencyOptIn] = useState(false);
+  const [code, setCode] = useState("");
   const [subscribeStatus, setSubscribeStatus] = useState<SubscribeStatus>("idle");
   const [subscribeError, setSubscribeError] = useState("");
+  const { otpStatus, otpError, cooldownRemaining, verifiedToken, sendCode, verifyCode } =
+    usePhoneVerification(phone);
 
   const resetStep1 = useCallback(() => {
     setReady(false);
@@ -53,7 +51,7 @@ export default function MvpModal() {
     setInsurer(DEFAULT_INSURER);
     setPhone("");
     setAgreed(false);
-    setClaimAgencyOptIn(false);
+    setCode("");
     setSubscribeStatus("idle");
     setSubscribeError("");
     resetStep1();
@@ -96,7 +94,7 @@ export default function MvpModal() {
           phone,
           insurer: insurer === "공통 기준" ? "기타 / 모름" : insurer,
           source: "mvp-result",
-          claimAgencyOptIn,
+          verifiedToken,
         }),
       });
       const data = await response.json().catch(() => ({}));
@@ -183,13 +181,18 @@ export default function MvpModal() {
             <Step4Notification
               phone={phone}
               agreed={agreed}
-              claimAgencyOptIn={claimAgencyOptIn}
               status={subscribeStatus}
               errorMessage={subscribeError}
               onPhoneChange={(value) => setPhone(formatMobileNumber(value))}
               onAgreementChange={setAgreed}
-              onClaimAgencyOptInChange={setClaimAgencyOptIn}
               onSubmit={submitNotification}
+              otpStatus={otpStatus}
+              otpError={otpError}
+              cooldownRemaining={cooldownRemaining}
+              code={code}
+              onCodeChange={setCode}
+              onSendCode={sendCode}
+              onVerifyCode={() => verifyCode(code)}
             />
           )}
         </div>
@@ -233,17 +236,13 @@ export default function MvpModal() {
                 className={`mbtn primary${subscribeStatus === "done" ? " done" : ""}`}
                 type="submit"
                 form="mvp-notification-form"
-                disabled={!agreed || subscribeStatus === "submitting" || subscribeStatus === "done"}
+                disabled={!agreed || !verifiedToken || subscribeStatus === "submitting" || subscribeStatus === "done"}
               >
                 {subscribeStatus === "done"
-                  ? claimAgencyOptIn
-                    ? "사전 체험 신청 완료 ✓"
-                    : "알림 신청 완료 ✓"
+                  ? "사전 체험 신청 완료 ✓"
                   : subscribeStatus === "submitting"
                     ? "신청 중…"
-                    : claimAgencyOptIn
-                      ? "청구대행 사전 체험 신청하기 →"
-                      : "출시 알림 신청하기 →"}
+                    : "청구대행 사전 체험 신청하기 →"}
               </button>
             )}
           </div>

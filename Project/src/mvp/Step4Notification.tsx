@@ -1,17 +1,24 @@
 import notificationBell from "../assets/launch_notification_bell_animated.svg";
+import type { OtpStatus } from "../hooks/usePhoneVerification";
+import { OTP_ERROR_MESSAGES } from "../lib/errorMessages";
 
 export type SubscribeStatus = "idle" | "submitting" | "done" | "error";
 
 interface Props {
   phone: string;
   agreed: boolean;
-  claimAgencyOptIn: boolean;
   status: SubscribeStatus;
   errorMessage: string;
   onPhoneChange: (phone: string) => void;
   onAgreementChange: (agreed: boolean) => void;
-  onClaimAgencyOptInChange: (agreed: boolean) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  otpStatus: OtpStatus;
+  otpError: string;
+  cooldownRemaining: number;
+  code: string;
+  onCodeChange: (code: string) => void;
+  onSendCode: () => void;
+  onVerifyCode: () => void;
 }
 
 const BENEFITS = [
@@ -23,13 +30,18 @@ const BENEFITS = [
 export default function Step4Notification({
   phone,
   agreed,
-  claimAgencyOptIn,
   status,
   errorMessage,
   onPhoneChange,
   onAgreementChange,
-  onClaimAgencyOptInChange,
   onSubmit,
+  otpStatus,
+  otpError,
+  cooldownRemaining,
+  code,
+  onCodeChange,
+  onSendCode,
+  onVerifyCode,
 }: Props) {
   const done = status === "done";
   const submitting = status === "submitting";
@@ -64,19 +76,61 @@ export default function Step4Notification({
 
       <form id="mvp-notification-form" className="notification-form" onSubmit={onSubmit}>
         <label htmlFor="mvp-notification-phone">연락받을 휴대전화번호</label>
-        <input
-          id="mvp-notification-phone"
-          className="field"
-          type="tel"
-          inputMode="numeric"
-          autoComplete="tel"
-          placeholder="010-1234-5678"
-          maxLength={13}
-          required
-          value={phone}
-          onChange={(event) => onPhoneChange(event.target.value)}
-          disabled={done || submitting}
-        />
+        <div className="otp-row">
+          <input
+            id="mvp-notification-phone"
+            className="field"
+            type="tel"
+            inputMode="numeric"
+            autoComplete="tel"
+            placeholder="010-1234-5678"
+            maxLength={13}
+            required
+            value={phone}
+            onChange={(event) => onPhoneChange(event.target.value)}
+            disabled={otpStatus === "verified" || done || submitting}
+          />
+          {otpStatus === "verified" ? (
+            <span className="otp-verified-badge">인증 완료 ✓</span>
+          ) : (
+            <button
+              type="button"
+              className="otp-btn"
+              onClick={onSendCode}
+              disabled={cooldownRemaining > 0 || otpStatus === "sending" || done || submitting}
+            >
+              {cooldownRemaining > 0
+                ? `재전송 ${cooldownRemaining}초`
+                : otpStatus === "sending"
+                  ? "전송 중…"
+                  : otpStatus === "sent" || otpStatus === "error"
+                    ? "인증번호 재전송 ›"
+                    : "인증번호 받기 ›"}
+            </button>
+          )}
+        </div>
+        <div className="otp-row">
+          <input
+            className="field otp-code-input"
+            inputMode="numeric"
+            maxLength={6}
+            placeholder="123456"
+            value={code}
+            onChange={(event) => onCodeChange(event.target.value.replace(/\D/g, "").slice(0, 6))}
+            disabled={otpStatus !== "sent"}
+          />
+          <button
+            type="button"
+            className="otp-btn"
+            onClick={onVerifyCode}
+            disabled={code.length !== 6 || otpStatus !== "sent"}
+          >
+            {otpStatus === "verifying" ? "확인 중…" : "인증 확인 ›"}
+          </button>
+        </div>
+        {otpError && (
+          <p className="notification-message error">{OTP_ERROR_MESSAGES[otpError] ?? "오류가 발생했어요."}</p>
+        )}
 
         <label className="notification-consent">
           <input
@@ -97,25 +151,10 @@ export default function Step4Notification({
           </a>
         </label>
 
-        <label className="notification-consent optional">
-          <input
-            type="checkbox"
-            checked={claimAgencyOptIn}
-            onChange={(event) => onClaimAgencyOptInChange(event.target.checked)}
-            disabled={done || submitting}
-          />
-          <span>
-            청구대행 서비스 사전 체험 신청 <b>(선택)</b>
-            <small>선택하면 체험 대상자로 먼저 연락드려요.</small>
-          </span>
-        </label>
-
         {status === "error" && <p className="notification-message error">{errorMessage}</p>}
         {done && (
           <p className="notification-message success">
-            {claimAgencyOptIn
-              ? "사전 체험 신청 완료! 체험 대상자로 먼저 연락드릴게요."
-              : "알림 신청 완료! 청구대행 소식을 가장 먼저 알려드릴게요."}
+            사전 체험 신청 완료! 체험 대상자로 먼저 연락드릴게요.
           </p>
         )}
       </form>

@@ -176,11 +176,13 @@ header.nav {
 .signup-box { max-width:840px; margin:0 auto; background:var(--primary-50); border:1px solid var(--border); border-radius:var(--radius-lg); padding:48px 56px; display:flex; flex-direction:column; align-items:center; gap:18px; text-align:center; }
 .signup-box h2 { font-family:var(--font-display); font-size:30px; }
 .signup-box .sub { font-size:16px; line-height:1.5; color:var(--text-secondary); }
-.signup-form { width:100%; display:flex; flex-direction:column; gap:12px; }
+.signup-form { width:100%; max-width:372px; margin:0 auto; display:flex; flex-direction:column; gap:12px; }
 .signup-consents { display:flex; flex-wrap:wrap; gap:8px 18px; text-align:left; }
 .signup-consents label { min-height:36px; display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-secondary); cursor:pointer; }
 .signup-consents input { width:18px; height:18px; accent-color:var(--primary-500); }
 .signup-consents b { color:var(--primary-600); }
+.field-labeled { display:flex; flex-direction:column; gap:6px; }
+.field-label { font-size:12px; font-weight:700; color:var(--text-tertiary); text-align:left; margin-left:10px; }
 .field-row { display:flex; gap:12px; }
 .field { flex:1 1 0; background:var(--surface); border:2px solid var(--border); border-radius:var(--radius-sm); padding:15px 18px; font-size:15px; font-family:var(--font-body); color:var(--text-primary); transition:border-color .15s; }
 .field::placeholder { color:var(--text-tertiary); }
@@ -190,6 +192,16 @@ select.field { appearance:none; background-image:url("data:image/svg+xml,%3Csvg 
 .signup-submit:hover { background:var(--primary-600); }
 .signup-submit:disabled { cursor:default; }
 .privacy { font-size:13px; color:var(--text-tertiary); }
+
+.otp-row { display:flex; justify-content:center; gap:12px; }
+.otp-row .field { flex:0 0 auto; width:220px; text-align:center; }
+.otp-btn { flex:0 0 auto; width:140px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; background:var(--surface); border:2px solid var(--primary-300); color:var(--primary-600); border-radius:var(--radius-sm); padding:0 18px; font-size:14px; font-weight:700; }
+.otp-btn:disabled { opacity:.5; cursor:default; }
+.otp-font { font-family:var(--font-display); }
+.otp-code-input { letter-spacing:6px; }
+.otp-verified-badge { flex:0 0 auto; width:140px; display:flex; align-items:center; justify-content:center; gap:6px; padding:0 18px; border-radius:var(--radius-sm); border:2px solid var(--success-300); background:var(--success-50); color:var(--success-700); font-size:14px; font-weight:700; white-space:nowrap; }
+.otp-error { font-size:13px; color:var(--error-500); margin:0; text-align:right; }
+.otp-info { font-size:13px; color:var(--text-tertiary); margin:0; text-align:right; }
 
 /* ---------- Footer ---------- */
 footer { background:var(--neutral-900); padding:40px 0 36px; }
@@ -412,6 +424,10 @@ footer .wm { font-family:var(--font-display); font-size:20px; color:var(--bg-app
   .signup-box { padding:34px 22px; }
   .signup-box h2 { font-size:24px; }
   .field-row { flex-direction:column; }
+  .otp-row { gap:8px; }
+  .otp-row .field { flex:1 1 auto; width:auto; min-width:0; }
+  .otp-btn { width:112px; padding:0 8px; font-size:12px; overflow:hidden; text-overflow:ellipsis; }
+  .otp-verified-badge { width:112px; padding:0 8px; font-size:12px; }
   .field-2 { grid-template-columns:1fr; }
   .insurer-grid { grid-template-columns:1fr 1fr; }
   .foot-row { flex-direction:column; align-items:center; gap:16px; text-align:center; }

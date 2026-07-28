@@ -1,19 +1,22 @@
 // Notion 사전알람 연동 핸들러 (서버 전용 — 브라우저에서 import 금지).
 // Vite dev 미들웨어에서 쓰이고, 추후 서버리스/Node 래퍼에서도 그대로 재사용 가능.
 
-const MOBILE_RE = /^01[016789]\d{7,8}$/;
+import { normalizePhone } from './phone.ts';
+import { isPhoneVerified } from './otp.ts';
+
 const NOTION_VERSION = '2025-09-03';
 
 export interface SubscribeInput {
   phone?: string;
   insurer?: string;
   source?: string;
-  claimAgencyOptIn?: boolean;
+  verifiedToken?: string;
 }
 
 export interface NotionEnv {
   token?: string;
   dataSourceId?: string;
+  otpSecret?: string;
 }
 
 export interface SubscribeResult {
@@ -30,9 +33,16 @@ export function normalizeInsurer(value: string): string {
 }
 
 export async function subscribe(input: SubscribeInput, env: NotionEnv): Promise<SubscribeResult> {
-  const phone = (input.phone ?? '').replace(/\D/g, '');
-  if (!MOBILE_RE.test(phone)) {
+  const phone = normalizePhone(input.phone ?? '');
+  if (!phone) {
     return { status: 400, body: { ok: false, error: 'invalid_phone', message: '휴대전화번호 형식이 올바르지 않아요.' } };
+  }
+  if (!env.otpSecret) {
+    return { status: 500, body: { ok: false, error: 'server_not_configured', message: 'OTP_SIGNING_SECRET 미설정' } };
+  }
+  // 인증된 요청만 Notion에 도달할 수 있도록 fail-closed: Notion 설정 체크보다 먼저 수행.
+  if (!isPhoneVerified(input.verifiedToken ?? '', phone, env.otpSecret)) {
+    return { status: 401, body: { ok: false, error: 'phone_not_verified', message: '휴대전화 인증을 먼저 완료해 주세요.' } };
   }
   if (!env.token || !env.dataSourceId) {
     return { status: 500, body: { ok: false, error: 'server_not_configured', message: 'NOTION_TOKEN / NOTION_SUBSCRIBE_DATA_SOURCE_ID 미설정' } };
@@ -41,8 +51,9 @@ export async function subscribe(input: SubscribeInput, env: NotionEnv): Promise<
   const properties: Record<string, unknown> = {
     전화번호: { title: [{ text: { content: phone } }] },
     상태: { select: { name: '신규' } },
-    '사전 체험 동의 여부': { checkbox: Boolean(input.claimAgencyOptIn) },
-    '베타 참여': { checkbox: Boolean(input.claimAgencyOptIn) },
+    // 인증을 거쳐 제출한 시점에 이미 사전 체험 신청으로 간주하므로 true 고정.
+    '사전 체험 동의 여부': { checkbox: true },
+    '베타 참여': { checkbox: true },
     // 유입경로 속성을 DB에 rich_text로 추가하면 아래 주석을 해제
     // 유입경로: { rich_text: [{ text: { content: input.source || 'landing-signup' } }] },
   };
