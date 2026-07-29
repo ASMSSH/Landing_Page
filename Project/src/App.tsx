@@ -4,7 +4,6 @@ import Nav from './components/Nav';
 import Hero from './components/Hero';
 import Problem from './components/Problem';
 import Features from './components/Features';
-import Reviews from './components/Reviews';
 import Faq from './components/Faq';
 import SignupCta from './components/SignupCta';
 import Footer from './components/Footer';
@@ -18,7 +17,6 @@ export default function App() {
         <Hero />
         <Problem />
         <Features />
-        <Reviews />
         <Faq />
         <SignupCta />
       </main>

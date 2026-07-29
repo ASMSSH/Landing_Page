@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { FAQ } from '../data/faq';
+import Icon from './icons';
 import { track } from '../lib/analytics';
 
 function FaqRow({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
@@ -14,7 +15,7 @@ function FaqRow({ q, a, open, onToggle }: { q: string; a: string; open: boolean;
     <div className={`faq-item${open ? ' open' : ''}`}>
       <button className="faq-q" onClick={onToggle}>
         <span className="q">{q}</span>
-        <span className="ic">＋</span>
+        <Icon name="chevron-down" size={20} className="ic" />
       </button>
       <div className="faq-a" ref={ref} style={{ maxHeight: maxH }}>
         <p>{a}</p>
@@ -24,13 +25,20 @@ function FaqRow({ q, a, open, onToggle }: { q: string; a: string; open: boolean;
 }
 
 export default function Faq() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openSet, setOpenSet] = useState<Set<number>>(() => new Set([0]));
+  const toggle = (i: number) =>
+    setOpenSet((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
   return (
     <section id="faq" className="faq">
       <div className="wrap">
         <div className="sec-head">
           <span className="sec-tag">자주 묻는 질문</span>
-          <h2 className="sec-h2">궁금한 점을 모았어요</h2>
+          <h2 className="sec-h2">궁금한 점, 미리 풀어드릴게요</h2>
         </div>
         <div className="faq-list">
           {FAQ.map((item, i) => (
@@ -38,10 +46,10 @@ export default function Faq() {
               key={i}
               q={item.q}
               a={item.a}
-              open={openIndex === i}
+              open={openSet.has(i)}
               onToggle={() => {
-                if (openIndex !== i) track('faq_open', { index: i, question: item.q });
-                setOpenIndex(openIndex === i ? null : i);
+                if (!openSet.has(i)) track('faq_open', { index: i, question: item.q });
+                toggle(i);
               }}
             />
           ))}

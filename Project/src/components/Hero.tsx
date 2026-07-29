@@ -7,18 +7,18 @@ export default function Hero() {
     <section className="hero">
       <div className="wrap hero-inner">
         <div className="hero-copy">
-          <span className="eyebrow">🐶 펫보험 청구, 이제 헤매지 않아도 돼요</span>
+          <span className="eyebrow">🐾 출시 준비 중 — 사전 알림 신청받아요</span>
           <h1>
-            복잡한 반려동물 보험금 청구,
+            복잡한 펫보험 청구,
             <br />
-            챙길 서류를 콕 집어 알려드릴게요.
+            이제 저희가 대신 해드릴게요
           </h1>
-          <p className="sub">영수증 사진 한 장이면, 가입한 보험사에 맞춰 필요한 서류만 정리해드려요.</p>
+          <p className="sub">영수증 한 장만 올리면, 서류 준비부터 보험금 청구까지 알아서 끝내드려요.</p>
           <div className="cta-row">
             <a href="#signup" className="btn btn-primary" onClick={() => track('cta_click', { cta: 'hero_signup' })}>사전 신청하기 🐾</a>
             <button className="btn btn-sage" onClick={() => { track('cta_click', { cta: 'hero_try' }); open(); }}>체험해보기 🐾</button>
           </div>
-          <p className="hero-note">✉️ 출시되면 이메일로 딱 한 번만 알려드려요. 스팸 걱정 없어요.</p>
+          <p className="hero-note">🐶 출시되면 가장 먼저 알려드려요 · 출시 전 청구 대행도 무료로 체험 가능</p>
         </div>
 
         <div className="app-mock">
@@ -37,9 +37,12 @@ export default function Hero() {
           </div>
           <div className="arrow-down">↓</div>
           <div className="doc-list">
-            <div className="doc-item"><span className="chk">✓</span><span className="name">진료비 세부내역서</span></div>
-            <div className="doc-item"><span className="chk">✓</span><span className="name">진단서 (질병명 기재)</span></div>
-            <div className="doc-item"><span className="chk">✓</span><span className="name">진료비 영수증 원본</span></div>
+            <div className="doc-item"><span className="chk">✓</span><span className="name">서류 자동 준비 완료</span></div>
+            <div className="doc-item"><span className="chk">✓</span><span className="name">가입 보험사에 청구 접수</span></div>
+            <div className="doc-item paid">
+              <span className="doc-item-left"><span className="chk">✓</span><span className="name">보험금 지급 완료</span></span>
+              <span className="paid-amount">128,800원</span>
+            </div>
           </div>
         </div>
       </div>

@@ -12,5 +12,5 @@ createRoot(document.getElementById('root')!).render(
 
 initAnalytics()
 requestAnimationFrame(() => {
-  observeSections(['problem', 'features', 'reviews', 'faq', 'signup'])
+  observeSections(['problem', 'features', 'faq', 'signup'])
 })

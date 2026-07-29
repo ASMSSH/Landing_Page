@@ -83,6 +83,10 @@ header.nav {
 .doc-item { display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; }
 .chk { width:22px; height:22px; border-radius:999px; background:var(--success-500); color:#fff; display:grid; place-items:center; font-size:12px; font-weight:700; flex-shrink:0; }
 .doc-item .name { font-size:14px; font-weight:600; color:var(--text-primary); }
+.doc-item.paid { justify-content:space-between; background:var(--success-50); border-color:var(--success-300); }
+.doc-item-left { display:flex; align-items:center; gap:10px; }
+.doc-item.paid .name { color:var(--success-700); font-weight:700; }
+.paid-amount { font-family:var(--font-display); font-size:15px; color:var(--success-700); }
 
 /* ---------- Problem ---------- */
 .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
@@ -114,20 +118,42 @@ header.nav {
 .pill.bad { background:var(--error-100); color:var(--error-700); }
 .pill.good { background:var(--success-500); color:#fff; }
 .mid-arrow { color:var(--success-600); font-size:20px; font-weight:700; }
+.f-visual .f-arrow { color:var(--primary-500); flex-shrink:0; }
 
-.flow-label { font-size:13px; font-weight:700; letter-spacing:0.5px; color:var(--text-tertiary); margin:8px 0 0; }
-.flow { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:12px; }
-.flow-step { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:26px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px; }
-.flow-num { width:40px; height:40px; border-radius:999px; display:grid; place-items:center; font-family:var(--font-display); font-size:18px; }
-.flow-step h4 { font-family:var(--font-display); font-size:17px; font-weight:400; margin:0; }
-.flow-step p { font-size:13px; line-height:1.55; color:var(--text-secondary); }
-.center-cta { display:flex; justify-content:center; margin-top:32px; }
+/* Feature 2 visual — real-time status card */
+.status-card { width:100%; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:18px; display:flex; flex-direction:column; gap:16px; }
+.status-row { display:flex; align-items:center; justify-content:space-between; gap:11px; }
+.sr-label { font-size:13px; font-weight:600; color:var(--text-secondary); }
+.sr-badge { font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; white-space:nowrap; }
+.sr-badge.done { background:var(--success-100); color:var(--success-700); }
+.sr-badge.live { background:var(--secondary-100); color:var(--secondary-700); }
 
-/* ---------- Reviews ---------- */
+/* How-it-works — vertical timeline */
+.flow-label { text-align:center; font-family:var(--font-body); font-size:20px; font-weight:700; color:var(--text-tertiary); margin:56px 0 0; }
+.flow { width:fit-content; max-width:100%; margin:24px auto 0; display:flex; flex-direction:column; align-items:stretch; }
+.flow-step { display:flex; gap:20px; }
+.flow-rail { display:flex; flex-direction:column; align-items:center; width:40px; flex-shrink:0; }
+.flow-num { width:40px; height:40px; border-radius:999px; display:grid; place-items:center; font-family:var(--font-display); font-size:18px; border:2px solid var(--border); flex-shrink:0; }
+.flow-line { flex:1; width:2px; min-height:16px; margin:2px 0; background:var(--border); }
+.flow-content { display:flex; flex-direction:column; gap:5px; padding:6px 0 32px; }
+.flow-title { display:flex; align-items:center; gap:8px; }
+.flow-title h4 { font-family:var(--font-display); font-size:18px; font-weight:400; margin:0; color:var(--text-primary); }
+.flow-ic { flex-shrink:0; }
+.flow-content p { font-size:14px; line-height:1.6; color:var(--text-secondary); max-width:360px; }
+.flow-step.tone-primary .flow-num { background:var(--primary-50); border-color:var(--primary-300); color:var(--primary-600); }
+.flow-step.tone-primary .flow-ic { color:var(--primary-600); }
+.flow-step.tone-secondary .flow-num { background:var(--secondary-50); border-color:var(--secondary-300); color:var(--secondary-700); }
+.flow-step.tone-secondary .flow-ic { color:var(--secondary-700); }
+.flow-step.tone-success .flow-num { background:var(--success-50); border-color:var(--success-300); color:var(--success-600); }
+.flow-step.tone-success .flow-ic { color:var(--success-600); }
+.center-cta { display:flex; justify-content:center; margin-top:48px; }
+
+/* ---------- Problem — voice quotes ---------- */
 .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
-.rev-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px; display:flex; flex-direction:column; gap:18px; }
-.stars { color:var(--secondary-500); font-size:15px; letter-spacing:1px; }
-.rev-card .quote { font-size:15px; line-height:1.7; color:var(--text-primary); flex:1; }
+.voice-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px; display:flex; flex-direction:column; gap:18px; }
+.voice-card .quote-mark { color:var(--primary-300); }
+.voice-card .voice-title { font-family:var(--font-display); font-size:17px; line-height:1.4; color:var(--text-primary); margin-bottom:-8px; }
+.voice-card .quote { font-size:15px; line-height:1.65; color:var(--text-secondary); flex:1; }
 .profile { display:flex; align-items:center; gap:10px; }
 .avatar { width:38px; height:38px; border-radius:999px; background:var(--secondary-100); display:grid; place-items:center; font-size:18px; }
 .profile .nm { font-family:var(--font-display); font-size:15px; }
@@ -139,8 +165,8 @@ header.nav {
 .faq-item { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden; }
 .faq-q { width:100%; background:transparent; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:20px 24px; text-align:left; }
 .faq-q .q { flex:1; font-family:var(--font-display); font-size:17px; color:var(--text-primary); }
-.faq-q .ic { color:var(--primary-500); font-size:24px; font-weight:700; line-height:1; transition:transform .2s; }
-.faq-item.open .faq-q .ic { transform:rotate(45deg); }
+.faq-q .ic { color:var(--text-tertiary); flex-shrink:0; transition:transform .2s; }
+.faq-item.open .faq-q .ic { transform:rotate(180deg); }
 .faq-a { max-height:0; overflow:hidden; transition:max-height .28s ease; }
 .faq-a p { padding:0 24px 20px; font-size:15px; line-height:1.6; color:var(--text-secondary); }
 
