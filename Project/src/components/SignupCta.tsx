@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMvp } from '../mvp/MvpContext';
 import { formatMobileNumber } from '../lib/phone';
+import { track } from '../lib/analytics';
 
 const INSURER_OPTIONS = [
   '메리츠화재 펫퍼민트',
@@ -43,13 +44,16 @@ export default function SignupCta() {
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
         setStatus('done');
+        track('signup_submit', { status: 'done', source: 'landing-signup', insurer, claim_agency_opt_in: claimAgencyOptIn });
       } else {
         setStatus('error');
         setErrMsg(ERROR_MESSAGES[data.error] ?? '신청에 실패했어요. 잠시 후 다시 시도해 주세요.');
+        track('signup_submit', { status: 'error', source: 'landing-signup', error: data.error ?? 'unknown' });
       }
     } catch {
       setStatus('error');
       setErrMsg('네트워크 오류예요. 잠시 후 다시 시도해 주세요.');
+      track('signup_submit', { status: 'error', source: 'landing-signup', error: 'network' });
     }
   }
 
@@ -61,7 +65,7 @@ export default function SignupCta() {
       <div className="wrap">
         <div className="mvp-strip">
           <span className="line">결과가 어떻게 나오는지, 먼저 체험해볼까요?</span>
-          <button className="btn btn-sage" onClick={open}>체험해보기 🐾</button>
+          <button className="btn btn-sage" onClick={() => { track('cta_click', { cta: 'strip_try' }); open(); }}>체험해보기 🐾</button>
         </div>
         <div className="signup-box">
           <h2>가장 먼저 써보실래요?</h2>

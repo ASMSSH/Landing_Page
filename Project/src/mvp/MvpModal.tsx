@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { useMvp } from "./MvpContext";
 import { EXAMPLES } from "../data/examples";
 import { DEFAULT_INSURER } from "../data/insurers";
@@ -13,6 +13,7 @@ import Step2Insurer from "./Step2Insurer";
 import Step3Result from "./Step3Result";
 import Step4Notification, { type SubscribeStatus } from "./Step4Notification";
 import { formatMobileNumber } from "../lib/phone";
+import { track } from "../lib/analytics";
 
 const STEP_LABELS = ["영수증", "보험", "서류", "청구대행"];
 
@@ -57,6 +58,7 @@ export default function MvpModal() {
     setSubscribeStatus("idle");
     setSubscribeError("");
     resetStep1();
+    track("mvp_open");
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
@@ -68,8 +70,22 @@ export default function MvpModal() {
     };
   }, [isOpen, close, resetStep1]);
 
+  /* 모달이 열려 있는 동안 단계 진입을 기록해 퍼널 이탈 지점을 파악한다. */
+  useEffect(() => {
+    if (isOpen) track("mvp_step", { step });
+  }, [isOpen, step]);
+
+  /* 모달이 닫힐 때 마지막으로 보고 있던 단계를 기록한다 (이탈 지점). */
+  const stepRef = useRef(step);
+  stepRef.current = step;
+  useEffect(() => {
+    if (!isOpen) return;
+    return () => track("mvp_close", { last_step: stepRef.current });
+  }, [isOpen]);
+
   function selectReceipt(i: number) {
     const ex = EXAMPLES[i];
+    track("mvp_receipt_select", { receipt: ex.file });
     setSelectedReceipt(i);
     const url = receiptSVG(ex);
     setUpload({
@@ -103,6 +119,7 @@ export default function MvpModal() {
 
       if (response.ok && data.ok) {
         setSubscribeStatus("done");
+        track("signup_submit", { status: "done", source: "mvp-result", insurer, claim_agency_opt_in: claimAgencyOptIn });
         return;
       }
 
@@ -110,9 +127,11 @@ export default function MvpModal() {
       setSubscribeError(
         SUBSCRIBE_ERROR_MESSAGES[data.error] ?? "신청에 실패했어요. 잠시 후 다시 시도해 주세요.",
       );
+      track("signup_submit", { status: "error", source: "mvp-result", error: data.error ?? "unknown" });
     } catch {
       setSubscribeStatus("error");
       setSubscribeError("네트워크 오류예요. 잠시 후 다시 시도해 주세요.");
+      track("signup_submit", { status: "error", source: "mvp-result", error: "network" });
     }
   }
 
