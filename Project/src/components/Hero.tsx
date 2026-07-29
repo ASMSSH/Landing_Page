@@ -1,4 +1,5 @@
 import { useMvp } from '../mvp/MvpContext';
+import { track } from '../lib/analytics';
 
 export default function Hero() {
   const { open } = useMvp();
@@ -14,8 +15,8 @@ export default function Hero() {
           </h1>
           <p className="sub">영수증 사진 한 장이면, 가입한 보험사에 맞춰 필요한 서류만 정리해드려요.</p>
           <div className="cta-row">
-            <a href="#signup" className="btn btn-primary">사전 신청하기 🐾</a>
-            <button className="btn btn-sage" onClick={open}>체험해보기 🐾</button>
+            <a href="#signup" className="btn btn-primary" onClick={() => track('cta_click', { cta: 'hero_signup' })}>사전 신청하기 🐾</a>
+            <button className="btn btn-sage" onClick={() => { track('cta_click', { cta: 'hero_try' }); open(); }}>체험해보기 🐾</button>
           </div>
           <p className="hero-note">✉️ 출시되면 이메일로 딱 한 번만 알려드려요. 스팸 걱정 없어요.</p>
         </div>

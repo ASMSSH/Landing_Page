@@ -1,3 +1,5 @@
+import { track } from '../lib/analytics';
+
 export default function Nav() {
   return (
     <header className="nav">
@@ -12,7 +14,7 @@ export default function Nav() {
           <a href="#reviews">후기</a>
           <a href="#faq">자주 묻는 질문</a>
         </nav>
-        <a href="#signup" className="nav-cta">사전 신청하기</a>
+        <a href="#signup" className="nav-cta" onClick={() => track('cta_click', { cta: 'nav_signup' })}>사전 신청하기</a>
       </div>
     </header>
   );

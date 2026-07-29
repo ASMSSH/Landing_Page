@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { FAQ } from '../data/faq';
+import { track } from '../lib/analytics';
 
 function FaqRow({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -38,7 +39,10 @@ export default function Faq() {
               q={item.q}
               a={item.a}
               open={openIndex === i}
-              onToggle={() => setOpenIndex(openIndex === i ? null : i)}
+              onToggle={() => {
+                if (openIndex !== i) track('faq_open', { index: i, question: item.q });
+                setOpenIndex(openIndex === i ? null : i);
+              }}
             />
           ))}
         </div>
