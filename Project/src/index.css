@@ -416,7 +416,7 @@ footer .wm { font-family:var(--font-display); font-size:20px; color:var(--bg-app
   .field-row { flex-direction:column; }
   .field-2 { grid-template-columns:1fr; }
   .insurer-grid { grid-template-columns:1fr 1fr; }
-  .foot-row { flex-direction:column; align-items:center; gap:16px; text-align:center; }
+  .foot-row { justify-content:space-between; }
   .foot-links { display:none; }
 
   .modal-backdrop { padding:0; align-items:stretch; }
