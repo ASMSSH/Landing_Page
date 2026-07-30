@@ -10,6 +10,7 @@ export interface SubscribeInput {
   phone?: string;
   insurer?: string;
   source?: string;
+  claimAgencyOptIn?: boolean;
   verifyToken?: string;
   verifyExp?: number;
 }
@@ -48,8 +49,8 @@ export async function subscribe(input: SubscribeInput, env: NotionEnv): Promise<
   const properties: Record<string, unknown> = {
     전화번호: { title: [{ text: { content: phone } }] },
     상태: { select: { name: '신규' } },
-    '사전 체험 동의 여부': { checkbox: true },
-    '베타 참여': { checkbox: true },
+    '사전 체험 동의 여부': { checkbox: Boolean(input.claimAgencyOptIn) },
+    '베타 참여': { checkbox: Boolean(input.claimAgencyOptIn) },
   };
   const insurer = normalizeInsurer(input.insurer ?? '');
   if (insurer) {

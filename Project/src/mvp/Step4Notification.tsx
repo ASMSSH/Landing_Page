@@ -7,11 +7,13 @@ export type SubscribeStatus = "idle" | "submitting" | "done" | "error";
 interface Props {
   phone: string;
   agreed: boolean;
+  claimAgencyOptIn: boolean;
   status: SubscribeStatus;
   errorMessage: string;
   otp: OtpControls;
   onPhoneChange: (phone: string) => void;
   onAgreementChange: (agreed: boolean) => void;
+  onClaimAgencyOptInChange: (agreed: boolean) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 }
 
@@ -24,11 +26,13 @@ const BENEFITS = [
 export default function Step4Notification({
   phone,
   agreed,
+  claimAgencyOptIn,
   status,
   errorMessage,
   otp,
   onPhoneChange,
   onAgreementChange,
+  onClaimAgencyOptInChange,
   onSubmit,
 }: Props) {
   const done = status === "done";
@@ -44,7 +48,7 @@ export default function Step4Notification({
         <p>
           {done
             ? "서비스가 준비되면 인증하신 휴대전화번호로 가장 먼저 연락드릴게요."
-            : "전화번호 인증만 하면 사전 체험 대상자로 등록돼요. 준비되면 가장 먼저 연락드릴게요."}
+            : "전화번호 인증 후 신청하면, 준비되는 대로 가장 먼저 연락드릴게요."}
         </p>
       </div>
 
@@ -99,10 +103,25 @@ export default function Step4Notification({
           </a>
         </label>
 
+        <label className="notification-consent optional">
+          <input
+            type="checkbox"
+            checked={claimAgencyOptIn}
+            onChange={(event) => onClaimAgencyOptInChange(event.target.checked)}
+            disabled={done || submitting}
+          />
+          <span>
+            청구대행 서비스 사전 체험 신청 <b>(선택)</b>
+            <small>선택하면 체험 대상자로 먼저 연락드려요.</small>
+          </span>
+        </label>
+
         {status === "error" && <p className="notification-message error">{errorMessage}</p>}
         {done && (
           <p className="notification-message success">
-            사전 체험 신청 완료! 체험 대상자로 먼저 연락드릴게요.
+            {claimAgencyOptIn
+              ? "사전 체험 신청 완료! 체험 대상자로 먼저 연락드릴게요."
+              : "알림 신청 완료! 청구대행 소식을 가장 먼저 알려드릴게요."}
           </p>
         )}
       </form>

@@ -31,6 +31,7 @@ export default function SignupCta() {
   const [phone, setPhone] = useState('');
   const [insurer, setInsurer] = useState('');
   const [agreed, setAgreed] = useState(false);
+  const [claimAgencyOptIn, setClaimAgencyOptIn] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
   const [errMsg, setErrMsg] = useState('');
 
@@ -51,6 +52,7 @@ export default function SignupCta() {
           phone,
           insurer,
           source: 'landing-signup',
+          claimAgencyOptIn,
           verifyToken: otp.token,
           verifyExp: otp.exp,
         }),
@@ -58,7 +60,7 @@ export default function SignupCta() {
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
         setStatus('done');
-        track('signup_submit', { status: 'done', source: 'landing-signup', insurer });
+        track('signup_submit', { status: 'done', source: 'landing-signup', insurer, claim_agency_opt_in: claimAgencyOptIn });
       } else {
         setStatus('error');
         setErrMsg(ERROR_MESSAGES[data.error] ?? '신청에 실패했어요. 잠시 후 다시 시도해 주세요.');
@@ -84,7 +86,7 @@ export default function SignupCta() {
         </div>
         <div className="signup-box">
           <h2>가장 먼저 써보실래요?</h2>
-          <p className="sub">전화번호 인증만 하면 청구대행 사전 체험 대상자로 등록돼요. 준비되면 가장 먼저 연락드릴게요.</p>
+          <p className="sub">전화번호 인증 후 신청하면, 청구대행이 준비되는 대로 가장 먼저 연락드릴게요.</p>
           <form className="signup-form" onSubmit={handleSubmit}>
             <div className="field-row">
               <input
@@ -124,6 +126,15 @@ export default function SignupCta() {
                 />
                 개인정보 수집 및 이용 동의 <b>(필수)</b>
               </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={claimAgencyOptIn}
+                  onChange={(e) => setClaimAgencyOptIn(e.target.checked)}
+                  disabled={done || submitting}
+                />
+                청구대행 서비스 사전 체험 신청 <b>(선택)</b>
+              </label>
             </div>
             <button
               className="signup-submit"
@@ -136,7 +147,9 @@ export default function SignupCta() {
                 ? '신청 완료! 가장 먼저 연락드릴게요 🐾'
                 : submitting
                   ? '신청 중…'
-                  : '청구대행 사전 체험 신청하기 🐾'}
+                  : claimAgencyOptIn
+                    ? '청구대행 사전 체험 신청하기 🐾'
+                    : '출시 알림 신청하기 🐾'}
             </button>
           </form>
           {status === 'error' && (

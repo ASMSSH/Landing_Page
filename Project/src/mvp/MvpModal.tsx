@@ -39,6 +39,7 @@ export default function MvpModal() {
   const [insurer, setInsurer] = useState(DEFAULT_INSURER);
   const [phone, setPhone] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [claimAgencyOptIn, setClaimAgencyOptIn] = useState(false);
   const [subscribeStatus, setSubscribeStatus] = useState<SubscribeStatus>("idle");
   const [subscribeError, setSubscribeError] = useState("");
 
@@ -57,6 +58,7 @@ export default function MvpModal() {
     setInsurer(DEFAULT_INSURER);
     setPhone("");
     setAgreed(false);
+    setClaimAgencyOptIn(false);
     setSubscribeStatus("idle");
     setSubscribeError("");
     resetOtp();
@@ -115,6 +117,7 @@ export default function MvpModal() {
           phone,
           insurer: insurer === "공통 기준" ? "기타 / 모름" : insurer,
           source: "mvp-result",
+          claimAgencyOptIn,
           verifyToken: otp.token,
           verifyExp: otp.exp,
         }),
@@ -123,7 +126,7 @@ export default function MvpModal() {
 
       if (response.ok && data.ok) {
         setSubscribeStatus("done");
-        track("signup_submit", { status: "done", source: "mvp-result", insurer });
+        track("signup_submit", { status: "done", source: "mvp-result", insurer, claim_agency_opt_in: claimAgencyOptIn });
         return;
       }
 
@@ -206,6 +209,7 @@ export default function MvpModal() {
             <Step4Notification
               phone={phone}
               agreed={agreed}
+              claimAgencyOptIn={claimAgencyOptIn}
               status={subscribeStatus}
               errorMessage={subscribeError}
               otp={otp}
@@ -214,6 +218,7 @@ export default function MvpModal() {
                 if (otp.stage !== "idle") otp.reset();
               }}
               onAgreementChange={setAgreed}
+              onClaimAgencyOptInChange={setClaimAgencyOptIn}
               onSubmit={submitNotification}
             />
           )}
@@ -262,10 +267,14 @@ export default function MvpModal() {
                 title={otp.stage !== "verified" ? "문자 인증을 먼저 완료해 주세요" : undefined}
               >
                 {subscribeStatus === "done"
-                  ? "사전 체험 신청 완료 ✓"
+                  ? claimAgencyOptIn
+                    ? "사전 체험 신청 완료 ✓"
+                    : "알림 신청 완료 ✓"
                   : subscribeStatus === "submitting"
                     ? "신청 중…"
-                    : "청구대행 사전 체험 신청하기 →"}
+                    : claimAgencyOptIn
+                      ? "청구대행 사전 체험 신청하기 →"
+                      : "출시 알림 신청하기 →"}
               </button>
             )}
           </div>
