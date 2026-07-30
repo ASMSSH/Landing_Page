@@ -1,13 +1,10 @@
 select
   case
-    when ref_code is not null then '뿌린 링크: ' || ref_code
+    when ref_code is not null then ref_code
     when utm_source is not null then '광고: ' || utm_source
     when referrer ilike '%search.naver.com%' then '네이버 검색'
-    when referrer ilike '%naver.com%' then '네이버 (검색 외)'
     when referrer ilike '%google.%' then '구글 검색'
-    when referrer ilike '%instagram.com%' then '인스타그램 (태그 없는 링크)'
-    when referrer ilike '%kakao%' then '카카오톡'
-    when referrer is null or referrer = '' then '직접 유입 (주소 입력/북마크/앱)'
+    when referrer is null or referrer = '' then '직접 유입'
     else '기타: ' || referrer
   end as channel,
   count(distinct session_id) as visitors
