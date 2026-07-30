@@ -1,31 +1,55 @@
-# 채널별 유입 추적 링크 (UTM)
+# 유입 추적 링크 (`?r=` 코드)
 
 홍보 글에는 **반드시 아래 링크를 그대로** 사용하세요.
 네이버 카페·인스타그램은 앱 내 브라우저라 referrer(유입 경로)가 지워지는 경우가 많아,
-링크 자체에 출처를 심어야 정확하게 잡힙니다.
+링크 자체에 코드를 심어야 정확하게 잡힙니다.
 
-## 준비된 링크
+## 채널 표 (일반 유입)
 
-| 채널 | 링크 |
-|---|---|
-| 네이버 강사모 카페 | `https://www.boheomgaenyang.com/?utm_source=naver_cafe&utm_medium=community&utm_campaign=gangsamo` |
-| 네이버 블로그 홍보 | `https://www.boheomgaenyang.com/?utm_source=naver_blog&utm_medium=blog&utm_campaign=launch` |
-| 인스타 공식계정 게시글1 | `https://www.boheomgaenyang.com/?utm_source=instagram&utm_medium=social&utm_campaign=post1` |
-| 인스타 공식계정 스토리 | `https://www.boheomgaenyang.com/?utm_source=instagram&utm_medium=social&utm_campaign=story1` |
+**코드는 식별자일 뿐이고, 의미는 이 표가 갖습니다.** 새 채널에 뿌릴 때 이 표에 한 줄 추가하세요.
 
-## 새 채널 링크 만드는 규칙
+| 코드 | 채널 | 링크 |
+|---|---|---|
+| `cafe1` | 네이버 강사모 카페 | `https://www.boheomgaenyang.com/?r=cafe1` |
+| `blog1` | 네이버 블로그 홍보 | `https://www.boheomgaenyang.com/?r=blog1` |
+| `ig-p1` | 공식 계정 인스타 게시글1 | `https://www.boheomgaenyang.com/?r=ig-p1` |
+| `ig-s1` | 공식 계정 인스타 스토리 | `https://www.boheomgaenyang.com/?r=ig-s1` |
 
-```
-https://www.boheomgaenyang.com/?utm_source=<어디서>&utm_medium=<종류>&utm_campaign=<게시물 구분>
-```
+새 코드 규칙: 짧게, 소문자, 같은 채널의 다음 게시물은 번호만 올린다 (`ig-p2`, `blog2` …).
+코드를 재사용하거나 의미를 바꾸지 말 것 — 헷갈리면 그냥 새 코드를 만든다.
 
-- `utm_source` — 플랫폼: `naver_cafe`, `naver_blog`, `instagram`, `kakao`, `everytime` …
-- `utm_medium` — 형태: `community`(카페/커뮤니티), `blog`, `social`(SNS), `dm`, `paid`(광고)
-- `utm_campaign` — 게시물 구분: `post2`, `story2`, `launch_event` 처럼 자유롭게
+## 왜 UTM이 아니고 `?r=` 하나인가
 
-같은 채널이라도 게시물이 다르면 `utm_campaign`을 다르게 해야 어떤 글이 효과 있었는지 비교할 수 있어요.
+카톡·인스타 바이오에 붙일 링크라 짧아야 하고, `utm_source=naver&utm_medium=cafe&utm_campaign=...`를
+손으로 관리하다 오타가 나면 그대로 별개 채널로 잡힙니다. 코드는 식별자만 맡고 **의미는 위 표가 갖습니다** —
+그래서 나중에 분류를 바꿔도 링크를 다시 뿌릴 필요가 없습니다.
+
+나중에 유료광고를 돌리면 그때는 `utm_*`도 같이 받아서 저장하면 됩니다
+(광고 플랫폼이 표준으로 붙이므로). 수집 코드는 이미 들어 있어 별도 작업이 필요 없습니다.
+
+## 검색·직접 유입은 링크에 코드를 붙일 수 없다
+
+검색으로 들어오는 유저는 `?r=`이 없으므로, 함께 저장되는 `referrer`로 구분합니다.
+
+- 이 표는 **"우리가 능동적으로 뿌린 곳"만** 관리합니다.
+- 네이버 검색 / 구글 검색 / 직접 유입 등은 Supabase 쿼리에서 referrer 기준으로 분류합니다.
+  → `supabase/queries.sql`의 "유입 채널 통합 분류" 쿼리 참고.
 
 ## 데이터 확인
 
-Supabase 대시보드 → SQL Editor에서 `supabase/queries.sql`의 쿼리를 실행하면
-채널별 유입 수·전환율을 바로 볼 수 있습니다.
+Supabase 대시보드 → SQL Editor에서 `supabase/queries.sql`의 쿼리를 실행하면 됩니다.
+파일에는 주석이 없으므로, 쿼리 순서는 아래와 같습니다.
+
+1. 유입 채널 통합 분류 (ref_code 우선, 없으면 referrer로 네이버/구글 검색·인스타·카카오·직접 유입 추정)
+2. 뿌린 링크 코드별 유입 수
+3. 코드별 전환율 (방문 → 알림 신청)
+4. 스크롤 도달률 (25/50/75/100%)
+5. 섹션별 도달률
+6. 체험 모달 퍼널 (열기 → 단계 → 신청)
+7. 모달 이탈 지점 (닫은 단계)
+8. 평균 체류 시간·최대 스크롤
+9. 최다 클릭 요소 Top 20
+10. FAQ 인기 질문
+11. 기기·재방문 비율
+
+특정 방문자의 타임라인 재구성: `select created_at, event, props from events where session_id = '세션ID' order by created_at;`
