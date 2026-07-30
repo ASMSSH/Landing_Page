@@ -1,20 +1,15 @@
-// 행동 트래킹 모듈 — Supabase REST에 직접 기록한다.
-// publishable key는 클라이언트 노출을 전제로 한 키이며, events 테이블은
-// RLS로 insert만 허용되어 있어 조회/수정/삭제는 불가능하다.
-// 개인정보(전화번호 등)는 어떤 이벤트에도 담지 않는다.
-
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const ENDPOINT =
   SUPABASE_URL && SUPABASE_KEY ? `${SUPABASE_URL}/rest/v1/events` : null;
 
-// 무한 루프·악성 스크립트로 인한 폭주 방지용 세션당 전송 상한.
 const MAX_EVENTS_PER_SESSION = 500;
 let sentCount = 0;
 
 const SESSION_KEY = 'bgn_session_id';
 const VISIT_KEY = 'bgn_visit_count';
 const UTM_KEY = 'bgn_utm';
+const REF_KEY = 'bgn_ref';
 
 function getSessionId(): string {
   try {
@@ -29,7 +24,6 @@ function getSessionId(): string {
   }
 }
 
-/** 세션 시작 시 1회 증가하는 누적 방문 횟수 (재방문 여부 판별용). */
 function getVisitNumber(): number {
   try {
     if (!sessionStorage.getItem('bgn_visit_counted')) {
@@ -44,7 +38,6 @@ function getVisitNumber(): number {
   }
 }
 
-/** UTM은 첫 진입(first-touch) 값을 세션 동안 유지한다. */
 function getUtm(): Record<string, string> {
   try {
     const stored = sessionStorage.getItem(UTM_KEY);
@@ -62,7 +55,18 @@ function getUtm(): Record<string, string> {
   }
 }
 
-/** fetch keepalive로 전송해 페이지 이탈 중에도 요청이 살아남게 한다. */
+function getRefCode(): string | null {
+  try {
+    const stored = sessionStorage.getItem(REF_KEY);
+    if (stored !== null) return stored || null;
+    const r = new URLSearchParams(location.search).get('r')?.slice(0, 32) ?? '';
+    sessionStorage.setItem(REF_KEY, r);
+    return r || null;
+  } catch {
+    return null;
+  }
+}
+
 function send(row: Record<string, unknown>): void {
   if (!ENDPOINT || sentCount >= MAX_EVENTS_PER_SESSION) return;
   sentCount += 1;
@@ -78,17 +82,17 @@ function send(row: Record<string, unknown>): void {
       body: JSON.stringify(row),
     }).catch(() => {});
   } catch {
-    /* 트래킹 실패는 무시 — UX에 영향을 주지 않는다 */
+    void 0;
   }
 }
 
-/** 이벤트 기록. 모든 이벤트에 세션·유입·기기 정보가 자동으로 붙는다. */
 export function track(event: string, props: Record<string, unknown> = {}): void {
   const utm = getUtm();
   send({
     event,
     props: { ...props, ...(utm.utm_term && { utm_term: utm.utm_term }), ...(utm.utm_content && { utm_content: utm.utm_content }) },
     session_id: getSessionId(),
+    ref_code: getRefCode(),
     referrer: document.referrer.slice(0, 500) || null,
     utm_source: utm.utm_source ?? null,
     utm_medium: utm.utm_medium ?? null,
@@ -96,8 +100,6 @@ export function track(event: string, props: Record<string, unknown> = {}): void 
     device: matchMedia('(max-width: 768px)').matches ? 'mobile' : 'desktop',
   });
 }
-
-/* ---------- 페이지 수명주기: 진입 → 스크롤 → 이탈 ---------- */
 
 let maxScrollPercent = 0;
 let activeMs = 0;
@@ -145,7 +147,6 @@ function initScrollDepth(): void {
   );
 }
 
-/** 탭 이탈/닫기 시 체류 시간과 최대 스크롤 깊이를 기록한다. */
 function initPageLeave(): void {
   visibleSince = document.visibilityState === 'visible' ? performance.now() : null;
 
@@ -167,15 +168,12 @@ function initPageLeave(): void {
     if (document.visibilityState === 'hidden') onHidden();
     else {
       visibleSince = performance.now();
-      leaveSent = false; // 다시 돌아왔다 떠나면 새로 기록 (seconds_active는 누적값)
+      leaveSent = false;
     }
   });
   addEventListener('pagehide', onHidden);
 }
 
-/* ---------- 전체 클릭 자동 수집 ---------- */
-
-/** 버튼·링크·입력요소 클릭을 자동 수집한다. 입력값(value)은 절대 담지 않는다. */
 function initClickCapture(): void {
   document.addEventListener(
     'click',
@@ -215,8 +213,6 @@ function initClickCapture(): void {
   );
 }
 
-/* ---------- 에러 수집 ---------- */
-
 function initErrorCapture(): void {
   let errorCount = 0;
   const report = (message: string, extra: Record<string, unknown> = {}) => {
@@ -232,9 +228,6 @@ function initErrorCapture(): void {
   );
 }
 
-/* ---------- 섹션 도달률 ---------- */
-
-/** 섹션이 화면에 처음 보일 때 1회씩 기록해 스크롤 도달률을 측정한다. */
 export function observeSections(ids: string[]): void {
   if (!ENDPOINT || typeof IntersectionObserver === 'undefined') return;
   const observer = new IntersectionObserver(
@@ -254,7 +247,6 @@ export function observeSections(ids: string[]): void {
   }
 }
 
-/** 앱 시작 시 1회 호출 — 페이지뷰, 스크롤, 이탈, 클릭, 에러 트래킹을 모두 시작한다. */
 export function initAnalytics(): void {
   if (!ENDPOINT) return;
   trackPageView();
