@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useMvp } from '../mvp/MvpContext';
 import { formatMobileNumber } from '../lib/phone';
 import { track } from '../lib/analytics';
+import { useOtp } from '../lib/useOtp';
+import OtpPanel from './OtpPanel';
 
 const INSURER_OPTIONS = [
   '메리츠화재 펫퍼민트',
@@ -18,18 +20,24 @@ type Status = 'idle' | 'submitting' | 'done' | 'error';
 
 const ERROR_MESSAGES: Record<string, string> = {
   invalid_phone: '휴대전화번호 형식을 확인해 주세요.',
+  not_verified: '전화번호 인증이 필요해요.',
   server_not_configured: '서버 설정이 아직 완료되지 않았어요.',
   object_not_found: '연동 대상을 찾지 못했어요. 잠시 후 다시 시도해 주세요.',
 };
 
 export default function SignupCta() {
   const { open } = useMvp();
+  const otp = useOtp();
   const [phone, setPhone] = useState('');
   const [insurer, setInsurer] = useState('');
   const [agreed, setAgreed] = useState(false);
-  const [claimAgencyOptIn, setClaimAgencyOptIn] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
   const [errMsg, setErrMsg] = useState('');
+
+  function handlePhoneChange(value: string) {
+    setPhone(formatMobileNumber(value));
+    if (otp.stage !== 'idle') otp.reset();
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,12 +47,18 @@ export default function SignupCta() {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, insurer, claimAgencyOptIn, source: 'landing-signup' }),
+        body: JSON.stringify({
+          phone,
+          insurer,
+          source: 'landing-signup',
+          verifyToken: otp.token,
+          verifyExp: otp.exp,
+        }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
         setStatus('done');
-        track('signup_submit', { status: 'done', source: 'landing-signup', insurer, claim_agency_opt_in: claimAgencyOptIn });
+        track('signup_submit', { status: 'done', source: 'landing-signup', insurer });
       } else {
         setStatus('error');
         setErrMsg(ERROR_MESSAGES[data.error] ?? '신청에 실패했어요. 잠시 후 다시 시도해 주세요.');
@@ -59,6 +73,7 @@ export default function SignupCta() {
 
   const done = status === 'done';
   const submitting = status === 'submitting';
+  const verified = otp.stage === 'verified';
 
   return (
     <section id="signup" style={{ paddingBottom: 90 }}>
@@ -69,7 +84,7 @@ export default function SignupCta() {
         </div>
         <div className="signup-box">
           <h2>가장 먼저 써보실래요?</h2>
-          <p className="sub">청구대행 서비스가 준비되면 가장 먼저 연락드릴게요. 휴대전화번호만 남겨주세요.</p>
+          <p className="sub">전화번호 인증만 하면 청구대행 사전 체험 대상자로 등록돼요. 준비되면 가장 먼저 연락드릴게요.</p>
           <form className="signup-form" onSubmit={handleSubmit}>
             <div className="field-row">
               <input
@@ -81,7 +96,7 @@ export default function SignupCta() {
                 placeholder="010-1234-5678"
                 required
                 value={phone}
-                onChange={(e) => setPhone(formatMobileNumber(e.target.value))}
+                onChange={(e) => handlePhoneChange(e.target.value)}
                 disabled={done || submitting}
               />
               <select
@@ -97,6 +112,7 @@ export default function SignupCta() {
                 ))}
               </select>
             </div>
+            <OtpPanel otp={otp} phone={phone} disabled={done || submitting} />
             <div className="signup-consents">
               <label>
                 <input
@@ -108,29 +124,19 @@ export default function SignupCta() {
                 />
                 개인정보 수집 및 이용 동의 <b>(필수)</b>
               </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={claimAgencyOptIn}
-                  onChange={(e) => setClaimAgencyOptIn(e.target.checked)}
-                  disabled={done || submitting}
-                />
-                청구대행 서비스 사전 체험 신청 <b>(선택)</b>
-              </label>
             </div>
             <button
               className="signup-submit"
               type="submit"
-              disabled={done || submitting || !agreed}
+              disabled={done || submitting || !agreed || !verified}
+              title={!verified ? '문자 인증을 먼저 완료해 주세요' : undefined}
               style={done ? { background: 'var(--success-500)' } : undefined}
             >
               {done
-                ? '신청 완료! 가장 먼저 알려드릴게요 🐾'
+                ? '신청 완료! 가장 먼저 연락드릴게요 🐾'
                 : submitting
                   ? '신청 중…'
-                  : claimAgencyOptIn
-                    ? '청구대행 사전 체험 신청하기 🐾'
-                    : '출시 알림 신청하기 🐾'}
+                  : '청구대행 사전 체험 신청하기 🐾'}
             </button>
           </form>
           {status === 'error' && (

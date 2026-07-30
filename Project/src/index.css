@@ -188,8 +188,25 @@ header.nav {
 select.field { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23A38F7D' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 18px center; color:var(--text-tertiary); }
 .signup-submit { width:100%; background:var(--primary-500); color:#fff; border-radius:999px; padding:17px 26px; font-family:var(--font-display); font-size:16px; box-shadow:0 8px 20px rgba(255,122,89,0.28); }
 .signup-submit:hover { background:var(--primary-600); }
-.signup-submit:disabled { cursor:default; }
+.signup-submit:disabled { cursor:default; opacity:.6; }
 .privacy { font-size:13px; color:var(--text-tertiary); }
+
+.otp-panel { display:flex; flex-direction:column; gap:10px; text-align:left; }
+.otp-verified { background:var(--success-50); border:1.5px solid var(--success-300); color:var(--success-700); border-radius:var(--radius-sm); padding:13px 18px; font-weight:700; font-size:14px; }
+.otp-flow { display:flex; flex-direction:column; gap:12px; background:var(--secondary-50); border:1.5px solid var(--secondary-300); border-radius:var(--radius-sm); padding:16px 18px; }
+.otp-guide { font-size:14px; color:var(--text-secondary); line-height:1.7; }
+.otp-code { font-size:19px; color:var(--primary-600); letter-spacing:2px; }
+.otp-note { font-size:12px; color:var(--text-tertiary); }
+.otp-btn { display:inline-flex; align-items:center; justify-content:center; border-radius:999px; padding:13px 20px; font-family:var(--font-display); font-size:15px; background:var(--secondary-500); color:#fff; transition:background .15s, opacity .15s; }
+.otp-btn:hover { background:var(--secondary-600); }
+.otp-btn:disabled { opacity:.5; cursor:not-allowed; }
+.otp-send { background:var(--primary-500); }
+.otp-send:hover { background:var(--primary-600); }
+.otp-confirm { background:var(--success-500); }
+.otp-confirm:hover { background:var(--success-600); }
+.otp-qr { display:flex; align-items:center; gap:14px; font-size:12px; color:var(--text-tertiary); line-height:1.6; }
+.otp-qr img { border-radius:10px; border:1px solid var(--border); background:#fff; flex-shrink:0; }
+.otp-error { font-size:13px; color:var(--error-500); }
 
 /* ---------- Footer ---------- */
 footer { background:var(--neutral-900); padding:40px 0 36px; }

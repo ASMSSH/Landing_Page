@@ -14,17 +14,21 @@ import Step3Result from "./Step3Result";
 import Step4Notification, { type SubscribeStatus } from "./Step4Notification";
 import { formatMobileNumber } from "../lib/phone";
 import { track } from "../lib/analytics";
+import { useOtp } from "../lib/useOtp";
 
 const STEP_LABELS = ["영수증", "보험", "서류", "청구대행"];
 
 const SUBSCRIBE_ERROR_MESSAGES: Record<string, string> = {
   invalid_phone: "휴대전화번호 형식을 확인해 주세요.",
+  not_verified: "전화번호 인증이 필요해요.",
   server_not_configured: "서버 설정이 아직 완료되지 않았어요.",
   object_not_found: "연동 대상을 찾지 못했어요. 잠시 후 다시 시도해 주세요.",
 };
 
 export default function MvpModal() {
   const { isOpen, close } = useMvp();
+  const otp = useOtp();
+  const { reset: resetOtp } = otp;
 
   const [step, setStep] = useState(1);
   const [ready, setReady] = useState(false);
@@ -35,7 +39,6 @@ export default function MvpModal() {
   const [insurer, setInsurer] = useState(DEFAULT_INSURER);
   const [phone, setPhone] = useState("");
   const [agreed, setAgreed] = useState(false);
-  const [claimAgencyOptIn, setClaimAgencyOptIn] = useState(false);
   const [subscribeStatus, setSubscribeStatus] = useState<SubscribeStatus>("idle");
   const [subscribeError, setSubscribeError] = useState("");
 
@@ -54,9 +57,9 @@ export default function MvpModal() {
     setInsurer(DEFAULT_INSURER);
     setPhone("");
     setAgreed(false);
-    setClaimAgencyOptIn(false);
     setSubscribeStatus("idle");
     setSubscribeError("");
+    resetOtp();
     resetStep1();
     track("mvp_open");
     document.body.style.overflow = "hidden";
@@ -68,7 +71,7 @@ export default function MvpModal() {
       document.body.style.overflow = "";
       document.removeEventListener("keydown", onKey);
     };
-  }, [isOpen, close, resetStep1]);
+  }, [isOpen, close, resetStep1, resetOtp]);
 
   /* 모달이 열려 있는 동안 단계 진입을 기록해 퍼널 이탈 지점을 파악한다. */
   useEffect(() => {
@@ -112,14 +115,15 @@ export default function MvpModal() {
           phone,
           insurer: insurer === "공통 기준" ? "기타 / 모름" : insurer,
           source: "mvp-result",
-          claimAgencyOptIn,
+          verifyToken: otp.token,
+          verifyExp: otp.exp,
         }),
       });
       const data = await response.json().catch(() => ({}));
 
       if (response.ok && data.ok) {
         setSubscribeStatus("done");
-        track("signup_submit", { status: "done", source: "mvp-result", insurer, claim_agency_opt_in: claimAgencyOptIn });
+        track("signup_submit", { status: "done", source: "mvp-result", insurer });
         return;
       }
 
@@ -202,12 +206,14 @@ export default function MvpModal() {
             <Step4Notification
               phone={phone}
               agreed={agreed}
-              claimAgencyOptIn={claimAgencyOptIn}
               status={subscribeStatus}
               errorMessage={subscribeError}
-              onPhoneChange={(value) => setPhone(formatMobileNumber(value))}
+              otp={otp}
+              onPhoneChange={(value) => {
+                setPhone(formatMobileNumber(value));
+                if (otp.stage !== "idle") otp.reset();
+              }}
               onAgreementChange={setAgreed}
-              onClaimAgencyOptInChange={setClaimAgencyOptIn}
               onSubmit={submitNotification}
             />
           )}
@@ -252,17 +258,14 @@ export default function MvpModal() {
                 className={`mbtn primary${subscribeStatus === "done" ? " done" : ""}`}
                 type="submit"
                 form="mvp-notification-form"
-                disabled={!agreed || subscribeStatus === "submitting" || subscribeStatus === "done"}
+                disabled={!agreed || otp.stage !== "verified" || subscribeStatus === "submitting" || subscribeStatus === "done"}
+                title={otp.stage !== "verified" ? "문자 인증을 먼저 완료해 주세요" : undefined}
               >
                 {subscribeStatus === "done"
-                  ? claimAgencyOptIn
-                    ? "사전 체험 신청 완료 ✓"
-                    : "알림 신청 완료 ✓"
+                  ? "사전 체험 신청 완료 ✓"
                   : subscribeStatus === "submitting"
                     ? "신청 중…"
-                    : claimAgencyOptIn
-                      ? "청구대행 사전 체험 신청하기 →"
-                      : "출시 알림 신청하기 →"}
+                    : "청구대행 사전 체험 신청하기 →"}
               </button>
             )}
           </div>
