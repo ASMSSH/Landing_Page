@@ -114,7 +114,6 @@ export default function SignupCta() {
                 ))}
               </select>
             </div>
-            <OtpPanel otp={otp} phone={phone} disabled={done || submitting} />
             <div className="signup-consents">
               <label>
                 <input
@@ -136,6 +135,12 @@ export default function SignupCta() {
                 청구대행 서비스 사전 체험 신청 <b>(선택)</b>
               </label>
             </div>
+            <OtpPanel
+              otp={otp}
+              phone={phone}
+              disabled={done || submitting || !agreed}
+              disabledHint="개인정보 수집 및 이용에 먼저 동의해 주세요"
+            />
             <button
               className="signup-submit"
               type="submit"

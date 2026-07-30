@@ -82,8 +82,6 @@ export default function Step4Notification({
           disabled={done || submitting}
         />
 
-        <OtpPanel otp={otp} phone={phone} disabled={done || submitting} />
-
         <label className="notification-consent">
           <input
             type="checkbox"
@@ -115,6 +113,13 @@ export default function Step4Notification({
             <small>선택하면 체험 대상자로 먼저 연락드려요.</small>
           </span>
         </label>
+
+        <OtpPanel
+          otp={otp}
+          phone={phone}
+          disabled={done || submitting || !agreed}
+          disabledHint="개인정보 수집 및 이용에 먼저 동의해 주세요"
+        />
 
         {status === "error" && <p className="notification-message error">{errorMessage}</p>}
         {done && (

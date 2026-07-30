@@ -6,9 +6,10 @@ interface Props {
   otp: OtpControls;
   phone: string;
   disabled?: boolean;
+  disabledHint?: string;
 }
 
-export default function OtpPanel({ otp, phone, disabled }: Props) {
+export default function OtpPanel({ otp, phone, disabled, disabledHint }: Props) {
   const digits = phone.replace(/\D/g, '');
   const phoneValid = MOBILE_RE.test(digits);
 
@@ -23,7 +24,7 @@ export default function OtpPanel({ otp, phone, disabled }: Props) {
           type="button"
           className="otp-btn"
           disabled={!phoneValid || otp.busy || disabled}
-          title={!phoneValid ? '휴대전화번호를 먼저 입력해 주세요' : undefined}
+          title={disabled ? disabledHint : !phoneValid ? '휴대전화번호를 먼저 입력해 주세요' : undefined}
           onClick={() => otp.request(digits)}
         >
           {otp.busy ? '준비 중…' : '문자로 본인 인증하기 📩'}
