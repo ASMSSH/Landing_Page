@@ -1,6 +1,8 @@
 // Notion 사전알람 연동 핸들러 (서버 전용 — 브라우저에서 import 금지).
 // Vite dev 미들웨어에서 쓰이고, 추후 서버리스/Node 래퍼에서도 그대로 재사용 가능.
 
+import { isVerified } from './otp.js';
+
 const MOBILE_RE = /^01[016789]\d{7,8}$/;
 const NOTION_VERSION = '2025-09-03';
 
@@ -9,11 +11,14 @@ export interface SubscribeInput {
   insurer?: string;
   source?: string;
   claimAgencyOptIn?: boolean;
+  verifyToken?: string;
+  verifyExp?: number;
 }
 
 export interface NotionEnv {
   token?: string;
   dataSourceId?: string;
+  otpSecret?: string;
 }
 
 export interface SubscribeResult {
@@ -37,14 +42,15 @@ export async function subscribe(input: SubscribeInput, env: NotionEnv): Promise<
   if (!env.token || !env.dataSourceId) {
     return { status: 500, body: { ok: false, error: 'server_not_configured', message: 'NOTION_TOKEN / NOTION_SUBSCRIBE_DATA_SOURCE_ID 미설정' } };
   }
+  if (env.otpSecret && !isVerified(phone, input.verifyToken, input.verifyExp, env.otpSecret)) {
+    return { status: 401, body: { ok: false, error: 'not_verified', message: '전화번호 인증이 필요해요.' } };
+  }
 
   const properties: Record<string, unknown> = {
     전화번호: { title: [{ text: { content: phone } }] },
     상태: { select: { name: '신규' } },
     '사전 체험 동의 여부': { checkbox: Boolean(input.claimAgencyOptIn) },
     '베타 참여': { checkbox: Boolean(input.claimAgencyOptIn) },
-    // 유입경로 속성을 DB에 rich_text로 추가하면 아래 주석을 해제
-    // 유입경로: { rich_text: [{ text: { content: input.source || 'landing-signup' } }] },
   };
   const insurer = normalizeInsurer(input.insurer ?? '');
   if (insurer) {

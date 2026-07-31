@@ -1,4 +1,6 @@
 import notificationBell from "../assets/launch_notification_bell_animated.svg";
+import OtpPanel from "../components/OtpPanel";
+import type { OtpControls } from "../lib/useOtp";
 import { PRIVACY_URL } from "../data/links";
 
 export type SubscribeStatus = "idle" | "submitting" | "done" | "error";
@@ -9,6 +11,7 @@ interface Props {
   claimAgencyOptIn: boolean;
   status: SubscribeStatus;
   errorMessage: string;
+  otp: OtpControls;
   onPhoneChange: (phone: string) => void;
   onAgreementChange: (agreed: boolean) => void;
   onClaimAgencyOptInChange: (agreed: boolean) => void;
@@ -27,6 +30,7 @@ export default function Step4Notification({
   claimAgencyOptIn,
   status,
   errorMessage,
+  otp,
   onPhoneChange,
   onAgreementChange,
   onClaimAgencyOptInChange,
@@ -44,8 +48,8 @@ export default function Step4Notification({
         <h3>{done ? "청구대행 신청이 완료됐어요!" : "보험금 청구, 이제 맡겨보세요"}</h3>
         <p>
           {done
-            ? "서비스가 준비되면 입력하신 휴대전화번호로 가장 먼저 연락드릴게요."
-            : "복잡한 서류 확인과 보험사 제출을 대신 처리하는 청구대행 서비스를 준비하고 있어요."}
+            ? "서비스가 준비되면 인증하신 휴대전화번호로 가장 먼저 연락드릴게요."
+            : "전화번호 인증 후 신청하면, 준비되는 대로 가장 먼저 연락드릴게요."}
         </p>
       </div>
 
@@ -110,6 +114,13 @@ export default function Step4Notification({
             <small>선택하면 체험 대상자로 먼저 연락드려요.</small>
           </span>
         </label>
+
+        <OtpPanel
+          otp={otp}
+          phone={phone}
+          disabled={done || submitting || !agreed}
+          disabledHint="개인정보 수집 및 이용에 먼저 동의해 주세요"
+        />
 
         {status === "error" && <p className="notification-message error">{errorMessage}</p>}
         {done && (
