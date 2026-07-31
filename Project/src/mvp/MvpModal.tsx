@@ -258,13 +258,12 @@ export default function MvpModal() {
                 청구대행 서비스 알아보기 →
               </button>
             )}
-            {step === 4 && (
+            {step === 4 && otp.stage === "verified" && (
               <button
                 className={`mbtn primary${subscribeStatus === "done" ? " done" : ""}`}
                 type="submit"
                 form="mvp-notification-form"
-                disabled={!agreed || otp.stage !== "verified" || subscribeStatus === "submitting" || subscribeStatus === "done"}
-                title={otp.stage !== "verified" ? "문자 인증을 먼저 완료해 주세요" : undefined}
+                disabled={!agreed || subscribeStatus === "submitting" || subscribeStatus === "done"}
               >
                 {subscribeStatus === "done"
                   ? claimAgencyOptIn

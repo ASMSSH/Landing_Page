@@ -142,21 +142,22 @@ export default function SignupCta() {
               disabled={done || submitting || !agreed}
               disabledHint="개인정보 수집 및 이용에 먼저 동의해 주세요"
             />
-            <button
-              className="signup-submit"
-              type="submit"
-              disabled={done || submitting || !agreed || !verified}
-              title={!verified ? '문자 인증을 먼저 완료해 주세요' : undefined}
-              style={done ? { background: 'var(--success-500)' } : undefined}
-            >
-              {done
-                ? '신청 완료! 가장 먼저 연락드릴게요 🐾'
-                : submitting
-                  ? '신청 중…'
-                  : claimAgencyOptIn
-                    ? '청구대행 사전 체험 신청하기 🐾'
-                    : '출시 알림 신청하기 🐾'}
-            </button>
+            {verified && (
+              <button
+                className="signup-submit"
+                type="submit"
+                disabled={done || submitting || !agreed}
+                style={done ? { background: 'var(--success-500)' } : undefined}
+              >
+                {done
+                  ? '신청 완료! 가장 먼저 연락드릴게요 🐾'
+                  : submitting
+                    ? '신청 중…'
+                    : claimAgencyOptIn
+                      ? '청구대행 사전 체험 신청하기 🐾'
+                      : '출시 알림 신청하기 🐾'}
+              </button>
+            )}
           </form>
           {status === 'error' && (
             <p className="privacy" style={{ color: 'var(--error-500)' }}>⚠️ {errMsg}</p>
