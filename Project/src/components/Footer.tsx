@@ -1,7 +1,6 @@
 import Icon from './icons';
 import { track } from '../lib/analytics';
-
-const INSTAGRAM_URL = 'https://www.instagram.com/boheomgaenyang/';
+import { INSTAGRAM_URL } from '../data/links';
 
 export default function Footer() {
   return (
