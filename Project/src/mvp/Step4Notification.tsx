@@ -1,4 +1,5 @@
 import notificationBell from "../assets/launch_notification_bell_animated.svg";
+import { PRIVACY_URL } from "../data/links";
 
 export type SubscribeStatus = "idle" | "submitting" | "done" | "error";
 
@@ -88,7 +89,7 @@ export default function Step4Notification({
           />
           <span>개인정보 수집 및 이용 동의 <b>(필수)</b></span>
           <a
-            href="https://app.notion.com/p/39bdbdcebb5e80e6a2ffc34ff1c11a8f?source=copy_link"
+            href={PRIVACY_URL}
             target="_blank"
             rel="noreferrer"
             onClick={(event) => event.stopPropagation()}
