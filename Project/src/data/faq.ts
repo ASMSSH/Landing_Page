@@ -1,6 +1,9 @@
+import { INSTAGRAM_URL } from './links';
+
 export interface FaqItem {
   q: string;
   a: string;
+  link?: { href: string; label: string };
 }
 
 export const FAQ: FaqItem[] = [
@@ -23,5 +26,10 @@ export const FAQ: FaqItem[] = [
   {
     q: '언제 출시되나요?',
     a: '지금 사전 신청을 받고 있어요. 출시되면 남겨주신 전화번호로 가장 먼저 알려드릴게요.',
+  },
+  {
+    q: '전화번호를 남기기가 부담스러워요.',
+    a: '괜찮아요! 전화번호 입력이 부담되거나 개인정보가 걱정되시면, 공식 인스타그램 계정(@boheomgaenyang)으로 DM을 주셔도 똑같이 안내해드려요.',
+    link: { href: INSTAGRAM_URL, label: '인스타그램으로 문의하기 →' },
   },
 ];

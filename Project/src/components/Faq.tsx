@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { FAQ } from '../data/faq';
+import { FAQ, type FaqItem } from '../data/faq';
 import Icon from './icons';
 import { track } from '../lib/analytics';
 
-function FaqRow({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
+function FaqRow({ q, a, link, open, onToggle }: FaqItem & { open: boolean; onToggle: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const [maxH, setMaxH] = useState(0);
 
@@ -18,7 +18,17 @@ function FaqRow({ q, a, open, onToggle }: { q: string; a: string; open: boolean;
         <Icon name="chevron-down" size={20} className="ic" />
       </button>
       <div className="faq-a" ref={ref} style={{ maxHeight: maxH }}>
-        <p>{a}</p>
+        <p>
+          {a}
+          {link && (
+            <>
+              {' '}
+              <a className="faq-link" href={link.href} target="_blank" rel="noreferrer">
+                {link.label}
+              </a>
+            </>
+          )}
+        </p>
       </div>
     </div>
   );
@@ -46,6 +56,7 @@ export default function Faq() {
               key={i}
               q={item.q}
               a={item.a}
+              link={item.link}
               open={openSet.has(i)}
               onToggle={() => {
                 if (!openSet.has(i)) track('faq_open', { index: i, question: item.q });
