@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMvp } from '../mvp/MvpContext';
 import { formatMobileNumber } from '../lib/phone';
 import { track } from '../lib/analytics';
+import { INSTAGRAM_URL } from '../data/links';
 
 const INSURER_OPTIONS = [
   '메리츠화재 펫퍼민트',
@@ -145,6 +146,18 @@ export default function SignupCta() {
             >
               개인정보 처리방침
             </a>
+          </p>
+          <p className="privacy">
+            💬 전화번호 입력이 부담되거나 개인정보가 걱정되시나요? 인스타그램{' '}
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => track('cta_click', { cta: 'signup_insta_dm' })}
+            >
+              @boheomgaenyang
+            </a>
+            {' '}DM으로 편하게 문의주세요.
           </p>
         </div>
       </div>
