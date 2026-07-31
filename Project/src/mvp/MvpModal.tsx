@@ -266,14 +266,10 @@ export default function MvpModal() {
                 disabled={!agreed || subscribeStatus === "submitting" || subscribeStatus === "done"}
               >
                 {subscribeStatus === "done"
-                  ? claimAgencyOptIn
-                    ? "사전 체험 신청 완료 ✓"
-                    : "알림 신청 완료 ✓"
+                  ? "알림 신청 완료 ✓"
                   : subscribeStatus === "submitting"
                     ? "신청 중…"
-                    : claimAgencyOptIn
-                      ? "청구대행 사전 체험 신청하기 →"
-                      : "출시 알림 신청하기 →"}
+                    : "출시 알림 신청하기 →"}
               </button>
             )}
           </div>
