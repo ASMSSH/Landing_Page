@@ -4,7 +4,7 @@ import { formatMobileNumber } from '../lib/phone';
 import { track } from '../lib/analytics';
 import { useOtp } from '../lib/useOtp';
 import OtpPanel from './OtpPanel';
-import { INSTAGRAM_URL } from '../data/links';
+import { INSTAGRAM_URL, PRIVACY_URL } from '../data/links';
 
 const INSURER_OPTIONS = [
   '메리츠화재 펫퍼민트',
@@ -165,7 +165,7 @@ export default function SignupCta() {
           <p className="privacy">
             🔒 입력하신 정보는 청구대행 안내 용도로만 사용하고 안전하게 보관해요 ·{' '}
             <a
-              href="https://app.notion.com/p/39bdbdcebb5e80e6a2ffc34ff1c11a8f?source=copy_link"
+              href={PRIVACY_URL}
               target="_blank"
               rel="noreferrer"
             >

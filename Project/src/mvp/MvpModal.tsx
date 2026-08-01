@@ -75,12 +75,10 @@ export default function MvpModal() {
     };
   }, [isOpen, close, resetStep1, resetOtp]);
 
-  /* 모달이 열려 있는 동안 단계 진입을 기록해 퍼널 이탈 지점을 파악한다. */
   useEffect(() => {
     if (isOpen) track("mvp_step", { step });
   }, [isOpen, step]);
 
-  /* 모달이 닫힐 때 마지막으로 보고 있던 단계를 기록한다 (이탈 지점). */
   const stepRef = useRef(step);
   stepRef.current = step;
   useEffect(() => {
