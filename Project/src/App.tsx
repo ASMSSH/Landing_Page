@@ -7,8 +7,10 @@ import Features from './components/Features';
 import Faq from './components/Faq';
 import SignupCta from './components/SignupCta';
 import Footer from './components/Footer';
+import ApplyPage from './apply/ApplyPage';
+import { isApplyPath } from './lib/route';
 
-export default function App() {
+function Landing() {
   return (
     <MvpProvider>
       <Nav />
@@ -24,4 +26,8 @@ export default function App() {
       <MvpModal />
     </MvpProvider>
   );
+}
+
+export default function App() {
+  return isApplyPath(location.pathname) ? <ApplyPage /> : <Landing />;
 }
