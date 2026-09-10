@@ -67,3 +67,8 @@ Icon
 .gstack/
 .vercel
 .env*
+
+# ===== AI 작업 환경 — 개인 설정만 제외한다 =====
+# CLAUDE.md와 .claude/{skills,agents,hooks,settings.json}는 팀 공유 대상이라 커밋한다.
+CLAUDE.local.md
+.claude/settings.local.json
