@@ -19,7 +19,7 @@
 /* ---------- Progress ---------- */
 .apply-progress { list-style:none; margin:0; padding:0; display:flex; align-items:center; }
 .apply-step { display:flex; align-items:center; flex:1 1 0; min-width:0; }
-.apply-step:last-child { flex:0 0 auto; }
+.apply-step:first-child { flex:0 0 auto; }
 .apply-step-line { flex:1 1 0; height:2px; margin:0 12px; border-radius:2px; background:var(--border); }
 .apply-step.done .apply-step-line, .apply-step.active .apply-step-line { background:var(--primary-500); }
 .apply-step-node { display:inline-flex; align-items:center; gap:8px; flex:0 0 auto; background:none; padding:0; color:inherit; font:inherit; }
@@ -63,14 +63,15 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 /* ---------- Actions ---------- */
 .apply-actions { display:flex; align-items:center; justify-content:space-between; gap:16px; }
 .apply-step-count { font-size:15px; color:var(--text-secondary); }
-.apply-actions-btns { display:flex; align-items:center; gap:12px; }
+.apply-actions-btns { display:flex; align-items:center; gap:12px; flex-shrink:0; }
+.apply-actions-btns .btn { width:auto; white-space:nowrap; flex-shrink:0; }
 .apply-btn-ghost { padding:10px 20px; font-size:15px; background:var(--surface); color:var(--text-primary); border:1.5px solid var(--border); }
 .apply-btn-ghost:hover { border-color:var(--neutral-300); }
 .apply-btn-next { padding:14px 26px; font-size:16px; }
 .apply-btn-next:disabled { cursor:default; opacity:.5; box-shadow:none; }
 
 /* ---------- Footer ---------- */
-.apply-foot { margin-top:auto; padding:24px 32px 32px; text-align:center; font-size:13px; color:var(--text-tertiary); }
+.apply-foot { margin-top:auto; padding:24px 32px 32px; background:none; text-align:center; font-size:13px; color:var(--text-tertiary); }
 .apply-foot a { color:inherit; text-decoration:underline; text-underline-offset:2px; }
 
 /* ---------- Responsive ---------- */
