@@ -6,10 +6,12 @@ interface ApplyActionsProps {
   nextDisabled?: boolean;
   /** 주 버튼 동작. 없으면 다음 단계로 */
   onNext?: () => void;
+  /** 주 버튼 라벨 오버라이드. S5가 전송 중에 「전송 중…」을 보여 주는 데 쓴다 (SSH-486). 없으면 steps.ts nextLabel */
+  nextLabel?: string;
 }
 
-export default function ApplyActions({ nextDisabled = false, onNext }: ApplyActionsProps) {
-  const { state, dispatch } = useApply();
+export default function ApplyActions({ nextDisabled = false, onNext, nextLabel }: ApplyActionsProps) {
+  const { state, dispatch, submitting } = useApply();
   const def = stepDef(state.step);
   if (!def) return null;
   return (
@@ -17,7 +19,12 @@ export default function ApplyActions({ nextDisabled = false, onNext }: ApplyActi
       <span className="apply-step-count">{state.step} / {STEP_COUNT}</span>
       <div className="apply-actions-btns">
         {state.step > 1 && (
-          <button type="button" className="btn apply-btn-ghost" onClick={() => dispatch({ type: 'prev' })}>
+          <button
+            type="button"
+            className="btn apply-btn-ghost"
+            disabled={submitting}
+            onClick={() => dispatch({ type: 'prev' })}
+          >
             ← 이전
           </button>
         )}
@@ -27,7 +34,7 @@ export default function ApplyActions({ nextDisabled = false, onNext }: ApplyActi
           disabled={nextDisabled}
           onClick={onNext ?? (() => dispatch({ type: 'next' }))}
         >
-          {def.nextLabel}
+          {nextLabel ?? def.nextLabel}
         </button>
       </div>
     </div>

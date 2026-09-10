@@ -24,7 +24,7 @@ function SummaryCard() {
     ['병원', treatment.hospitalName],
     ['진료일 · 진료비', visitLine(treatment.visitDate, treatment.treatmentCost)],
     ['보험사', [insurance.insurer, insurance.productName].filter(Boolean).join(' · ')],
-    ['보호자', applicant.name],
+    ['보호자', [applicant.name, applicant.phone].filter(Boolean).join(' · ')],
     ['반려동물', applicant.petName],
   ];
   return (

@@ -6,9 +6,10 @@ import { DONE_STEP } from './state';
 type Status = 'done' | 'active' | 'todo';
 
 export default function ApplyProgress() {
-  const { state, dispatch } = useApply();
+  const { state, dispatch, submitting } = useApply();
   // 접수 완료(6)는 종착이라 완료 단계를 눌러도 돌아가지 않는다. 버튼으로 그리지 않는다.
-  const locked = state.step === DONE_STEP;
+  // 전송 중에도 잠근다 — 떠나면 접수는 되는데 접수번호를 못 본다 (SSH-486)
+  const locked = state.step === DONE_STEP || submitting;
   return (
     <ol className="apply-progress" aria-label="신청 단계">
       {STEPS.map((step, i) => {
@@ -29,7 +30,10 @@ export default function ApplyProgress() {
               </button>
             ) : (
               <span className="apply-step-node">
-                <span className="apply-step-circle">{step.number}</span>
+                {/* 접수 완료(잠금)에서는 완료 단계를 버튼 없이 체크로만 그린다 — Figma S6 (SSH-486) */}
+                <span className="apply-step-circle">
+                  {status === 'done' ? <Icon name="check" size={13} strokeWidth={3} /> : step.number}
+                </span>
                 <span className="apply-step-label">{step.label}</span>
               </span>
             )}
