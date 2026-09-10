@@ -49,6 +49,13 @@
 - [x] 스크린샷 1440 · 768 · 390(결과) + 로딩 1440 + fallback 1440 → `docs/spec/SSH-473/`
 - [x] **커밋** `docs: SSH-473 검증 스크린샷 추가`
 
+## 8. 2차 피드백 반영 (2026-09-10) — spec 「2차 피드백 반영」
+
+- [x] `ApplyActions` secondary prop·`has-secondary` CSS·S3 토스트 제거 → 「← 이전」 (**커밋** `fix: S3 액션 행을 「← 이전」으로 — 「서류만 확인할게요」 제거`)
+- [x] `lib/claimDocuments.ts` `fetchClaimDocumentsOrGeneral` + `claimDocuments.test.ts` 3건 (**커밋** `fix: 청구 유형 서류가 없으면 같은 보험사 질병 서류로 다시 조회`)
+- [x] 스크린샷 다시 찍기(액션 행 바뀜) · spec·tasks 갱신 (**커밋** `docs: SSH-473 2차 피드백 반영 기록·스크린샷 교체`)
+- [ ] Figma S3 프레임 「서류만 확인할게요」 → 「← 이전」 (사람 확인 뒤)
+
 ## 7. 마무리
 
 - [x] PR 본문 갱신(`/pr`) → `/pr-review` **별도 서브에이전트** → P1·P2 반영, P3 이하 보고 (2026-09-10 리뷰 1회: P1·P2 없음, P3 1건 — 조회 실패 fallback이 세션 동안 굳음 → 사용자 지시로 반영: fallback 카드 「다시 찾아보기」 버튼. 재리뷰 등록은 사람 확인 뒤)

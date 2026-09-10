@@ -99,6 +99,9 @@ SSH-543과 같은 이유 — `tsconfig.app.json`은 `src`만 포함하고 `serve
 - `fetchClaimDocuments(claimType: ClaimType, insurer: string, signal?: AbortSignal): Promise<ClaimDocumentGuide>` —
   `GET /api/claim-documents?claimType=&insurer=`, **10초 타임아웃**과 호출자 signal 합성, `AbortError`는 그대로 throw, 비-2xx는
   `Error(body.error ?? 'claim_documents_unavailable')`. 얇은 래퍼라 테스트하지 않는다(`geminiAnalyze.ts`와 같은 취급)
+- `fetchClaimDocumentsOrGeneral(claimType, insurer, signal?)` — 위를 부르고, 그 유형이 404 `no_documents`면 `illness`로 한 번 더.
+  다른 오류·이미 `illness`면 그대로 throw. `claimDocuments.test.ts`(fetch 스텁 3케이스: 재조회 / 질병은 재조회 없음 / 501은 재조회 없음).
+  「2차 피드백 반영」 2
 
 `src/apply/requiredDocs.ts` (신규, React 의존 없음) + `requiredDocs.test.ts`
 ```ts
@@ -143,7 +146,7 @@ StrictMode 이중 effect에서 1회차는 abort로 무시되고 fallback dispatc
 | 상태 | 헤딩 설명 | 본문 | 액션 행 |
 | --- | --- | --- | --- |
 | loading | `steps.ts` description(「{보험사} 기준으로 필요한 서류를 찾고 있어요」 — 2절 끝) | **로더 카드**(연코랄 `--primary-50`, 스피너 · **필요한 서류를 찾고 있어요…** · 보험사·진료 유형에 맞는 서류를 확인하는 중이에요. 잠시만요.) + **스켈레톤 패널**(열 제목 2 + 행 3×2, pulse) | 주 버튼 비활성 |
-| ready · 정상 | `docsSummaryLine` | **요약 배너**(sage `--success-50/100`: 제목 「{보험사} · {유형} 청구 준비 서류」 + 「최종 요건은 보험사가 정해요. 담당자가 병원에 확인한 뒤 알려드려요.」 + 배지 「보험사 기준」) → **2열 패널**(🏥 병원에서 받을 서류 / ✍️ 직접 준비할 서류, 행 = 이름 + 배지 「병원 발급」/「보험사 양식」, 한쪽이 비면 열 제목 유지 + 「없어요」 한 줄) → **베타 카드**(앰버: 🎁 **베타 기간엔 대리 청구가 무료예요** / 서류 발급부터 보험사 제출까지 담당자가 대신해요. 사본은 나중에 따로 받아요.) | 「서류만 확인할게요」(고스트) + 「무료로 대신 청구 맡기기 →」 |
+| ready · 정상 | `docsSummaryLine` | **요약 배너**(sage `--success-50/100`: 제목 「{보험사} · {유형} 청구 준비 서류」 + 「최종 요건은 보험사가 정해요. 담당자가 병원에 확인한 뒤 알려드려요.」 + 배지 「보험사 기준」) → **2열 패널**(🏥 병원에서 받을 서류 / ✍️ 직접 준비할 서류, 행 = 이름 + 배지 「병원 발급」/「보험사 양식」, 한쪽이 비면 열 제목 유지 + 「없어요」 한 줄) → **베타 카드**(앰버: 🎁 **베타 기간엔 대리 청구가 무료예요** / 서류 발급부터 보험사 제출까지 담당자가 대신해요. 사본은 나중에 따로 받아요.) | 「← 이전」 + 「무료로 대신 청구 맡기기 →」 |
 | ready · fallback | `docsSummaryLine` | 요약 배너의 **앰버 변형**(`.is-fallback`, `--secondary-50/100`): 제목 「담당자가 확인 후 안내드려요」 + 부제(기타/모름: 「보험사를 아직 몰라도 괜찮아요. 신청하면 담당자가 보험사를 확인해서 필요한 서류를 알려드려요. …」 / 조회 실패: 「{보험사} 기준 서류를 지금은 찾지 못했어요. 신청하면 담당자가 보험사에 확인해서 알려드려요. …」) + 배지 「기본 안내」 + **조회 실패일 때만 「다시 찾아보기」 고스트 버튼**(스냅샷을 null로 → effect가 재조회, AI 리뷰 P3 반영) → 같은 2열 패널에 공통 3건 → 같은 베타 카드 | 같음 |
 
 - 배너 제목의 `{유형}`은 `CLAIM_TYPE_LABEL`(스냅샷에 title이 없으므로 클라이언트 문구). 「기타 / 모름」은 `{보험사}` 자리에 그대로 「기타 / 모름」
@@ -162,6 +165,8 @@ StrictMode 이중 effect에서 1회차는 abort로 무시되고 fallback dispatc
 **「서류만 확인할게요」 동작** — 클릭 시 `Toast` 「서류는 위 목록에서 확인하면 돼요. 맡기고 싶어지면 언제든 「무료로 대신 청구
 맡기기」를 눌러 주세요」. 페이지를 떠나지 않고 상태도 잃지 않는다. 보호자가 원하는 건 지금 화면의 서류 목록이다 — `/`로 보내면
 그 목록을 치우고 입력도 잃는다. 클릭 트래킹은 SSH-545(`apply_docs`와 함께). **1차 리뷰 결정 요청 4.**
+
+> **폐기(2026-09-10 2차 피드백)** — 이 절 전체를 뺐다. S3 액션 행은 다른 단계와 같은 「← 이전」 + 주 버튼이고 `ApplyActions`는 바꾸지 않는다.
 
 ### 4. 스타일 — `src/styles/apply.css`에 `/* S3: 필요 서류 */` 절 추가
 
@@ -188,17 +193,16 @@ StrictMode 이중 effect에서 1회차는 abort로 무시되고 fallback dispatc
 ```
 src/lib/claimType.ts                        inferClaimTypeFromText · CLAIM_TYPE_LABEL · mvp 의존 제거
 src/lib/claimType.test.ts                   신규 — node:test
-src/lib/claimDocuments.ts                   신규 — /api/claim-documents 클라이언트 + 응답 타입
+src/lib/claimDocuments.ts                   신규 — /api/claim-documents 클라이언트 + 응답 타입 + 질병 재조회
+src/lib/claimDocuments.test.ts              신규 — fetch 스텁
 src/apply/requiredDocs.ts                   신규 — 순수 함수(스냅샷 변환·fallback·현재성·요약 문구)
 src/apply/requiredDocs.test.ts              신규 — node:test
 src/apply/steps/StepDocuments.tsx           신규 — S3 조립(헤딩·로더/결과·액션·토스트)
-src/apply/ApplyActions.tsx                  secondary prop
 src/apply/ApplyPage.tsx                     단계 분기
 src/apply/steps.ts                          3단계 description → 로딩 문구
-src/apply/Toast.tsx                         주석
 src/styles/apply.css                        4절 클래스
 docs/spec/SSH-473/{spec,tasks}.md           이 문서
-docs/spec/SSH-473/apply-s3-{1440,768,390}.png · apply-s3-loading-1440.png · apply-s3-fallback-1440.png
+docs/spec/SSH-473/apply-s3-{1440,768,390}.png · apply-s3-loading-1440.png · apply-s3-fallback-1440.png · apply-s3-retry-1440.png
 ```
 
 ## 범위 밖 — 형제 티켓이 한다
@@ -223,8 +227,9 @@ docs/spec/SSH-473/apply-s3-{1440,768,390}.png · apply-s3-loading-1440.png · ap
 - [x] S2 「기타 / 모름」 → 로더 없이 담당자 안내 카드 + 공통 3건
 - [x] 네트워크 차단(fetch reject) → 담당자 안내 카드(fallback) + 「다시 찾아보기」 → 네트워크 복구 후 클릭 → 로더 → 결과. 501 경로는 같은 catch로 수렴 — 코드 경로 동일
 - [x] 마이브라운(직접 준비 0건) → 오른쪽 열 「없어요」
-- [x] 「서류만 확인할게요」 → 토스트, 화면 유지. ≤480에서 버튼 두 개 전폭 세로
+- [x] ~~「서류만 확인할게요」 토스트~~ → 2차 피드백으로 제거. S3 액션 행이 S2와 같은 「← 이전」 + 주 버튼
 - [x] S1·S2 액션 행이 그대로인지(「← 이전」 유지)
+- [x] 예방/검진 행이 없는 보험사(DB손해보험 + 「중성화」) → 질병 서류로 재조회돼 담당자 카드가 아니라 보험사 서류가 보임
 - [x] Vercel 프리뷰 `/apply?r=test` — 프리뷰 환경에도 NOTION env가 있어 실데이터로 동작 확인(2026-09-10)
 - [x] 스크린샷 1440 · 768 · 390(결과, 대표) + 로딩 1440 + fallback 1440 → `docs/spec/SSH-473/`, PR 본문 임베드
 
@@ -241,6 +246,15 @@ docs/spec/SSH-473/apply-s3-{1440,768,390}.png · apply-s3-loading-1440.png · ap
 8. **`inferClaimTypeFromText` 추가 + 기존 함수는 구조적 타입으로 위임** — mvp 파일 무수정. 「배경」
 9. **재조회 규칙** — 스냅샷의 `insurer`·`claimType`이 현재 입력과 같으면 재조회하지 않는다(S4 갔다 와도 로더 없음). 2절
 10. **`RequiredDocsSnapshot` 모양 확정** — SSH-542가 둔 그대로(이름 배열 + fallback). title·notes는 넣지 않는다
+
+## 2차 피드백 반영 (2026-09-10, 구현 뒤 사용자)
+
+1. **S3 액션 행은 다른 단계와 같은 「← 이전」 + 주 버튼.** Figma의 「서류만 확인할게요」(결정 4·7)는 뺐다 — `ApplyActions.secondary` prop·토스트·
+   `has-secondary` CSS를 제거하고 S1·S2와 같은 행으로 돌아갔다. Figma S3 프레임은 「← 이전」으로 고쳐 둔다
+2. **「기능은 도는데 왜 찾지 못했다고 나오나」** — 노션 필요서류 DB에 **예방/검진 행이 없는 보험사가 5곳**(DB·KB·현대해상·카카오페이·
+   마이브라운, 2026-09-10 전체 조합 실측)이라 병명에 접종·중성화·검진·미용·스케일링이 들어가면 서버가 404를 주고 담당자 카드로 갔다.
+   → `fetchClaimDocumentsOrGeneral`: 그 유형이 404 `no_documents`면 **같은 보험사의 질병(통원) 서류로 한 번 더 조회**한다(1절).
+   스냅샷·헤딩의 `claimType`은 요청한 유형(예방·검진)을 유지하고 서류 목록만 질병 행이다. 질병 행도 없거나 다른 오류면 그대로 담당자 카드
 
 ## 1차 리뷰 결정 (2026-09-10)
 
