@@ -71,8 +71,9 @@
 
 - [x] `npm run build` · `npm run lint` · `npm test` (23건)
 - [x] 로컬 OCR 성공 경로(로컬에 GEMINI 키가 없어 브라우저에서 fetch를 모킹) · 직접 입력 경로 · 실패 토스트(실서버 500) · S2 비활성 · 랜딩 select 8개
-- [ ] 실제 영수증 사진 OCR · 4MB 초과 폰 사진 축소(실기기) — GEMINI 키 있는 환경에서 사람이 확인
-- [ ] Vercel 프리뷰 `/apply?r=test` (GEMINI env 유무는 사람 확인)
+- [x] 실제 영수증 사진 OCR — 프리뷰(Vercel env)·로컬(.env) 양쪽 5칸 채워짐 (2026-09-10)
+- [ ] 3MB 초과 폰 사진 축소(실기기) — 사람이 확인
+- [x] Vercel 프리뷰 `/apply?r=test` 200 · 번들 확인 · 실제 OCR 동작 (저장소 public 복귀 후)
 - [x] 스크린샷 1440 · 768 · 390(S1) + S1-a(1440·390) · 사진 보기(1440·390) · S2 · 실패 토스트 1440 → `docs/spec/SSH-543/`
 - [x] **커밋** `docs: SSH-543 검증 스크린샷 추가`
 
