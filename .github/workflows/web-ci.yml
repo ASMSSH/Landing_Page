@@ -20,6 +20,9 @@ on:
   push:
     # Squash Merge 는 PR 과 다른 커밋을 만든다. dev/main 에 올라간 결과물도 한 번 확인한다.
     branches: [dev, main]
+  # 사람이 Actions 탭에서 아무 브랜치에나 직접 돌릴 수 있다. Draft 상태에서 CI 를 미리 보고 싶을 때 쓴다.
+  # 이 경로는 기준 커밋이 없어 변경 감지 없이 전체를 돈다.
+  workflow_dispatch:
 
 # 같은 브랜치에 새 커밋을 밀면 진행 중이던 이전 실행을 취소한다.
 concurrency:
@@ -71,12 +74,14 @@ jobs:
           fi
 
       # 테스트가 TS 를 그대로 실행한다(node --test, 별도 러너 없음). 26 미만에서는 돌지 않는다.
-      # 버전은 Project/package.json 의 engines.node 와 맞춘다. 로컬도 26 이다.
+      # 버전은 Project/.nvmrc 한 곳에만 적는다. package.json engines 에 넣지 않는 이유 —
+      # Vercel 이 engines.node 를 읽어 빌드·서버리스 런타임을 고르는데 26 은 Vercel 에 없어 배포가 실패한다
+      # (SSH-546 에서 실측). 서버리스 함수는 Vercel 의 Node 로 돌고, 26 이 필요한 것은 테스트 러너뿐이다.
       - name: Node 설치
         if: steps.changes.outputs.run == 'true'
         uses: actions/setup-node@v4
         with:
-          node-version: 26
+          node-version-file: Project/.nvmrc
           cache: npm
           cache-dependency-path: Project/package-lock.json
 
