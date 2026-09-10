@@ -98,9 +98,12 @@ receiptToTreatment(a: GeminiAnalysis): Partial<Treatment>
 - 테스트: 정상 매핑 · 날짜 4형식 · 잘못된 날짜 제외 · 쉼표·원 제거 · 빈 값 제외
 
 `src/apply/imageToDataUrl.ts` (신규) — `File → Promise<{ dataUrl, mimeType }>`
-- 파일이 **4MB 이하이고 긴 변 2000px 이하**면 `FileReader`로 그대로 dataURL
+- 파일이 **3MB 이하이고 긴 변 2000px 이하**면 `FileReader`로 그대로 dataURL
 - 아니면 `createImageBitmap` → canvas로 **긴 변 1600px, JPEG 품질 0.85**로 다시 인코딩 (폰 JPEG는 3~6MB가 흔해 그대로
-  보내면 서버 413). 디코드 실패(Chrome의 HEIC 등)면 원본이 4MB 이하일 때만 원본을 보내고, 아니면 `ImageTooLargeError`
+  보내면 413). 디코드 실패(Chrome의 HEIC 등)면 원본이 3MB 이하일 때만 원본을 보내고, 아니면 `ImageTooLargeError`
+- **상한이 서버의 4MB가 아니라 3MB인 이유**(AI 리뷰 P2 반영, 2026-09-10): 전송 본문은 base64 dataURL을 감싼 JSON이라 원본의
+  약 1.37배다. Vercel 서버리스 함수의 요청 본문 한도가 4.5MB라 원본 3.3MB부터는 서버의 413(JSON)보다 플랫폼 413(비JSON)이
+  먼저 온다. 로컬 dev 미들웨어는 6MB 버퍼라 이 한계가 로컬에서는 재현되지 않는다
 - 브라우저 API라 `node:test`로는 안 본다 — 검증 절의 실기기 항목으로
 
 ### 3. S1 — 진료 정보 등록 화면
@@ -121,7 +124,7 @@ receiptToTreatment(a: GeminiAnalysis): Partial<Treatment>
 - 흐름: 파일 선택 → `imageToDataUrl` → `analyzeReceiptWithGemini(dataUrl, signal)` → `receiptToTreatment` →
   `dispatch({ type: 'setTreatment', patch })` → `done`. 파일·dataURL은 컴포넌트 로컬 변수로만 쓰고 **상태·스토리지에
   넣지 않는다.** 언마운트·재업로드 시 `AbortController`로 진행 중 요청을 취소한다
-- 토스트 문안: 너무 큼 → `사진이 너무 커요. 4MB 이하 JPG·PNG로 올려 주세요` / 형식 → `JPG·PNG·WEBP·HEIC 사진만 올릴 수 있어요` /
+- 토스트 문안: 너무 큼 → `사진이 너무 커요. 3MB 이하 JPG·PNG로 올려 주세요` / 형식 → `JPG·PNG·WEBP·HEIC 사진만 올릴 수 있어요` /
   서버·네트워크 → 서버가 준 `error` 문자열(없으면 `영수증을 읽지 못했어요. 직접 입력해 주세요`)
 - `Toast.tsx`: 화면 하단 고정, 4초 뒤 자동 닫힘, `role="status"`. S1 로컬 상태로 띄운다(전역 토스트 시스템은 만들지 않는다 —
   쓰는 곳이 여기뿐이다)
@@ -248,7 +251,7 @@ docs/spec/SSH-543/apply-s1-{1440,768,390}.png · apply-s1a-1440.png · apply-s2-
       S2 보험사 선택 → 요약 레일에 보험사 표시 → 「필요 서류 확인」 → S3 placeholder → 「이전」으로 돌아와도 값 유지
 - [ ] 사진 없이 「다음」 → 필수 3칸 오류 표시·첫 칸 포커스 → 채우면 통과. 미래 날짜 → 오류
 - [ ] OCR 실패(키 제거 또는 네트워크 차단) → 토스트, 폼·입력값 유지
-- [ ] 4MB 넘는 폰 사진(실기기) → 축소돼 성공. HEIC(iPhone) 1장
+- [ ] 3MB 넘는 폰 사진(실기기) → 축소돼 성공. HEIC(iPhone) 1장
 - [ ] S2에서 보험사 미선택이면 주 버튼 비활성
 - [ ] 랜딩 `/`의 사전 신청 select에 8개 옵션이 그대로 보임(라벨 2개만 바뀜)
 - [ ] Vercel 프리뷰 `/apply?r=test` — **Vercel에 `GEMINI_API_KEY`·`GEMINI_MODEL`이 있는지 사람이 확인**. 없으면 프리뷰에서는
@@ -269,7 +272,7 @@ S1-b의 폼 5칸을 카드 아래로), S1-b 프레임은 「(미사용)」으로
    것과 일관된다 (플랜 단계 사용자 결정, 2026-09-10)
 2. **`SignupCta.tsx` 보험사 목록을 `INSURERS`로 치환** — 사전 신청 Notion·`signup_submit` 값 두 개가 바뀐다. 8절 (플랜 단계 사용자 결정)
 3. **`src/mvp/types.ts` Fields 확장 안 함** — 티켓 본문과 다르다. 「배경」 (플랜 단계 사용자 결정)
-4. **4MB 초과 사진은 브라우저에서 1600px JPEG로 축소** — 2절 (플랜 단계 사용자 결정)
+4. **3MB 초과 사진은 브라우저에서 1600px JPEG로 축소** — 2절 (처음엔 4MB였으나 AI 리뷰 P2로 3MB) (플랜 단계 사용자 결정)
 5. **S1 「다음」 항상 활성 + 클릭 시 오류 표시 / S2는 보험사 고를 때까지 비활성** — 폼은 어디가 틀렸는지 보여 주는 쪽이 낫고,
    단일 선택은 비활성이 자연스럽다
 6. **진료일 상한은 오늘 포함** — 「오늘 이전」을 미래 금지로 읽었다
