@@ -1,0 +1,101 @@
+/* /apply 셸 전용 스타일. 토큰·.wrap·.btn·.field·.beta-badge는 index.css 것을 그대로 쓴다.
+   레이아웃 규칙은 Figma 반응형 데모(1640-1327):
+   컨테이너 max 1040, 좌우 여백 최소 32 · ≤1024 메인 축소(레일 328 유지) · ≤768 1열 · ≤480 모바일 압축 */
+
+.apply-page { min-height:100dvh; display:flex; flex-direction:column; }
+.apply-container { width:100%; max-width:calc(1040px + 64px); margin:0 auto; padding:40px 32px 48px; display:flex; flex-direction:column; gap:28px; }
+
+/* ---------- Nav (apply variant) ---------- */
+.nav-help { font-size:14px; font-weight:600; color:var(--text-secondary); white-space:nowrap; transition:color .15s; }
+.nav-help:hover { color:var(--primary-600); }
+
+/* ---------- Page header ---------- */
+.apply-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.apply-head-copy { display:flex; flex-direction:column; gap:4px; }
+.apply-title { font-size:26px; line-height:1.2; color:var(--text-primary); }
+.apply-subtitle { font-size:15px; color:var(--text-secondary); }
+.apply-beta { margin-top:16px; font-size:11px; padding:4px 10px; }
+
+/* ---------- Progress ---------- */
+.apply-progress { list-style:none; margin:0; padding:0; display:flex; align-items:center; }
+.apply-step { display:flex; align-items:center; flex:1 1 0; min-width:0; }
+.apply-step:first-child { flex:0 0 auto; }
+.apply-step-line { flex:1 1 0; height:2px; margin:0 12px; border-radius:2px; background:var(--border); }
+.apply-step.done .apply-step-line, .apply-step.active .apply-step-line { background:var(--primary-500); }
+.apply-step-node { display:inline-flex; align-items:center; gap:8px; flex:0 0 auto; background:none; padding:0; color:inherit; font:inherit; }
+button.apply-step-node { cursor:pointer; border-radius:999px; }
+button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
+.apply-step-circle { width:26px; height:26px; border-radius:999px; display:inline-grid; place-items:center; flex-shrink:0; font-family:var(--font-display); font-size:14px; background:var(--surface); color:var(--text-tertiary); border:1.5px solid var(--border); }
+.apply-step.done .apply-step-circle, .apply-step.active .apply-step-circle, .apply-step-circle.active { background:var(--primary-500); color:#fff; border-color:var(--primary-500); }
+.apply-step-label { font-size:14px; font-weight:600; color:var(--text-tertiary); white-space:nowrap; }
+.apply-step.active .apply-step-label { color:var(--text-primary); font-weight:700; }
+.apply-step.done .apply-step-label { color:var(--text-secondary); }
+
+/* ---------- Body: 2열 ---------- */
+.apply-body { display:grid; grid-template-columns:minmax(0, 680px) 328px; justify-content:space-between; gap:32px; align-items:start; }
+.apply-main { display:flex; flex-direction:column; gap:20px; min-width:0; }
+.apply-rail { display:flex; flex-direction:column; gap:16px; min-width:0; }
+
+/* ---------- Step heading ---------- */
+.apply-step-heading { display:flex; flex-direction:column; gap:8px; }
+.apply-step-heading-row { display:flex; align-items:center; gap:10px; }
+.apply-step-title { font-family:var(--font-display); font-size:20px; color:var(--text-primary); }
+.apply-step-desc { font-size:15px; color:var(--text-secondary); }
+
+/* ---------- Panels ---------- */
+.apply-panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:24px; }
+.apply-placeholder { min-height:220px; display:grid; place-items:center; color:var(--text-tertiary); font-size:15px; border-style:dashed; }
+
+/* ---------- Rail cards ---------- */
+.apply-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:20px; display:flex; flex-direction:column; gap:12px; }
+.apply-card-title { font-size:15px; font-weight:700; color:var(--text-primary); }
+.apply-summary-list { margin:0; display:flex; flex-direction:column; gap:12px; }
+.apply-summary-row { display:flex; flex-direction:column; gap:2px; }
+.apply-summary-row dt { font-size:12px; color:var(--text-tertiary); }
+.apply-summary-row dd { margin:0; font-size:15px; font-weight:600; color:var(--text-primary); overflow-wrap:anywhere; }
+.apply-summary-row dd.empty { color:var(--text-tertiary); font-weight:400; }
+.apply-help { background:var(--success-50); border-color:var(--success-100); }
+.apply-help-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+.apply-help-list li { display:flex; align-items:flex-start; gap:8px; font-size:13px; line-height:1.5; color:var(--text-secondary); }
+.apply-help-list svg { flex-shrink:0; margin-top:3px; color:var(--success-700); }
+.apply-help-list a { color:var(--success-700); font-weight:700; text-decoration:underline; text-underline-offset:2px; }
+
+/* ---------- Actions ---------- */
+.apply-actions { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.apply-step-count { font-size:15px; color:var(--text-secondary); }
+.apply-actions-btns { display:flex; align-items:center; gap:12px; flex-shrink:0; }
+.apply-actions-btns .btn { width:auto; white-space:nowrap; flex-shrink:0; }
+.apply-btn-ghost { padding:10px 20px; font-size:15px; background:var(--surface); color:var(--text-primary); border:1.5px solid var(--border); }
+.apply-btn-ghost:hover { border-color:var(--neutral-300); }
+.apply-btn-next { padding:14px 26px; font-size:16px; }
+.apply-btn-next:disabled { cursor:default; opacity:.5; box-shadow:none; }
+
+/* ---------- Footer ---------- */
+.apply-foot { margin-top:auto; padding:24px 32px 32px; background:none; text-align:center; font-size:13px; color:var(--text-tertiary); }
+.apply-foot a { color:inherit; text-decoration:underline; text-underline-offset:2px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width:1024px) {
+  .apply-body { grid-template-columns:minmax(0, 1fr) 328px; }
+}
+@media (max-width:768px) {
+  .apply-body { grid-template-columns:1fr; }
+  .apply-rail { order:2; }
+  .apply-main { order:1; }
+}
+@media (max-width:480px) {
+  .apply-container { padding:24px 18px 36px; gap:22px; }
+  .apply-title { font-size:22px; }
+  .apply-beta { margin-top:8px; }
+  /* 프로그레스 압축 — 원 22px, 현재 단계 라벨만 (모바일 시안 1544-658) */
+  .apply-step-line { margin:0 6px; }
+  .apply-step-circle { width:22px; height:22px; font-size:12px; }
+  .apply-step-label { display:none; }
+  .apply-step.active .apply-step-label { display:inline; }
+  .apply-step-node { gap:6px; }
+  .apply-step-heading-row .apply-step-circle { width:26px; height:26px; font-size:14px; }
+  .apply-actions { flex-wrap:wrap; }
+  .apply-actions-btns { margin-left:auto; }
+  .apply-btn-next { padding:12px 20px; font-size:15px; }
+  .apply-foot { padding:20px 18px 28px; }
+}
