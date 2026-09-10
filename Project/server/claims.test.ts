@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { boardUrlFrom, buildClaimMessage, createClaim, nextReceiptNo, receiptPrefix, todayKst, validateClaimInput, type ClaimsEnv } from './claims.ts';
+import { boardUrlFrom, buildClaimMessage, createClaim, maskPhone, nextReceiptNo, receiptPrefix, todayKst, validateClaimInput, type ClaimsEnv } from './claims.ts';
 
 // PR #32 본문에 잡힌 실제 payload + client_id. 클라이언트가 통과시키는 값은 서버도 통과시켜야 한다.
 const CLIENT_ID = '6f1c2a3e-9b4d-4c5e-8f7a-1b2c3d4e5f60';
@@ -108,9 +108,17 @@ test('boardUrlFrom — SUPABASE_URL의 프로젝트 ref로 대시보드 링크',
   assert.equal(boardUrlFrom('https://abcdefgh.supabase.co'), 'https://supabase.com/dashboard/project/abcdefgh/editor');
 });
 
-test('buildClaimMessage — 접수번호·병원·진료일·보험사·유입 코드·링크만', () => {
+test('maskPhone — 가운데 4자리만 가린다', () => {
+  assert.equal(maskPhone('010-1234-5678'), '010-****-5678');
+  assert.equal(maskPhone('01012345678'), '***');
+});
+
+test('buildClaimMessage — 이름·마스킹 전화·반려동물·병원·진료일·보험사·유입 코드·링크', () => {
   const text = buildClaimMessage({
     receiptNo: 'BGN-260910-01',
+    guardianName: '홍길동',
+    guardianPhone: '010-1234-5678',
+    petName: '코코',
     hospitalName: '개냥동물병원',
     visitDate: '2026-09-08',
     insurer: '삼성화재',
@@ -118,6 +126,8 @@ test('buildClaimMessage — 접수번호·병원·진료일·보험사·유입 �
     boardUrl: 'https://example.com/board',
   });
   assert.match(text, /BGN-260910-01/);
+  assert.match(text, /홍길동 \(010-\*\*\*\*-5678\) · 반려동물: 코코/);
+  assert.doesNotMatch(text, /010-1234-5678/);
   assert.match(text, /개냥동물병원/);
   assert.match(text, /유입 코드: -/);
   assert.match(text, /<https:\/\/example\.com\/board\|/);
@@ -218,10 +228,10 @@ test('createClaim — 성공: 조회 → insert → 슬랙 → slack_notified', 
   assert.match(text, /개냥동물병원/);
   assert.match(text, /삼성화재/);
   assert.match(text, /유입 코드: test/);
-  assert.doesNotMatch(text, /김민석/);
+  assert.match(text, /김민석 \(010-\*\*\*\*-5678\)/);
+  assert.match(text, /코코/);
   assert.doesNotMatch(text, /010-1234-5678/);
   assert.doesNotMatch(text, /1995/);
-  assert.doesNotMatch(text, /코코/);
 
   assert.equal(patches(calls).length, 1);
   assert.deepEqual(patches(calls)[0].body, { slack_notified: true });

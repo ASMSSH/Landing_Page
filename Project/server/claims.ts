@@ -180,12 +180,17 @@ export async function markSlackNotified(env: SupabaseEnv, id: string): Promise<v
 }
 
 // ---------------------------------------------------------------- 슬랙 Incoming Webhook
-// 접수 직후 1통. 문안에는 접수번호·병원·진료일·보험사·유입 코드·운영 보드 링크만 넣는다 —
-// 이름·전화번호·생년월일·반려동물 이름은 타입에서부터 받지 않는다 (설계 §6-2 「이름·전화번호는 넣지 않는다」).
+// 접수 직후 1통. 담당자가 알림만 보고 누구인지 알 수 있게 보호자 이름·반려동물 이름은 넣고, **전화번호는 뒤 4자리만**
+// (010-****-5678) 남긴다 — 전체 번호는 Table Editor 링크에서. 생년월일은 넣지 않는다. 설계 §6-2의 「이름·전화번호 금지」를
+// 2026-09-10 사용자 결정으로 이렇게 완화했다 — 슬랙에 개인정보 원문이 남지 않아 처리방침 수탁자 변경 없이 가는 선.
 // 슬랙이 실패해도 접수는 살린다 — boolean만 보고 넘어간다. 자동 재시도 없음.
 
 export interface ClaimNotice {
   receiptNo: string;
+  guardianName: string;
+  /** 010-XXXX-XXXX — buildClaimMessage가 마스킹한다 */
+  guardianPhone: string;
+  petName: string;
   hospitalName: string;
   /** YYYY-MM-DD */
   visitDate: string;
@@ -197,15 +202,22 @@ export interface ClaimNotice {
 
 const SLACK_TIMEOUT_MS = 3000;
 
-/** mrkdwn 한 통. 순수 함수 — 테스트에서 개인정보가 없는지 확인한다 */
+/** 010-1234-5678 → 010-****-5678. 형식이 다르면 전부 가린다 */
+export function maskPhone(phone: string): string {
+  const m = /^(\d{3})-(\d{4})-(\d{4})$/.exec(phone);
+  return m ? `${m[1]}-****-${m[3]}` : '***';
+}
+
+/** mrkdwn 한 통. 순수 함수 — 테스트에서 전화번호 원문·생년월일이 없는지 확인한다 */
 export function buildClaimMessage(n: ClaimNotice): string {
   return [
     `🐾 새 대리청구 신청 *${n.receiptNo}*`,
+    `• 보호자: ${n.guardianName} (${maskPhone(n.guardianPhone)}) · 반려동물: ${n.petName}`,
     `• 병원: ${n.hospitalName}`,
     `• 진료일: ${n.visitDate}`,
     `• 보험사: ${n.insurer}`,
     `• 유입 코드: ${n.refCode ?? '-'}`,
-    `<${n.boardUrl}|Supabase Table Editor에서 보기>`,
+    `<${n.boardUrl}|Table Editor에서 전화번호 보기>`,
   ].join('\n');
 }
 
@@ -449,6 +461,9 @@ export async function createClaim(input: unknown, env: ClaimsEnv, now = new Date
   if (env.slackWebhookUrl) {
     const text = buildClaimMessage({
       receiptNo: inserted.receiptNo,
+      guardianName: row.guardian_name,
+      guardianPhone: row.guardian_phone,
+      petName: row.pet_name,
       hospitalName: row.hospital_name,
       visitDate: row.visit_date,
       insurer: row.insurer,
