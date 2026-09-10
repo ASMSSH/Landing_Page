@@ -1,0 +1,111 @@
+name: 웹 CI
+
+# Project/(Vite + React + TS) 코드가 lint · 타입 검사 · 빌드 · 테스트를 통과하는지 본다.
+# 협업 규칙(PR 제목·커밋 메시지·브랜치명) 검사는 rules-ci.yml 이 따로 한다.
+#
+# paths 필터를 쓰지 않고 job 안에서 변경을 감지한다 (SSH-546 1차 리뷰 결정).
+#   - paths 필터를 쓰면 문서만 고친 PR 에서 이 워크플로가 아예 트리거되지 않는다. 그 상태에서 이 job 을
+#     브랜치 보호의 필수 체크로 걸면 체크가 생성되지 않아 영원히 pending 으로 남고 머지 버튼이 잠긴다
+#   - 그래서 항상 트리거하되, Project/ 안의 .md 가 아닌 파일이 안 바뀌었으면 뒤 스텝을 건너뛰고 바로 초록을 낸다
+#
+# 검사하지 않는 것과 그 이유:
+#   - 배포          Vercel GitHub 앱이 PR 마다 프리뷰를 만들고 dev/main 푸시를 배포한다. 여기서 또 하지 않는다
+#   - E2E·스크린샷   규약이 아직 없다. 스크린샷은 PR 본문에 사람이(pr 스킬이) 붙인다
+
+on:
+  pull_request:
+    # ready_for_review 를 더해야 Draft -> Ready 전환 시점에 돈다. 아래 jobs.web.if 와 한 쌍이다.
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [dev, main]
+  push:
+    # Squash Merge 는 PR 과 다른 커밋을 만든다. dev/main 에 올라간 결과물도 한 번 확인한다.
+    branches: [dev, main]
+  # 사람이 Actions 탭에서 아무 브랜치에나 직접 돌릴 수 있다. Draft 상태에서 CI 를 미리 보고 싶을 때 쓴다.
+  # 이 경로는 기준 커밋이 없어 변경 감지 없이 전체를 돈다.
+  workflow_dispatch:
+
+# 같은 브랜치에 새 커밋을 밀면 진행 중이던 이전 실행을 취소한다.
+concurrency:
+  group: web-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: lint · 빌드 · 테스트
+    runs-on: ubuntu-latest
+
+    # Draft 동안에는 돌지 않는다. Ready for review 로 바꾸는 시점에 한 번 돌고, 그 뒤 푸시부터는 매번 돈다.
+    # push 이벤트에는 pull_request 컨텍스트가 없어 이 값이 null 이 된다. 'null != true' 는 참이라 정상적으로 돈다.
+    if: github.event.pull_request.draft != true
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # 변경 감지에 base 커밋이 필요하다
+
+      # Project/ 의 .md 가 아닌 파일, 또는 이 워크플로 자체가 바뀌었을 때만 뒤 스텝을 돈다.
+      # push 이벤트의 before 가 없는 경우(첫 푸시·force push)는 안전한 쪽으로 — 돈다.
+      - name: 변경 감지
+        id: changes
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -uo pipefail
+          if [ "$EVENT" = "pull_request" ]; then
+            RANGE="$BASE_SHA...$HEAD_SHA"
+          elif git cat-file -e "$BEFORE" 2>/dev/null; then
+            RANGE="$BEFORE..$AFTER"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::기준 커밋이 없어 전체 검사를 돌립니다."
+            exit 0
+          fi
+          CHANGED="$(git diff --name-only "$RANGE" -- Project .github/workflows/web-ci.yml | grep -v '\.md$' || true)"
+          if [ -z "$CHANGED" ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Project/ 코드 변경이 없어 lint·빌드·테스트를 건너뜁니다."
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            printf '%s\n' "$CHANGED"
+          fi
+
+      # 테스트가 TS 를 그대로 실행한다(node --test, 별도 러너 없음). 26 미만에서는 돌지 않는다.
+      # 버전은 Project/.nvmrc 한 곳에만 적는다. package.json engines 에 넣지 않는 이유 —
+      # Vercel 이 engines.node 를 읽어 빌드·서버리스 런타임을 고르는데 26 은 Vercel 에 없어 배포가 실패한다
+      # (SSH-546 에서 실측). 서버리스 함수는 Vercel 의 Node 로 돌고, 26 이 필요한 것은 테스트 러너뿐이다.
+      - name: Node 설치
+        if: steps.changes.outputs.run == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: Project/.nvmrc
+          cache: npm
+          cache-dependency-path: Project/package-lock.json
+
+      - name: 의존성 설치
+        if: steps.changes.outputs.run == 'true'
+        working-directory: Project
+        run: npm ci
+
+      # 아래 세 검사는 루트 CLAUDE.md 「명령」의 로컬 명령과 **의도적으로 동일하다.**
+      # CI 가 로컬보다 엄격하면 "로컬은 통과하는데 CI 만 실패"가 생기고, 사람은 코드가 아니라 CI 를 의심하게 된다.
+      - name: lint
+        if: steps.changes.outputs.run == 'true'
+        working-directory: Project
+        run: npm run lint
+
+      # tsc -b 가 포함돼 있어 타입 검사를 겸한다. api/·server/·테스트 파일도 tsconfig.node.json 으로 본다.
+      - name: 빌드
+        if: steps.changes.outputs.run == 'true'
+        working-directory: Project
+        run: npm run build
+
+      # --if-present: test 스크립트가 없는 브랜치(main 은 SSH-542 가 올라가기 전까지 없다)에서는 건너뛴다.
+      # 스크립트가 있으면 평소처럼 돌고 실패하면 빨강이다.
+      - name: 테스트
+        if: steps.changes.outputs.run == 'true'
+        working-directory: Project
+        run: npm run test --if-present
