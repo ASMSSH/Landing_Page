@@ -150,9 +150,10 @@ function claimsApi(env: Record<string, string>): PluginOption {
       const handler: Connect.NextHandleFunction = (req, res, next) => {
         if (req.method !== 'POST') return next()
         let raw = ''
+        let tooLarge = false
         req.on('data', (chunk) => {
           raw += chunk
-          if (raw.length > 1e5) req.destroy()
+          if (raw.length > 1e5) tooLarge = true // api/claims.ts와 같은 상한 — 413으로 답한다
         })
         req.on('end', async () => {
           const send = (status: number, body: unknown) => {
@@ -160,6 +161,7 @@ function claimsApi(env: Record<string, string>): PluginOption {
             res.setHeader('Content-Type', 'application/json')
             res.end(JSON.stringify(body))
           }
+          if (tooLarge) return send(413, { ok: false, error: 'payload_too_large' })
           let input: unknown
           try {
             input = raw ? JSON.parse(raw) : {}

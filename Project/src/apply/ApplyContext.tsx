@@ -33,17 +33,31 @@ interface ApplyContextValue {
    * 이미 접수된 접수번호를 돌려준다. 15초 타임아웃 뒤 「다시 시도」가 같은 신청을 두 번 접수하는 것을 막는다 (SSH-544).
    * reducer 상태(initialApplyState)는 상수라 거기 두면 reset 뒤에도 같은 값이 남는다 — 「처음으로」 뒤의 새 신청이 이전
    * 접수번호를 돌려받는 사고. 그래서 Provider가 들고 reset에서만 새로 만든다.
+   * 실패 뒤 S4로 돌아가 내용을 고치고 다시 보내도 같은 값이 간다 — 서버는 그 행의 내용을 갱신하고 접수번호를 유지한다.
    */
   clientId: string;
 }
 
 const ApplyContext = createContext<ApplyContextValue | null>(null);
 
+/**
+ * 멱등 키 생성. crypto.randomUUID는 보안 컨텍스트(HTTPS·localhost)에만 있어서 `vite --host`로 띄운 http://192.168.x.x를
+ * 실기기에서 열면 /apply가 렌더 전에 죽는다 (AI 리뷰 P3). getRandomValues는 어디서나 있으니 그걸로 v4를 만든다.
+ */
+function newClientId(): string {
+  if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
+
 export function ApplyProvider({ children }: { children: ReactNode }) {
   const [state, rawDispatch] = useReducer(applyReducer, initialApplyState);
   const [receiptPreview, setPreviewState] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [clientId, setClientId] = useState(() => crypto.randomUUID());
+  const [clientId, setClientId] = useState(newClientId);
   const previewRef = useRef<string | null>(null);
 
   const setReceiptPreview = useCallback((url: string | null) => {
@@ -59,7 +73,7 @@ export function ApplyProvider({ children }: { children: ReactNode }) {
       rawDispatch(action);
       if (action.type === 'reset') {
         setReceiptPreview(null);
-        setClientId(crypto.randomUUID());
+        setClientId(newClientId());
       }
     },
     [setReceiptPreview],
