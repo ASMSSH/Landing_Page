@@ -5,8 +5,15 @@ import { useApply } from './ApplyContext';
 
 const EMPTY = '—';
 
+// 진료비는 숫자 문자열이 원칙이지만("12000"), "12,000"·"12000원"처럼 들어와도 NaN원을 보여주지 않는다.
+function formatCost(treatmentCost: string): string {
+  const digits = treatmentCost.replace(/[^\d]/g, '');
+  if (!digits) return treatmentCost.trim();
+  return `${Number(digits).toLocaleString('ko-KR')}원`;
+}
+
 function visitLine(visitDate: string, treatmentCost: string): string {
-  const cost = treatmentCost ? `${Number(treatmentCost).toLocaleString('ko-KR')}원` : '';
+  const cost = treatmentCost.trim() ? formatCost(treatmentCost) : '';
   return [visitDate, cost].filter(Boolean).join(' · ');
 }
 
