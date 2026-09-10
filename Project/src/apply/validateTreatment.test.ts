@@ -45,3 +45,12 @@ test('진료비는 0원이거나 숫자가 없으면 오류다', () => {
 test('todayIso는 로컬 날짜를 YYYY-MM-DD로 만든다', () => {
   assert.equal(todayIso(new Date(2026, 8, 5)), '2026-09-05');
 });
+
+test('병원 이름 100자·주소 200자·병명 200자를 넘으면 오류다 — 서버 상한과 같다', () => {
+  const long = (n: number) => '가'.repeat(n);
+  const e = validateTreatment({ ...ok, hospitalName: long(101), hospitalAddress: long(201), diagnosis: long(201) }, TODAY);
+  assert.match(e.hospitalName ?? '', /100자/);
+  assert.match(e.hospitalAddress ?? '', /200자/);
+  assert.match(e.diagnosis ?? '', /200자/);
+  assert.deepEqual(validateTreatment({ ...ok, hospitalName: long(100), hospitalAddress: long(200), diagnosis: long(200) }, TODAY), {});
+});

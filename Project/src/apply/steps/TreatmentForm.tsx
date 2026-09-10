@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { Treatment } from '../state';
-import type { TreatmentErrors } from '../validateTreatment';
+import { TREATMENT_MAX_LENGTH, type TreatmentErrors } from '../validateTreatment';
 import { fieldId } from './treatmentFields';
 
 // S1 진료 정보 폼 — 2열(≤768 1열). 값은 입력 즉시 부모가 setTreatment patch로 상태에 넣는다.
@@ -47,6 +47,7 @@ export default function TreatmentForm({ value, errors, today, onChange }: Treatm
         <Field name="hospitalName" label="병원 이름 *" hint="영수증에 적힌 이름 그대로" error={errors.hospitalName}>
           <input
             id={fieldId('hospitalName')}
+            maxLength={TREATMENT_MAX_LENGTH.hospitalName}
             className="field"
             type="text"
             autoComplete="off"
@@ -80,24 +81,28 @@ export default function TreatmentForm({ value, errors, today, onChange }: Treatm
             onChange={(e) => onChange({ treatmentCost: e.target.value.replace(/\D/g, '') })}
           />
         </Field>
-        <Field name="diagnosis" label="병명·진료 내용 (선택)" hint="필요 서류를 더 정확히 안내해요">
+        <Field name="diagnosis" label="병명·진료 내용 (선택)" hint="필요 서류를 더 정확히 안내해요" error={errors.diagnosis}>
           <input
             id={fieldId('diagnosis')}
             className="field"
             type="text"
             autoComplete="off"
             placeholder="예) 피부염 치료"
+            maxLength={TREATMENT_MAX_LENGTH.diagnosis}
+            aria-invalid={Boolean(errors.diagnosis)}
             value={value.diagnosis}
             onChange={(e) => onChange({ diagnosis: e.target.value })}
           />
         </Field>
-        <Field name="hospitalAddress" label="병원 주소 (선택)" hint="담당자가 병원에 연락할 때 써요" full>
+        <Field name="hospitalAddress" label="병원 주소 (선택)" hint="담당자가 병원에 연락할 때 써요" error={errors.hospitalAddress} full>
           <input
             id={fieldId('hospitalAddress')}
             className="field"
             type="text"
             autoComplete="off"
             placeholder="예) 서울 마포구 …"
+            maxLength={TREATMENT_MAX_LENGTH.hospitalAddress}
+            aria-invalid={Boolean(errors.hospitalAddress)}
             value={value.hospitalAddress}
             onChange={(e) => onChange({ hospitalAddress: e.target.value })}
           />
