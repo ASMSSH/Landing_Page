@@ -8,9 +8,11 @@ import ApplyFooter from './ApplyFooter';
 import StepHeading from './StepHeading';
 import StepPlaceholder from './steps/StepPlaceholder';
 import { stepDef } from './steps';
+import { useApplyMeta } from './useApplyMeta';
 import '../styles/apply.css';
 
 function ApplyShell() {
+  useApplyMeta();
   const { state } = useApply();
   const def = stepDef(state.step);
   return (
