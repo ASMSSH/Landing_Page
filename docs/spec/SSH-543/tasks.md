@@ -59,11 +59,12 @@
 
 ## 9. 검증 — spec 「검증」
 
-- [ ] `npm run build` · `npm run lint` · `npm test`
-- [ ] 로컬 OCR 성공 경로 · 직접 입력 경로 · 실패 토스트 · 큰 사진 축소(실기기) · S2 비활성 · 랜딩 select 8개
+- [x] `npm run build` · `npm run lint` · `npm test` (23건)
+- [x] 로컬 OCR 성공 경로(로컬에 GEMINI 키가 없어 브라우저에서 fetch를 모킹) · 직접 입력 경로 · 실패 토스트(실서버 500) · S2 비활성 · 랜딩 select 8개
+- [ ] 실제 영수증 사진 OCR · 4MB 초과 폰 사진 축소(실기기) — GEMINI 키 있는 환경에서 사람이 확인
 - [ ] Vercel 프리뷰 `/apply?r=test` (GEMINI env 유무는 사람 확인)
-- [ ] 스크린샷 1440 · 768 · 390(S1) + S1-a · S2 1440 → `docs/spec/SSH-543/`
-- [ ] **커밋** `docs: SSH-543 검증 스크린샷 추가`
+- [x] 스크린샷 1440 · 768 · 390(S1) + S1-a · S2 · 실패 토스트 1440 → `docs/spec/SSH-543/`
+- [x] **커밋** `docs: SSH-543 검증 스크린샷 추가`
 
 ## 10. 마무리
 
