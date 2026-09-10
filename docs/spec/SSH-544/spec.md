@@ -124,7 +124,7 @@ alter table public.claims enable row level security;
 
 | 함수 | 요청 | 반환 |
 | --- | --- | --- |
-| `findByClientId(env, clientId)` | `GET /rest/v1/claims?client_id=eq.{id}&select=receipt_no&limit=1` | `string \| null` (receipt_no) |
+| `updateByClientId(env, clientId, row)` | `PATCH /rest/v1/claims?client_id=eq.{id}&select=receipt_no` 본문 = row, `Prefer: return=representation` | `string \| null` (receipt_no — 행이 있으면 내용을 갱신하고 번호를 돌려준다) |
 | `lastReceiptNoOfDay(env, prefix)` | `GET /rest/v1/claims?receipt_no=like.{prefix}*&select=receipt_no&order=receipt_no.desc&limit=1` | `string \| null` |
 | `insertClaim(env, row)` | `POST /rest/v1/claims`, `Prefer: return=representation` | `{ ok: true, id }` / `{ ok: false, conflict: 'receipt_no' \| 'client_id' \| null, status }` |
 | `markSlackNotified(env, id)` | `PATCH /rest/v1/claims?id=eq.{id}` `{ slack_notified: true }`, `Prefer: return=minimal` | `void` — 실패 무시 |
@@ -190,9 +190,9 @@ type ClaimsBody = { ok: true; receipt_no: string } | { ok: false; error: string;
 | --- | --- | --- |
 | 1 | `supabaseUrl`·`secretKey` 없으면 | 500 `server_not_configured` (`slackWebhookUrl`은 선택 — **결정 6**) |
 | 2 | `validateClaimInput` | 400 `invalid_input` + `field` |
-| 3 | `client_id`가 있으면 `findByClientId` → 있으면 **200 기존 `receipt_no`**, insert·슬랙 없음 | — |
+| 3 | `client_id`가 있으면 `updateByClientId` → 행이 있으면 **내용을 이 요청으로 갱신하고 200 기존 `receipt_no`**, insert·슬랙 없음 | — |
 | 4 | `lastReceiptNoOfDay` → `nextReceiptNo` → `insertClaim`. `receipt_no` 충돌이면 3→4를 **한 번 더**, 또 충돌이면 | 409 `receipt_conflict` |
-| 4' | `client_id` 충돌(같은 신청이 동시에 두 번 온 경합)이면 `findByClientId`로 기존 번호 200 | 그래도 없으면 502 `supabase_error` |
+| 4' | `client_id` 충돌(같은 신청이 동시에 두 번 온 경합)이면 `updateByClientId`로 갱신 + 기존 번호 200 | 그래도 없으면 502 `supabase_error` |
 | 5 | 조회·insert가 네트워크 실패·비-2xx | 502 `supabase_error` |
 | 6 | `slackWebhookUrl` 있으면 `buildClaimMessage` → `notifySlack` → `true`면 `markSlackNotified`. **슬랙 실패해도 다음 줄로** | — |
 | 7 | | 200 `{ ok: true, receipt_no }` |
@@ -310,3 +310,18 @@ docs/spec/SSH-544/{spec,tasks}.md                              이 문서
 6. **`SLACK_WEBHOOK_URL` 없으면 알림만 건너뛰고 200** — webhook이 아직 없어도 프리뷰 insert 검증이 된다
 7. **`consented_at`은 DB default `now()`** — 서버가 값을 만들지 않는다
 8. **서버 로그에 본문을 찍지 않는다** — Vercel 로그도 개인정보 저장소가 된다. 접수번호·error 코드·상태 코드만
+
+## AI 리뷰 1회차 반영 (2026-09-10)
+
+P1 없음 · P2 2건 · P3 2건 — 전부 반영.
+
+1. **(P2) 글자 수 상한이 서버에만 있었다.** 병원 이름 100·주소 200·병명 200·상품명 100을 `validateTreatment`(「다음」에서 칸별 메시지) +
+   input `maxLength`로 클라이언트에도. 「클라이언트 규칙 복제」가 실제로 양쪽 같은 값이 됐다 — 상수는 `TREATMENT_MAX_LENGTH`·`PRODUCT_NAME_MAX_LENGTH`
+2. **(P2) 같은 `client_id` 재전송이 고친 내용을 버렸다.** 타임아웃 뒤 S4에서 전화번호를 고치고 다시 보내면 서버가 옛 행의 접수번호만 돌려줬다.
+   → `findByClientId`를 `updateByClientId`(PATCH + `return=representation`)로 바꿔 **행 내용을 갱신하고 접수번호는 유지**. `receipt_no`·`created_at`·
+   `consented_at`·`status`·`assignee`·`memo`는 본문에 없어 그대로. 슬랙은 다시 보내지 않는다. 결정 1의 의미가 「같은 값이면 기존 번호」에서
+   「같은 값이면 갱신 + 기존 번호」로 바뀐다
+3. **(P3) `crypto.randomUUID`는 보안 컨텍스트에만 있다.** `vite --host`의 http://192.168.x.x에서 /apply가 죽는다 → `getRandomValues`로 v4 폴백
+4. **(P3) 본문 100KB 상한이 dev 미들웨어에만 있었다.** `api/claims.ts`도 `request.text()` 길이로 413 `payload_too_large`. dev도 연결을 끊는 대신 413
+
+로컬 검증 중 발견한 S1 분석 실패 토스트 문제는 이 PR 범위 밖 → **SSH-550**.
