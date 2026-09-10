@@ -4,6 +4,7 @@ import { subscribe } from './server/notion.ts'
 import { getClaimDocuments } from './server/documents.ts'
 import { analyzeReceipt } from './server/gemini.ts'
 import { requestOtp, verifyOtp } from './server/otp.ts'
+import { createClaim } from './server/claims.ts'
 
 // 로컬 dev 전용 /api/subscribe 엔드포인트.
 // NOTION_TOKEN 은 서버(Node)에서만 읽혀 클라이언트 번들에 포함되지 않음.
@@ -140,10 +141,48 @@ function geminiApi(env: Record<string, string>): PluginOption {
   }
 }
 
+// 로컬 dev 전용 /api/claims 엔드포인트 (대리청구 신청 접수, POST).
+// SUPABASE_SERVICE_ROLE_KEY 는 서버(Node)에서만 읽혀 클라이언트 번들에 포함되지 않음. SLACK_WEBHOOK_URL 은 없으면 알림만 건너뛴다.
+function claimsApi(env: Record<string, string>): PluginOption {
+  return {
+    name: 'api-claims-dev',
+    configureServer(server) {
+      const handler: Connect.NextHandleFunction = (req, res, next) => {
+        if (req.method !== 'POST') return next()
+        let raw = ''
+        req.on('data', (chunk) => {
+          raw += chunk
+          if (raw.length > 1e5) req.destroy()
+        })
+        req.on('end', async () => {
+          const send = (status: number, body: unknown) => {
+            res.statusCode = status
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify(body))
+          }
+          let input: unknown
+          try {
+            input = raw ? JSON.parse(raw) : {}
+          } catch {
+            return send(400, { ok: false, error: 'bad_request' })
+          }
+          const result = await createClaim(input, {
+            supabaseUrl: env.SUPABASE_URL,
+            serviceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY,
+            slackWebhookUrl: env.SLACK_WEBHOOK_URL,
+          })
+          send(result.status, result.body)
+        })
+      }
+      server.middlewares.use('/api/claims', handler)
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
-    plugins: [react(), subscribeApi(env), documentsApi(env), geminiApi(env), otpApi(env)],
+    plugins: [react(), subscribeApi(env), documentsApi(env), geminiApi(env), otpApi(env), claimsApi(env)],
   }
 })
