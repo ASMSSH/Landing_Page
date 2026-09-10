@@ -71,7 +71,8 @@ Boheomgaenyang 루트 CLAUDE.md를 단일 스택·`dev` base로 줄인다.
   `Project/`에서 `.md` 제외 변경이 없으면(문서만 고친 PR) 뒤 스텝을 건너뛰고 바로 초록(1차 리뷰 결정)
 - `concurrency: web-ci-${{ github.ref }}`, `cancel-in-progress: true`
 - `checkout@v5` → `setup-node@v4`(`node-version: 26`, npm 캐시, `Project/package-lock.json`) → `Project/`에서 `npm ci` → `lint` → `build` → `test`
-- Node 26 고정 이유(테스트가 TS를 그대로 실행)를 주석에. `Project/package.json`에 `engines.node >=26`
+- Node 26 고정 이유(테스트가 TS를 그대로 실행)를 주석에. 버전은 `Project/.nvmrc` 한 곳에 — **`engines.node`는 쓰지 않는다.**
+  Vercel이 `engines.node`를 읽어 런타임을 고르는데 26이 없어 프리뷰 배포가 실패했다(실측, 아래 「2차 결정」). `workflow_dispatch`도 둔다 — Draft 상태에서 사람이 CI를 미리 돌려볼 수 있게
 
 ### 5. `.github/` 문서
 
@@ -97,7 +98,7 @@ CLAUDE.md                                   신규
 .github/pull_request_template.md            교체
 .github/CONTRIBUTING.md                     교체
 .github/CODEOWNERS                          신규
-Project/package.json                        engines.node
+Project/.nvmrc                              신규 (Node 26)
 docs/spec/SSH-546/{spec,tasks}.md           이 문서
 ```
 
@@ -130,3 +131,9 @@ docs/spec/SSH-546/{spec,tasks}.md           이 문서
 1. **커밋 전 검증 훅은 넣는다** — 판단은 에이전트에 위임됨. `tsc -b` + oxlint 5초 안쪽이고 `SKIP_WEB_VERIFY=1` 우회가 있어 급할 때 비용이 없다. 타입 오류가 CI까지 가서 왕복하는 비용이 더 크다
 2. **이슈 템플릿은 둔다** — 삭제하지 않는다
 3. **문서만 고친 PR은 웹 CI를 돌리지 않는다** — 단 `paths` 필터가 아니라 job 안 변경 감지로. required check가 pending에 걸리지 않게(4절)
+
+## 구현 중 결정 (2026-09-10)
+
+1. **`engines.node >=26`을 넣었다가 뺐다** — 넣은 커밋에서 Vercel 프리뷰 배포가 실패했다(직전 문서 커밋은 성공). Vercel은 `engines.node`로
+   빌드·서버리스 런타임을 고르는데 26을 제공하지 않는다. 26이 필요한 것은 `node --test`뿐이므로 `Project/.nvmrc`로 옮기고 CI가 그 파일을 읽는다
+2. **`web-ci`에 `workflow_dispatch` 추가** — Draft 동안은 자동으로 안 돌기 때문에, 이 PR처럼 CI 자체를 검증해야 할 때 사람이 Actions 탭에서 돌린다
