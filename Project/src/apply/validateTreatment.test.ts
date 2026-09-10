@@ -32,6 +32,8 @@ test('진료일은 오늘까지 허용하고 미래는 막는다', () => {
 test('진료일 형식이 YYYY-MM-DD가 아니면 오류다', () => {
   assert.equal(validateTreatment({ ...ok, visitDate: '2026.09.08' }, TODAY).visitDate, '날짜 형식이 맞지 않아요');
   assert.equal(validateTreatment({ ...ok, visitDate: '2026-13-40' }, TODAY).visitDate, '날짜 형식이 맞지 않아요');
+  // 달력에 없는 날짜도 형식 오류로 — Date.parse('2026-02-30')은 3월 2일로 통과시켜 버린다
+  assert.equal(validateTreatment({ ...ok, visitDate: '2026-02-30' }, TODAY).visitDate, '날짜 형식이 맞지 않아요');
 });
 
 test('진료비는 0원이거나 숫자가 없으면 오류다', () => {

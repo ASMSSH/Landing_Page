@@ -46,6 +46,10 @@ test('날짜는 점·하이픈·슬래시·한글 표기를 전부 YYYY-MM-DD로
 test('읽을 수 없는 날짜는 빈 문자열이고 patch에서 빠진다', () => {
   assert.equal(normalizeVisitDate('09/08'), '');
   assert.equal(normalizeVisitDate('2026.13.01'), '');
+  // 범위는 맞지만 달력에 없는 날짜 — Date.parse는 3월 2일로 넘겨 버린다
+  assert.equal(normalizeVisitDate('2026.02.30'), '');
+  assert.equal(normalizeVisitDate('2026.04.31'), '');
+  assert.equal(normalizeVisitDate('2024.02.29'), '2024-02-29'); // 윤년은 통과
   assert.equal(normalizeVisitDate('날짜 없음'), '');
   const patch = receiptToTreatment({ ...base, date: '09/08', hospital: '개냥동물병원' });
   assert.deepEqual(patch, { hospitalName: '개냥동물병원' });

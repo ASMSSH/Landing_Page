@@ -37,6 +37,12 @@ export default function StepTreatment() {
   const [photoOpen, setPhotoOpen] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  // handleFile은 await 두 번 뒤에 상태를 읽는다. 클로저의 state는 파일을 고른 시점 스냅샷이라, 분석 중에 사용자가
+  // 직접 적은 값이 재검증에서 빠진다 — 최신 값은 ref로 읽는다 (AI 리뷰 P3 반영, 2026-09-10)
+  const treatmentRef = useRef(state.treatment);
+  treatmentRef.current = state.treatment;
+  const submittedRef = useRef(submitted);
+  submittedRef.current = submitted;
 
   // 언마운트(다음 단계로 이동 등) 시 진행 중인 분석 요청을 끊는다
   useEffect(() => () => abortRef.current?.abort(), []);
@@ -66,7 +72,7 @@ export default function StepTreatment() {
       dispatch({ type: 'setTreatment', patch });
       dispatch({ type: 'setReceiptRead', read: true });
       setReceiptPreview(URL.createObjectURL(file));
-      if (submitted) setErrors(validateTreatment({ ...state.treatment, ...patch }, today));
+      if (submittedRef.current) setErrors(validateTreatment({ ...treatmentRef.current, ...patch }, today));
       setStatus('done');
     } catch (error) {
       if (controller.signal.aborted) return;

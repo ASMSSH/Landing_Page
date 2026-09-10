@@ -17,10 +17,21 @@ export function normalizeVisitDate(raw: string): string {
   const m = s.match(/(\d{4})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})/);
   if (!m) return '';
   const [, y, mo, d] = m;
+  const year = Number(y);
   const month = Number(mo);
   const day = Number(d);
-  if (month < 1 || month > 12 || day < 1 || day > 31) return '';
+  if (!isRealDate(year, month, day)) return '';
   return `${y}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+/**
+ * 달력에 실제로 있는 날짜인가. `2026-02-30`처럼 범위는 맞지만 존재하지 않는 날짜를 거른다 —
+ * `Date.parse`는 이런 값을 3월 2일로 넘겨 버려서 쓸 수 없다 (AI 리뷰 P3 반영, 2026-09-10).
+ */
+export function isRealDate(year: number, month: number, day: number): boolean {
+  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) return false;
+  const dt = new Date(year, month - 1, day);
+  return dt.getFullYear() === year && dt.getMonth() === month - 1 && dt.getDate() === day;
 }
 
 /** 분석 응답의 cost 문자열에서 숫자만. 숫자가 없으면 빈 문자열. */
