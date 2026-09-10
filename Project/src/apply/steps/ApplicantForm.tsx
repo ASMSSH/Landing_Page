@@ -48,7 +48,7 @@ export default function ApplicantForm({ value, errors, onChange }: ApplicantForm
             className="field"
             type="text"
             autoComplete="name"
-            placeholder="예) 김민석"
+            placeholder="예) 홍길동"
             value={value.name}
             aria-invalid={Boolean(errors.name)}
             onChange={(e) => onChange({ name: e.target.value })}
