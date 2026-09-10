@@ -1,5 +1,6 @@
 import { track } from '../lib/analytics';
 import { INSTAGRAM_URL } from '../data/links';
+import { APPLY_PATH } from '../lib/route';
 
 interface NavProps {
   /** apply: /apply 페이지용. 앵커를 절대 경로로 바꾸고 CTA 자리에 인스타 DM 링크를 둔다 */
@@ -32,7 +33,7 @@ export default function Nav({ variant = 'landing' }: NavProps) {
             문의 · 인스타 DM
           </a>
         ) : (
-          <a href="#signup" className="nav-cta" onClick={() => track('cta_click', { cta: 'nav_signup' })}>사전 신청하기</a>
+          <a href={APPLY_PATH} className="nav-cta" onClick={() => track('cta_click', { cta: 'nav_apply' })}>무료로 청구 맡기기</a>
         )}
       </div>
     </header>
