@@ -8,6 +8,7 @@ import ApplyFooter from './ApplyFooter';
 import StepHeading from './StepHeading';
 import StepPlaceholder from './steps/StepPlaceholder';
 import { stepDef } from './steps';
+import '../styles/apply.css';
 
 function ApplyShell() {
   const { state } = useApply();
