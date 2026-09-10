@@ -43,7 +43,7 @@
 
 ## 4. 라우팅 + Nav — spec 1절
 
-- [ ] `src/components/Nav.tsx` — `variant?: 'landing' | 'apply'`. apply: 링크 `/#problem` 등 절대 경로, CTA 「무료로 청구 맡기기」 `href="/apply"`. 기본값은 지금 동작 그대로
+- [ ] `src/components/Nav.tsx` — `variant?: 'landing' | 'apply'`. apply: 링크 `/#problem` 등 절대 경로, CTA 자리에 「문의 · 인스타 DM」 링크(`INSTAGRAM_URL`, 새 탭, 모바일에서도 표시, `track('cta_click', { cta: 'nav_insta' })`). 기본값은 지금 동작 그대로
 - [ ] `src/App.tsx` — `pathname === '/apply'`(트레일링 슬래시 허용) → `ApplyPage`, 아니면 기존 랜딩
 - [ ] `src/main.tsx` — `observeSections`를 랜딩일 때만
 - [ ] **커밋** `feat: /apply 경로를 App에서 분기`
