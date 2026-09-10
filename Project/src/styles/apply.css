@@ -207,13 +207,17 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 .apply-consent-error-retry { padding:10px 20px; font-size:15px; box-shadow:none; }
 .apply-consent-error-btns .apply-btn-ghost { padding:9px 16px; font-size:14px; }
 
-/* ---------- S5-a: 동의 전문 (SSH-486) ---------- */
-/* section 전역 padding(index.css)을 끈다 — 레일 .apply-card와 같은 이유 */
-.apply-consent-doc { display:flex; flex-direction:column; gap:12px; padding:0; }
+/* ---------- S5-a: 동의 전문 팝업 (SSH-486) ---------- */
+/* .apply-dialog-backdrop/.apply-dialog(S1-c)를 그대로 쓰고, 머리·발 고정 + 본문만 스크롤로 바꾼다 */
+.apply-dialog.apply-consent-dialog { width:min(720px, 100%); padding:0; gap:0; overflow:hidden; }
+.apply-consent-doc-head { display:flex; flex-direction:column; gap:8px; padding:20px 24px 16px; border-bottom:1px solid var(--border); }
+.apply-consent-doc-head-row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
 .apply-consent-doc-chip { align-self:flex-start; padding:5px 10px; border-radius:999px; background:var(--primary-50); color:var(--primary-600); font-size:12px; font-weight:700; }
-.apply-consent-doc-title { margin-top:4px; font-family:var(--font-display); font-size:20px; color:var(--text-primary); }
-.apply-consent-doc-meta { margin:0; font-size:14px; color:var(--text-secondary); }
-.apply-consent-doc-body { display:flex; flex-direction:column; gap:12px; margin-top:8px; font-size:14px; line-height:1.65; color:var(--text-secondary); }
+.apply-consent-doc-title { font-family:var(--font-display); font-size:20px; color:var(--text-primary); }
+.apply-consent-doc-meta { margin:0; font-size:13px; color:var(--text-secondary); }
+.apply-consent-doc-scroll { flex:1 1 auto; min-height:0; overflow:auto; padding:20px 24px; display:flex; flex-direction:column; gap:16px; overscroll-behavior:contain; }
+.apply-consent-doc-scroll:focus { outline:none; }
+.apply-consent-doc-body { display:flex; flex-direction:column; gap:12px; font-size:14px; line-height:1.65; color:var(--text-secondary); }
 .apply-consent-doc-body h3 { margin:10px 0 0; font-size:15px; font-weight:700; color:var(--text-primary); }
 .apply-consent-doc-body h3:first-child { margin-top:0; }
 .apply-consent-doc-body p { margin:0; }
@@ -223,8 +227,7 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 .apply-consent-doc-body th, .apply-consent-doc-body td { padding:10px 12px; border:1px solid var(--border); text-align:left; vertical-align:top; overflow-wrap:anywhere; }
 .apply-consent-doc-body th { background:var(--neutral-100); color:var(--text-primary); font-weight:700; white-space:nowrap; }
 .apply-consent-doc-warn { display:flex; align-items:flex-start; gap:8px; margin:0; padding:12px 16px; border-radius:var(--radius-sm); background:var(--secondary-50); border:1px solid var(--secondary-100); font-size:13px; line-height:1.5; color:var(--secondary-900); }
-.apply-consent-doc-foot { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:8px; }
-.apply-consent-doc-close { width:auto; padding:12px 28px; font-size:16px; }
+.apply-consent-doc-foot { padding:14px 24px 20px; border-top:1px solid var(--border); background:var(--surface); }
 
 /* ---------- S6: 접수 완료 (SSH-486) ---------- */
 .apply-done { display:flex; flex-direction:column; gap:20px; padding:0; }
@@ -308,7 +311,10 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
   .apply-consent-doc-body td { border:0; border-top:1px solid var(--border); padding:10px 12px; }
   .apply-consent-doc-body td:first-child { border-top:0; }
   .apply-consent-doc-body td::before { content:attr(data-label); display:block; margin-bottom:3px; font-size:12px; font-weight:700; color:var(--text-primary); }
-  .apply-consent-doc-close { padding:11px 22px; font-size:15px; }
+  .apply-dialog.apply-consent-dialog { max-height:calc(100dvh - 40px); padding:0; gap:0; }
+  .apply-consent-doc-head { padding:16px 18px 12px; }
+  .apply-consent-doc-scroll { padding:16px 18px; }
+  .apply-consent-doc-foot { padding:12px 18px 18px; }
   .apply-done-receipt-no { font-size:28px; }
   .apply-done-step-num { width:34px; height:34px; font-size:14px; }
   .apply-done-step:not(:last-child)::before { left:16px; top:34px; }

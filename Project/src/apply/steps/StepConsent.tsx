@@ -10,13 +10,14 @@ import { CONSENTS, consentDoc, type ConsentKey } from '../consents';
 import type { Consents } from '../state';
 import StepHeading from '../StepHeading';
 import { stepDef } from '../steps';
-import ConsentDocument from './ConsentDocument';
+import ConsentDialog from './ConsentDialog';
 
 // S5 동의 + 「신청하기」. 헤딩·마스터 행·개별 5행·베타 문구·(실패 배너)·액션 행을 조립한다.
-// 「보기」를 누르면 본문 자리를 전문(ConsentDocument)으로 바꾼다 — Figma S5-a. URL은 /apply 그대로다.
+// 「보기」를 누르면 전문 팝업(ConsentDialog)을 연다 — 데스크톱 대화상자·모바일 시트. URL은 /apply 그대로다.
+// (처음엔 Figma S5-a대로 본문 자리를 통째로 바꿨는데, 닫기가 맨 아래라 불편하다는 피드백으로 팝업으로 바꿨다 — 2026-09-10)
 //
 // 뒤로가기: 전문을 열 때 history.pushState 한 엔트리를 넣어 브라우저 back이 /apply를 떠나지 않고 전문만 닫게 한다.
-// 「닫기」는 history.back()이라 엔트리가 남지 않는다. 전문이 열린 채 언마운트되면(프로그레스로 이전 단계 클릭)
+// 「닫기」·✕·배경 클릭·Esc는 전부 history.back()이라 엔트리가 남지 않는다. 전문이 열린 채 언마운트되면(「처음으로」 등)
 // cleanup에서 그 엔트리를 걷는다. 닫혀 있을 때의 popstate는 무시한다 — 단계 단위 back은 SSH-547이 맡는다.
 //
 // 전송: 5개 전부 체크돼야 「신청하기」가 켜진다. 전송 중(Provider의 submitting)엔 「신청하기」·「← 이전」·프로그레스가 전부 잠기고
@@ -105,9 +106,8 @@ export default function StepConsent() {
   const openDoc = (key: ConsentKey) => {
     history.pushState({ applyConsent: key } satisfies HistoryState, '');
     setViewing(key);
-    window.scrollTo(0, 0);
   };
-  // 「닫기」 — back으로 닫아야 pushState 엔트리가 남지 않는다. popstate 핸들러가 viewing을 지운다
+  // 닫기 — back으로 닫아야 pushState 엔트리가 남지 않는다. popstate 핸들러가 viewing을 지운다
   const closeDoc = useCallback(() => history.back(), []);
 
   const setAll = (checked: boolean) =>
@@ -134,8 +134,6 @@ export default function StepConsent() {
   };
 
   if (!def) return null;
-  if (viewing) return <ConsentDocument doc={consentDoc(viewing)} onClose={closeDoc} />;
-
   const every = allChecked(consents);
   return (
     <>
@@ -170,6 +168,7 @@ export default function StepConsent() {
       </p>
       {failed && <SubmitError onRetry={submit} />}
       <ApplyActions nextDisabled={!every || submitting} nextLabel={submitting ? '전송 중…' : undefined} onNext={submit} />
+      <ConsentDialog doc={viewing ? consentDoc(viewing) : null} onClose={closeDoc} />
     </>
   );
 }
