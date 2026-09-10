@@ -7,6 +7,11 @@ import type { ClaimType } from './claimType.ts';
 
 const DOCUMENTS_TIMEOUT_MS = 10_000;
 
+/** 서버가 「해당 조건의 서류 없음」일 때 주는 error 코드 (server/documents.ts) */
+export const NO_DOCUMENTS = 'no_documents';
+/** 가장 일반적인 유형. 특정 유형 행이 없을 때 이걸로 다시 묻는다 */
+const GENERAL_CLAIM_TYPE: ClaimType = 'illness';
+
 export interface ResultDoc {
   name: string;
   desc: string;
@@ -68,4 +73,23 @@ export async function fetchClaimDocuments(
     notes: data.notes ?? [],
     warning: data.warning,
   };
+}
+
+/**
+ * 청구 유형으로 조회하고, 그 유형 행이 없으면(404 no_documents) 같은 보험사의 질병(통원) 서류로 한 번 더 조회한다.
+ * 노션 필요서류 DB에 예방/검진 행이 없는 보험사가 있어(2026-09-10 실측: DB·KB·현대·카카오페이·마이브라운), 그대로 두면
+ * 보험사 서류가 있는데도 「찾지 못했어요」 카드가 뜬다. 질병 행마저 없거나 다른 오류(501·502·네트워크)면 그대로 던진다.
+ */
+export async function fetchClaimDocumentsOrGeneral(
+  claimType: ClaimType,
+  insurer: string,
+  signal?: AbortSignal,
+): Promise<ClaimDocumentGuide> {
+  try {
+    return await fetchClaimDocuments(claimType, insurer, signal);
+  } catch (error) {
+    const noRows = error instanceof Error && error.message === NO_DOCUMENTS;
+    if (!noRows || claimType === GENERAL_CLAIM_TYPE) throw error;
+    return fetchClaimDocuments(GENERAL_CLAIM_TYPE, insurer, signal);
+  }
 }
