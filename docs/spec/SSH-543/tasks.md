@@ -18,13 +18,13 @@
 
 ## 2. 클라이언트 변환 — spec 2절
 
-- [ ] `src/lib/geminiAnalyze.ts` — 응답 타입에 `hospital`·`address`, 반환을 서버 타입 그대로(`mvp/types` 의존 제거), `fetch`에 catch
-- [ ] `src/apply/receiptToTreatment.ts` — 날짜 4형식 → `YYYY-MM-DD`, 금액 숫자만, 빈 값은 patch에서 제외
-- [ ] `src/apply/receiptToTreatment.test.ts` — 정상 · 날짜 4형식 · 잘못된 날짜 제외 · 쉼표·원 제거 · 빈 값 제외
-- [ ] `src/apply/validateTreatment.ts` — 병원 이름·진료일(형식·오늘 이후)·진료비(빈값·0)
-- [ ] `src/apply/validateTreatment.test.ts` — 통과 · 필수 3칸 · 미래 날짜 · 오늘은 통과 · 0원
-- [ ] `src/apply/imageToDataUrl.ts` — 4MB·2000px 이하는 그대로, 초과는 1600px JPEG 0.85, 디코드 실패 처리
-- [ ] **커밋** `feat: 영수증 분석 결과를 진료 정보 상태로 변환하는 함수 추가`
+- [x] `src/lib/geminiAnalyze.ts` — 응답 타입에 `hospital`·`address`, 반환을 서버 타입 그대로(`mvp/types` 의존 제거), `fetch`에 catch
+- [x] `src/apply/receiptToTreatment.ts` — 날짜 4형식 → `YYYY-MM-DD`, 금액 숫자만, 빈 값은 patch에서 제외
+- [x] `src/apply/receiptToTreatment.test.ts` — 정상 · 날짜 4형식 · 잘못된 날짜 제외 · 쉼표·원 제거 · 빈 값 제외
+- [x] `src/apply/validateTreatment.ts` — 병원 이름·진료일(형식·오늘 이후)·진료비(빈값·0)
+- [x] `src/apply/validateTreatment.test.ts` — 통과 · 필수 3칸 · 미래 날짜 · 오늘은 통과 · 0원
+- [x] `src/apply/imageToDataUrl.ts` — 4MB·2000px 이하는 그대로, 초과는 1600px JPEG 0.85, 디코드 실패 처리
+- [x] **커밋** `feat: 영수증 분석 결과를 진료 정보 상태로 변환하는 함수 추가`
 
 ## 3. S1 화면 — spec 3절 · 7절
 
