@@ -22,6 +22,12 @@ interface ApplyContextValue {
   receiptPreview: string | null;
   /** 새 URL을 넣으면 이전 URL은 revoke한다. null이면 지운다 */
   setReceiptPreview: (url: string | null) => void;
+  /**
+   * S5 「신청하기」 전송 중. 단계 컴포넌트 밖의 「← 이전」(ApplyActions)·프로그레스(ApplyProgress)도 이 값을 읽어 이동을 막는다 —
+   * 요청이 서버에 닿은 뒤 화면을 떠나면 접수는 되는데 접수번호를 못 보고, 돌아와 다시 누르면 중복 접수다 (AI 리뷰 P2, SSH-486)
+   */
+  submitting: boolean;
+  setSubmitting: (value: boolean) => void;
 }
 
 const ApplyContext = createContext<ApplyContextValue | null>(null);
@@ -29,6 +35,7 @@ const ApplyContext = createContext<ApplyContextValue | null>(null);
 export function ApplyProvider({ children }: { children: ReactNode }) {
   const [state, rawDispatch] = useReducer(applyReducer, initialApplyState);
   const [receiptPreview, setPreviewState] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const previewRef = useRef<string | null>(null);
 
   const setReceiptPreview = useCallback((url: string | null) => {
@@ -51,7 +58,7 @@ export function ApplyProvider({ children }: { children: ReactNode }) {
   useEffect(() => () => setReceiptPreview(null), [setReceiptPreview]);
 
   return (
-    <ApplyContext.Provider value={{ state, dispatch, receiptPreview, setReceiptPreview }}>
+    <ApplyContext.Provider value={{ state, dispatch, receiptPreview, setReceiptPreview, submitting, setSubmitting }}>
       {children}
     </ApplyContext.Provider>
   );

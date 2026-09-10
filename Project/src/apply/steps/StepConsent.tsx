@@ -19,8 +19,9 @@ import ConsentDocument from './ConsentDocument';
 // 「닫기」는 history.back()이라 엔트리가 남지 않는다. 전문이 열린 채 언마운트되면(프로그레스로 이전 단계 클릭)
 // cleanup에서 그 엔트리를 걷는다. 닫혀 있을 때의 popstate는 무시한다 — 단계 단위 back은 SSH-547이 맡는다.
 //
-// 전송: 5개 전부 체크돼야 「신청하기」가 켜진다. 전송 중엔 버튼 비활성 + 「전송 중…」. 성공이면 접수번호를 상태에 넣고
-// 6단계로(reducer가 접수번호 없이는 6으로 못 가게 막는다). 실패면 배너 — 입력·체크는 그대로 남는다.
+// 전송: 5개 전부 체크돼야 「신청하기」가 켜진다. 전송 중(Provider의 submitting)엔 「신청하기」·「← 이전」·프로그레스가 전부 잠기고
+// 라벨은 「전송 중…」. 성공이면 접수번호를 상태에 넣고 6단계로(reducer가 접수번호 없이는 6으로 못 가게 막는다).
+// 실패면 배너 — 입력·체크는 그대로 남는다.
 
 const STEP = 5;
 const CONSENT_KEYS = CONSENTS.map((d) => d.key);
@@ -72,11 +73,10 @@ function SubmitError({ onRetry }: { onRetry: () => void }) {
 }
 
 export default function StepConsent() {
-  const { state, dispatch } = useApply();
+  const { state, dispatch, submitting, setSubmitting } = useApply();
   const def = stepDef(STEP);
   const { consents } = state;
   const [viewing, setViewing] = useState<ConsentKey | null>(null);
-  const [submitting, setSubmitting] = useState(false);
   const [failed, setFailed] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const viewingRef = useRef<ConsentKey | null>(null);
@@ -91,13 +91,15 @@ export default function StepConsent() {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
-  // 언마운트: 진행 중인 전송을 끊고, 전문이 열린 채면 pushState로 넣은 엔트리를 걷는다
+  // 언마운트: 진행 중인 전송을 끊고 잠금을 풀며, 전문이 열린 채면 pushState로 넣은 엔트리를 걷는다.
+  // 전송 중엔 이동이 잠겨 있어 여기 오는 길은 「처음으로」(reset)·페이지 이탈뿐이다
   useEffect(
     () => () => {
       abortRef.current?.abort();
+      setSubmitting(false);
       if (viewingRef.current) history.back();
     },
-    [],
+    [setSubmitting],
   );
 
   const openDoc = (key: ConsentKey) => {

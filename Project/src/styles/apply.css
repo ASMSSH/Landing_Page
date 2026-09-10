@@ -66,6 +66,7 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 .apply-actions-btns .btn { width:auto; white-space:nowrap; flex-shrink:0; }
 .apply-btn-ghost { padding:10px 20px; font-size:15px; background:var(--surface); color:var(--text-primary); border:1.5px solid var(--border); }
 .apply-btn-ghost:hover { border-color:var(--neutral-300); }
+.apply-btn-ghost:disabled { cursor:default; opacity:.5; }
 .apply-btn-next { padding:14px 26px; font-size:16px; }
 .apply-btn-next:disabled { cursor:default; opacity:.5; box-shadow:none; }
 

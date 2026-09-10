@@ -11,7 +11,7 @@ interface ApplyActionsProps {
 }
 
 export default function ApplyActions({ nextDisabled = false, onNext, nextLabel }: ApplyActionsProps) {
-  const { state, dispatch } = useApply();
+  const { state, dispatch, submitting } = useApply();
   const def = stepDef(state.step);
   if (!def) return null;
   return (
@@ -19,7 +19,12 @@ export default function ApplyActions({ nextDisabled = false, onNext, nextLabel }
       <span className="apply-step-count">{state.step} / {STEP_COUNT}</span>
       <div className="apply-actions-btns">
         {state.step > 1 && (
-          <button type="button" className="btn apply-btn-ghost" onClick={() => dispatch({ type: 'prev' })}>
+          <button
+            type="button"
+            className="btn apply-btn-ghost"
+            disabled={submitting}
+            onClick={() => dispatch({ type: 'prev' })}
+          >
             ← 이전
           </button>
         )}
