@@ -182,13 +182,13 @@ insert 본문 타입(= `ClaimPayload` + `client_id: string | null`, `consented_a
 `createClaim(input: unknown, env: ClaimsEnv, now = new Date()): Promise<{ status: number; body: ClaimsBody }>`
 
 ```ts
-export interface ClaimsEnv { supabaseUrl?: string; serviceRoleKey?: string; slackWebhookUrl?: string }
+export interface ClaimsEnv { supabaseUrl?: string; secretKey?: string; slackWebhookUrl?: string }
 type ClaimsBody = { ok: true; receipt_no: string } | { ok: false; error: string; field?: string };
 ```
 
 | 순서 | 무엇 | 실패 응답 |
 | --- | --- | --- |
-| 1 | `supabaseUrl`·`serviceRoleKey` 없으면 | 500 `server_not_configured` (`slackWebhookUrl`은 선택 — **결정 6**) |
+| 1 | `supabaseUrl`·`secretKey` 없으면 | 500 `server_not_configured` (`slackWebhookUrl`은 선택 — **결정 6**) |
 | 2 | `validateClaimInput` | 400 `invalid_input` + `field` |
 | 3 | `client_id`가 있으면 `findByClientId` → 있으면 **200 기존 `receipt_no`**, insert·슬랙 없음 | — |
 | 4 | `lastReceiptNoOfDay` → `nextReceiptNo` → `insertClaim`. `receipt_no` 충돌이면 3→4를 **한 번 더**, 또 충돌이면 | 409 `receipt_conflict` |
@@ -225,7 +225,7 @@ export async function POST(request: Request): Promise<Response> {
   try { input = await request.json(); } catch { return Response.json({ ok: false, error: 'bad_request' }, { status: 400 }); }
   const result = await createClaim(input, {
     supabaseUrl: process.env.SUPABASE_URL,
-    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    secretKey: process.env.SUPABASE_SECRET_KEY,
     slackWebhookUrl: process.env.SLACK_WEBHOOK_URL,
   });
   return Response.json(result.body, { status: result.status });
@@ -249,7 +249,7 @@ JSON 파싱 실패 400 `bad_request`. `server.middlewares.use('/api/claims', han
 ```
 # Supabase claims 저장 — 서버 전용. VITE_ 접두사를 붙이면 브라우저 번들에 들어가므로 절대 금지
 SUPABASE_URL=https://xxxxxxxx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=sb_secret_xxxxxxxxxxxxxxxxxxxx
+SUPABASE_SECRET_KEY=sb_secret_xxxxxxxxxxxxxxxxxxxx
 
 # 슬랙 Incoming Webhook — 없으면 알림만 건너뛰고 저장은 된다
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/xxx/xxx/xxx
@@ -291,7 +291,7 @@ docs/spec/SSH-544/{spec,tasks}.md                              이 문서
 ## 검증
 
 - [ ] `npm run build`(`tsc -b`) · `npm run lint` · `npm test` — `server/claims.test.ts` 신규, `claimPayload.test.ts` 갱신
-- [ ] **사람**: SQL Editor에 1절 DDL 적용 · 로컬 `.env`에 `SUPABASE_URL`·`SUPABASE_SERVICE_ROLE_KEY` · Vercel Preview 환경변수
+- [ ] **사람**: SQL Editor에 1절 DDL 적용 · 로컬 `.env`에 `SUPABASE_URL`·`SUPABASE_SECRET_KEY` · Vercel Preview 환경변수
 - [ ] 로컬 `npm run dev` `/apply?r=test` S1~S5 → 「신청하기」 → S6 접수번호 `BGN-YYMMDD-01` · Table Editor 행 1개(`consented_at` 채워짐 ·
       `status` 신규 · `slack_notified` false · `ref_code` test) · 같은 날 2번째 → `-02`
 - [ ] 멱등: `curl`로 같은 `client_id` 본문 2회 → 행 1개, 같은 `receipt_no`

@@ -15,7 +15,7 @@
 
 export interface ClaimsEnv {
   supabaseUrl?: string;
-  serviceRoleKey?: string;
+  secretKey?: string;
   /** 없으면 슬랙만 건너뛴다 — 저장은 된다 */
   slackWebhookUrl?: string;
 }
@@ -70,14 +70,14 @@ const MAX_COST = 99_999_999;
 const MAX_DOCS = 50;
 const MIN_AGE = 14;
 
-// ---------------------------------------------------------------- PostgREST (service role)
+// ---------------------------------------------------------------- PostgREST (secret key — RLS 우회)
 // SDK 없이 fetch로 부른다 — src/lib/analytics.ts가 events 테이블에 쓰는 방식과 같고(위키 ⑦), 키만 다르다.
 // 이 절의 함수는 throw하지 않는다 — 네트워크 예외·타임아웃은 { ok: false, status: 0 }으로 돌려준다.
 
 export interface SupabaseEnv {
   /** https://<ref>.supabase.co (끝 슬래시 없이) */
   url: string;
-  /** service role 키 — sb_secret_… 또는 legacy service_role JWT */
+  /** secret key — 대시보드 API Keys의 sb_secret_… (또는 legacy service_role JWT). RLS를 우회하므로 서버에만 둔다 */
   key: string;
 }
 
@@ -389,10 +389,10 @@ const SUPABASE_ERROR: ClaimsResult = { status: 502, body: { ok: false, error: 's
  * `now`는 테스트에서 KST 경계를 고정하기 위한 인자다.
  */
 export async function createClaim(input: unknown, env: ClaimsEnv, now = new Date()): Promise<ClaimsResult> {
-  if (!env.supabaseUrl || !env.serviceRoleKey) {
+  if (!env.supabaseUrl || !env.secretKey) {
     return { status: 500, body: { ok: false, error: 'server_not_configured' } };
   }
-  const db: SupabaseEnv = { url: env.supabaseUrl, key: env.serviceRoleKey };
+  const db: SupabaseEnv = { url: env.supabaseUrl, key: env.secretKey };
 
   const validated = validateClaimInput(input, todayKst(now));
   if (!validated.ok) return { status: 400, body: { ok: false, error: 'invalid_input', field: validated.field } };

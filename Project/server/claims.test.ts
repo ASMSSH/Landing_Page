@@ -28,7 +28,7 @@ const payload = {
 };
 const TODAY = '2026-09-10';
 const NOW = new Date('2026-09-10T03:00:00Z'); // KST 12:00
-const ENV = { supabaseUrl: 'https://abcdefgh.supabase.co', serviceRoleKey: 'sb_secret_test', slackWebhookUrl: 'https://hooks.slack.com/services/T/B/x' };
+const ENV = { supabaseUrl: 'https://abcdefgh.supabase.co', secretKey: 'sb_secret_test', slackWebhookUrl: 'https://hooks.slack.com/services/T/B/x' };
 
 // ---------------------------------------------------------------- 순수 함수
 
@@ -282,7 +282,7 @@ test('createClaim — 검증 실패 400 + field, Supabase 호출 없음', async 
 });
 
 test('createClaim — env 없으면 500', async () => {
-  const { result, calls } = await run({}, payload, { supabaseUrl: undefined, serviceRoleKey: undefined });
+  const { result, calls } = await run({}, payload, { supabaseUrl: undefined, secretKey: undefined });
   assert.equal(result.status, 500);
   assert.deepEqual(result.body, { ok: false, error: 'server_not_configured' });
   assert.equal(calls.length, 0);

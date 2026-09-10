@@ -40,7 +40,7 @@
 
 ## 5. 환경변수 — spec 5절
 
-- [x] `Project/.env.example` — `SUPABASE_URL` · `SUPABASE_SERVICE_ROLE_KEY` · `SLACK_WEBHOOK_URL` · `GEMINI_API_KEY` · `GEMINI_MODEL`
+- [x] `Project/.env.example` — `SUPABASE_URL` · `SUPABASE_SECRET_KEY` · `SLACK_WEBHOOK_URL` · `GEMINI_API_KEY` · `GEMINI_MODEL`
 - [x] **커밋** `chore: .env.example에 Supabase·슬랙·Gemini 변수 추가`
 - [ ] **사람**: Vercel Preview·Production 환경변수 등록 · 로컬 `.env`
 

@@ -142,7 +142,7 @@ function geminiApi(env: Record<string, string>): PluginOption {
 }
 
 // 로컬 dev 전용 /api/claims 엔드포인트 (대리청구 신청 접수, POST).
-// SUPABASE_SERVICE_ROLE_KEY 는 서버(Node)에서만 읽혀 클라이언트 번들에 포함되지 않음. SLACK_WEBHOOK_URL 은 없으면 알림만 건너뛴다.
+// SUPABASE_SECRET_KEY 는 서버(Node)에서만 읽혀 클라이언트 번들에 포함되지 않음. SLACK_WEBHOOK_URL 은 없으면 알림만 건너뛴다.
 function claimsApi(env: Record<string, string>): PluginOption {
   return {
     name: 'api-claims-dev',
@@ -168,7 +168,7 @@ function claimsApi(env: Record<string, string>): PluginOption {
           }
           const result = await createClaim(input, {
             supabaseUrl: env.SUPABASE_URL,
-            serviceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY,
+            secretKey: env.SUPABASE_SECRET_KEY,
             slackWebhookUrl: env.SLACK_WEBHOOK_URL,
           })
           send(result.status, result.body)
