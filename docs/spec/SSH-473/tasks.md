@@ -12,42 +12,42 @@
 
 ## 1. 순수 로직 — spec 1절 (커밋 3개)
 
-- [ ] `src/lib/claimType.ts` — `inferClaimTypeFromText`(빈 값 → illness) · `inferClaimType` 첫 인자를 구조적 타입으로(mvp 의존 제거, 동작 유지) · `CLAIM_TYPE_LABEL`
-- [ ] `src/lib/claimType.test.ts` — 키워드 7종 · 빈/공백 → illness · 대소문자 · 우선순위 · `inferClaimType` surgery 우선·빈 fields → manual
-- [ ] **커밋** `feat: 병명 텍스트만으로 청구 유형을 추정하는 inferClaimTypeFromText 추가`
-- [ ] `src/lib/claimDocuments.ts` — `ClaimDocumentGuide` 재선언 · `fetchClaimDocuments`(10초 타임아웃·signal 합성·비-2xx throw)
-- [ ] **커밋** `feat: /api/claim-documents 브라우저 클라이언트 추가`
-- [ ] `src/apply/requiredDocs.ts` — `UNKNOWN_INSURER` · `canLookupDocs` · `toRequiredDocsSnapshot` · `fallbackRequiredDocs`(공통 3건) · `isSnapshotCurrent` · `docsSummaryLine`
-- [ ] `src/apply/requiredDocs.test.ts` — 변환(이름만·trim·중복·fallback 플래그) · fallback 모양 · 현재성 4케이스 · `canLookupDocs` 3케이스 · 요약 문구 2종
-- [ ] **커밋** `feat: S3 필요 서류 스냅샷 변환과 공통 기준 fallback 순수 함수 추가`
+- [x] `src/lib/claimType.ts` — `inferClaimTypeFromText`(빈 값 → illness) · `inferClaimType` 첫 인자를 구조적 타입으로(mvp 의존 제거, 동작 유지) · `CLAIM_TYPE_LABEL`
+- [x] `src/lib/claimType.test.ts` — 키워드 7종 · 빈/공백 → illness · 대소문자 · 우선순위 · `inferClaimType` surgery 우선·빈 fields → manual
+- [x] **커밋** `feat: 병명 텍스트만으로 청구 유형을 추정하는 inferClaimTypeFromText 추가`
+- [x] `src/lib/claimDocuments.ts` — `ClaimDocumentGuide` 재선언 · `fetchClaimDocuments`(10초 타임아웃·signal 합성·비-2xx throw)
+- [x] **커밋** `feat: /api/claim-documents 브라우저 클라이언트 추가`
+- [x] `src/apply/requiredDocs.ts` — `UNKNOWN_INSURER` · `canLookupDocs` · `toRequiredDocsSnapshot` · `fallbackRequiredDocs`(공통 3건) · `isSnapshotCurrent` · `docsSummaryLine`
+- [x] `src/apply/requiredDocs.test.ts` — 변환(이름만·trim·중복·fallback 플래그) · fallback 모양 · 현재성 4케이스 · `canLookupDocs` 3케이스 · 요약 문구 2종
+- [x] **커밋** `feat: S3 필요 서류 스냅샷 변환과 공통 기준 fallback 순수 함수 추가`
 
 ## 2·3·5. S3 화면 + 액션 행 + 셸 연결 — spec 2·3·5절
 
-- [ ] `src/apply/ApplyActions.tsx` — `secondary?: { label, onClick }` prop, 있으면 「← 이전」 자리에 고스트 버튼 + 루트 `has-secondary`
-- [ ] `src/apply/steps.ts` — 3단계 description을 로딩 문구로
-- [ ] `src/apply/steps/StepDocuments.tsx` — 스냅샷 파생 loading · effect(현재면 skip / 기타·모름 fallback / fetch → 스냅샷·실패 fallback, AbortController) ·
+- [x] `src/apply/ApplyActions.tsx` — `secondary?: { label, onClick }` prop, 있으면 「← 이전」 자리에 고스트 버튼 + 루트 `has-secondary`
+- [x] `src/apply/steps.ts` — 3단계 description을 로딩 문구로
+- [x] `src/apply/steps/StepDocuments.tsx` — 스냅샷 파생 loading · effect(현재면 skip / 기타·모름 fallback / fetch → 스냅샷·실패 fallback, AbortController) ·
       로더+스켈레톤 / 요약 배너(+fallback 변형) / 2열 목록(빈 열 「없어요」) / 베타 카드 · `ApplyActions nextDisabled={loading} secondary=…` · 토스트
-- [ ] `src/apply/ApplyPage.tsx` — step 3 → `StepDocuments`
-- [ ] `src/apply/Toast.tsx` — 주석 갱신
-- [ ] **커밋** `feat: S3 필요 서류 추천 화면 추가 — 조회·로딩·담당자 안내·스냅샷 저장`
+- [x] `src/apply/ApplyPage.tsx` — step 3 → `StepDocuments`
+- [x] `src/apply/Toast.tsx` — 주석 갱신
+- [x] **커밋** `feat: S3 필요 서류 추천 화면 추가 — 조회·로딩·담당자 안내·스냅샷 저장`
 
 ## 4. 스타일 — spec 4절
 
-- [ ] `src/styles/apply.css` — `.apply-docs-loader*` · `.apply-docs-skeleton*` + pulse · `.apply-docs-summary(.is-fallback)*` · `.apply-docs-badge*` ·
+- [x] `src/styles/apply.css` — `.apply-docs-loader*` · `.apply-docs-skeleton*` + pulse · `.apply-docs-summary(.is-fallback)*` · `.apply-docs-badge*` ·
       `.apply-docs-grid/-col/-row/-empty` · `.apply-docs-beta*` · `.apply-actions.has-secondary`(≤480 세로 전폭)
-  - [ ] 2열 → ≤768 1열 · 긴 서류 이름 줄바꿈
-  - [ ] 토큰만, 하드코딩 없음
-- [ ] **커밋** `style: S3 로더·요약 배너·2열 서류 목록·베타 카드 스타일 추가`
+  - [x] 2열 → ≤768 1열 · 긴 서류 이름 줄바꿈
+  - [x] 토큰만, 하드코딩 없음
+- [x] **커밋** `style: S3 로더·요약 배너·2열 서류 목록·베타 카드 스타일 추가`
 
 ## 6. 검증 — spec 「검증」
 
-- [ ] `npm run build` · `npm run lint` · `npm test`
-- [ ] 로컬(노션 키 있음): 피부염+삼성화재 → 로더 → 결과 → S4 → 복귀 시 로더 없음 · 병명 비움 → 통원 · 병명 변경 → 재조회 · 마이브라운 빈 열
-- [ ] 로컬(노션 키 없음): 501 → fallback 카드 · 「기타 / 모름」 → 로더 없이 fallback
-- [ ] 「서류만 확인할게요」 토스트 · ≤480 버튼 전폭 · S1·S2 액션 행 그대로
+- [x] `npm run build` · `npm run lint` · `npm test`
+- [x] 로컬(노션 키 있음, 헤드리스 Chromium): 피부염+삼성화재 → 로더(fetch 8초 지연) → 결과 → S4 → 복귀 시 요청 0건 · 병명 「골절」로 변경 → 상해로 재조회 · 마이브라운 직접 준비 「없어요」 (2026-09-10)
+- [x] 로컬: fetch를 reject로 바꿔 실패 경로 → fallback 카드 · 「기타 / 모름」 → 요청 없이 즉시 fallback (2026-09-10)
+- [x] 「서류만 확인할게요」 토스트 · ≤480 버튼 전폭 · S1·S2 액션 행 그대로
 - [ ] Vercel 프리뷰 `/apply?r=test` — Vercel env(`NOTION_*`)는 사람이 확인
-- [ ] 스크린샷 1440 · 768 · 390(결과) + 로딩 1440 + fallback 1440 → `docs/spec/SSH-473/`
-- [ ] **커밋** `docs: SSH-473 검증 스크린샷 추가`
+- [x] 스크린샷 1440 · 768 · 390(결과) + 로딩 1440 + fallback 1440 → `docs/spec/SSH-473/`
+- [x] **커밋** `docs: SSH-473 검증 스크린샷 추가`
 
 ## 7. 마무리
 

@@ -216,17 +216,17 @@ docs/spec/SSH-473/apply-s3-{1440,768,390}.png · apply-s3-loading-1440.png · ap
 
 ## 검증
 
-- [ ] `npm run build`(`tsc -b` 포함) · `npm run lint` · `npm test` — claimType · requiredDocs 신규 + 기존 전부
-- [ ] `npm run dev` + `.env`에 `NOTION_TOKEN`·`NOTION_DOCS_DATA_SOURCE_ID`: S1 병명 「피부염」 + S2 삼성화재 → 로더 → 피부 서류 2열 →
+- [x] `npm run build`(`tsc -b` 포함) · `npm run lint` · `npm test` — claimType 6 · requiredDocs 7 신규, 총 37건 (2026-09-10)
+- [x] `npm run dev` + `.env`에 `NOTION_TOKEN`·`NOTION_DOCS_DATA_SOURCE_ID`: S1 병명 「피부염」 + S2 삼성화재 → 로더 → 피부 서류 2열 →
       헤딩 「삼성화재 · 피부 기준 — 병원에서 N개, 직접 준비 M개」 → 「무료로 대신 청구 맡기기」 → S4 placeholder → 프로그레스로 S3 복귀 시 **로더 없이** 결과
-- [ ] 병명 비움 → 「통원」(illness) 서류. S1에서 병명을 「골절」로 바꾸고 S3 재진입 → 재조회(상해)
-- [ ] S2 「기타 / 모름」 → 로더 없이 담당자 안내 카드 + 공통 3건
-- [ ] `.env` 키 제거(501) 또는 네트워크 차단 → 담당자 안내 카드(fallback) — 로컬 기본 화면
-- [ ] 마이브라운(직접 준비 0건) → 오른쪽 열 「없어요」
-- [ ] 「서류만 확인할게요」 → 토스트, 화면 유지. ≤480에서 버튼 두 개 전폭 세로
-- [ ] S1·S2 액션 행이 그대로인지(「← 이전」 유지)
+- [x] 병명 비움 → 「통원」(illness) 서류. S1에서 병명을 「골절」로 바꾸고 S3 재진입 → 재조회(상해)
+- [x] S2 「기타 / 모름」 → 로더 없이 담당자 안내 카드 + 공통 3건
+- [x] 네트워크 차단(fetch reject) → 담당자 안내 카드(fallback). 501 경로는 같은 catch로 수렴 — 코드 경로 동일
+- [x] 마이브라운(직접 준비 0건) → 오른쪽 열 「없어요」
+- [x] 「서류만 확인할게요」 → 토스트, 화면 유지. ≤480에서 버튼 두 개 전폭 세로
+- [x] S1·S2 액션 행이 그대로인지(「← 이전」 유지)
 - [ ] Vercel 프리뷰 `/apply?r=test` — **Vercel에 `NOTION_TOKEN`·`NOTION_DOCS_DATA_SOURCE_ID`가 있는지 사람이 확인**(프로덕션에는 있다 — 실측)
-- [ ] 스크린샷 1440 · 768 · 390(결과, 대표) + 로딩 1440 + fallback 1440 → `docs/spec/SSH-473/`, PR 본문 임베드
+- [x] 스크린샷 1440 · 768 · 390(결과, 대표) + 로딩 1440 + fallback 1440 → `docs/spec/SSH-473/`, PR 본문 임베드
 
 ## 1차 리뷰 결정 요청
 
