@@ -83,6 +83,13 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 .apply-upload-btn:hover { background:var(--secondary-600); }
 .apply-upload-btn:disabled { cursor:default; opacity:.6; }
 .apply-upload .apply-btn-ghost { flex-shrink:0; white-space:nowrap; }
+.apply-upload-btns { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.apply-btn-white { background:var(--neutral-0); }
+/* 읽은 뒤: 사진 썸네일 + 체크 배지 (Figma S1-a) */
+.apply-upload-thumb { position:relative; width:56px; height:56px; flex-shrink:0; padding:0; border-radius:10px; overflow:visible; background:var(--neutral-100); border:1px solid var(--border); display:grid; place-items:center; color:var(--text-primary); cursor:pointer; }
+/* 절대 위치로 고정 — grid 셀에 두면 이미지 원본 크기로 셀이 늘어나 상자를 넘친다 */
+.apply-upload-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:9px; display:block; }
+.apply-upload-badge { position:absolute; top:-5px; right:-5px; width:18px; height:18px; border-radius:999px; background:var(--success-500); color:var(--neutral-0); display:grid; place-items:center; border:2px solid var(--success-50); }
 .apply-spinner { width:22px; height:22px; border-radius:999px; border:3px solid var(--primary-100); border-top-color:var(--primary-500); animation:apply-spin .8s linear infinite; }
 @keyframes apply-spin { to { transform:rotate(360deg); } }
 
@@ -99,6 +106,20 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 .apply-field-hint { color:var(--text-tertiary); }
 .apply-field-error { color:var(--error-700); font-weight:600; }
 .apply-field.has-error .field { border-color:var(--error-500); }
+
+/* ---------- S1: 사진 보기 모달 (Figma S1-c) ---------- */
+.apply-dialog-backdrop { position:fixed; inset:0; z-index:60; background:color-mix(in srgb, var(--neutral-900) 50%, transparent); display:flex; align-items:center; justify-content:center; padding:24px; }
+.apply-dialog { width:min(560px, 100%); max-height:calc(100dvh - 48px); overflow:auto; background:var(--surface); border-radius:var(--radius-md); padding:24px; display:flex; flex-direction:column; gap:16px; box-shadow:var(--shadow-card); }
+.apply-dialog-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.apply-dialog-title { font-size:16px; font-weight:700; color:var(--text-primary); }
+.apply-dialog-close { background:none; padding:4px 8px; font-size:16px; font-weight:700; color:var(--text-tertiary); cursor:pointer; border-radius:8px; }
+.apply-dialog-close:hover { color:var(--text-primary); }
+.apply-dialog-image { background:var(--neutral-100); border:1px solid var(--border); border-radius:14px; min-height:240px; max-height:60vh; display:grid; place-items:center; overflow:hidden; }
+.apply-dialog-image img { max-width:100%; max-height:60vh; object-fit:contain; display:block; }
+.apply-dialog-image-fallback { display:flex; flex-direction:column; align-items:center; gap:10px; padding:32px 24px; text-align:center; font-size:13px; line-height:1.5; color:var(--text-tertiary); }
+.apply-dialog-note { margin:0; font-size:12px; line-height:1.5; color:var(--text-secondary); }
+.apply-dialog-btns { display:flex; justify-content:flex-end; gap:12px; }
+.apply-dialog-btns .btn { width:auto; white-space:nowrap; }
 
 /* ---------- 토스트 ---------- */
 .apply-toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); z-index:50; max-width:min(92vw, 480px); padding:12px 18px; border-radius:var(--radius-sm); background:var(--neutral-900); color:var(--neutral-0); font-size:14px; line-height:1.45; box-shadow:var(--shadow-card); }
@@ -148,6 +169,15 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
   /* 업로드 카드는 세로로 — 모바일 시안(1544-658) */
   .apply-upload { flex-direction:column; align-items:center; text-align:center; padding:22px 18px; }
   .apply-upload-btn, .apply-upload .apply-btn-ghost { width:100%; }
+  .apply-upload-btns { width:100%; }
+  .apply-upload-btns .btn { flex:1 1 0; }
   .apply-panel { padding:18px; }
   .apply-toast { bottom:16px; }
+  /* 사진 보기는 아래에서 올라오는 시트로 (Figma 모바일 S1-c) */
+  .apply-dialog-backdrop { align-items:flex-end; padding:0; }
+  .apply-dialog { width:100%; max-height:calc(100dvh - 40px); border-radius:var(--radius-md) var(--radius-md) 0 0; padding:18px 18px 24px; gap:14px; }
+  .apply-dialog-image { min-height:200px; max-height:52vh; }
+  .apply-dialog-image img { max-height:52vh; }
+  .apply-dialog-btns { flex-direction:column-reverse; }
+  .apply-dialog-btns .btn { width:100%; }
 }

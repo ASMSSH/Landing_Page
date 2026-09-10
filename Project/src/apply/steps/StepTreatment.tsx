@@ -4,11 +4,12 @@ import ApplyActions from '../ApplyActions';
 import { useApply } from '../ApplyContext';
 import StepHeading from '../StepHeading';
 import Toast from '../Toast';
-import { imageToDataUrl } from '../imageToDataUrl';
+import { ACCEPTED_MIME_TYPES, imageToDataUrl } from '../imageToDataUrl';
 import { receiptToTreatment } from '../receiptToTreatment';
 import type { Treatment } from '../state';
 import { stepDef } from '../steps';
 import { todayIso, validateTreatment, type TreatmentErrors } from '../validateTreatment';
+import ReceiptPhotoDialog from './ReceiptPhotoDialog';
 import ReceiptUploadCard, { type UploadStatus } from './ReceiptUploadCard';
 import TreatmentForm from './TreatmentForm';
 import { TREATMENT_FIELD_ORDER, fieldId } from './treatmentFields';
@@ -17,13 +18,14 @@ import { TREATMENT_FIELD_ORDER, fieldId } from './treatmentFields';
 // 단계 컴포넌트가 헤딩과 액션 행을 소유한다. S3·S4~S6도 같은 방식).
 //
 // 영수증 사진 흐름: 파일 선택 → imageToDataUrl(축소) → /api/analyze-receipt → receiptToTreatment →
-// setTreatment patch. 파일·dataURL은 이 함수 안에서만 살고 상태·스토리지에 넣지 않는다 (위키 ⑪-③).
+// setTreatment patch + receiptRead. 파일·dataURL은 이 함수 안에서만 살고 상태·스토리지에 넣지 않는다 (위키 ⑪-③).
+// 「사진 보기」용 object URL만 Provider 메모리에 둔다(ApplyContext.receiptPreview).
 
 const OCR_DONE_DESCRIPTION = '영수증에서 읽은 내용이에요. 확인하고 틀린 곳은 고쳐 주세요';
 const OCR_EMPTY_MESSAGE = '영수증에서 읽을 수 있는 내용이 없었어요. 직접 입력해 주세요';
 
 export default function StepTreatment() {
-  const { state, dispatch } = useApply();
+  const { state, dispatch, receiptPreview, setReceiptPreview } = useApply();
   const def = stepDef(1);
   const today = useMemo(() => todayIso(), []);
 
@@ -32,17 +34,22 @@ export default function StepTreatment() {
   const [errors, setErrors] = useState<TreatmentErrors>({});
   const [submitted, setSubmitted] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [photoOpen, setPhotoOpen] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // 언마운트(다음 단계로 이동 등) 시 진행 중인 분석 요청을 끊는다
   useEffect(() => () => abortRef.current?.abort(), []);
 
   const closeToast = useCallback(() => setToast(null), []);
+  const closePhoto = useCallback(() => setPhotoOpen(false), []);
+  const openPicker = () => inputRef.current?.click();
 
   const handleFile = async (file: File) => {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
+    const wasRead = state.receiptRead;
     setStatus('loading');
     setToast(null);
 
@@ -52,17 +59,19 @@ export default function StepTreatment() {
       if (controller.signal.aborted) return;
       const patch = receiptToTreatment(analysis);
       if (Object.keys(patch).length === 0) {
-        setStatus('idle');
+        setStatus(wasRead ? 'done' : 'idle');
         setToast(OCR_EMPTY_MESSAGE);
         return;
       }
       dispatch({ type: 'setTreatment', patch });
       dispatch({ type: 'setReceiptRead', read: true });
+      setReceiptPreview(URL.createObjectURL(file));
       if (submitted) setErrors(validateTreatment({ ...state.treatment, ...patch }, today));
       setStatus('done');
     } catch (error) {
       if (controller.signal.aborted) return;
-      setStatus('idle');
+      // 실패해도 이전에 읽은 사진·값은 그대로 — 카드만 이전 상태로
+      setStatus(wasRead ? 'done' : 'idle');
       setToast(error instanceof Error && error.message ? error.message : ANALYZE_FAILED_MESSAGE);
     }
   };
@@ -93,9 +102,35 @@ export default function StepTreatment() {
         title={def.title}
         description={status === 'done' ? OCR_DONE_DESCRIPTION : def.description}
       />
-      <ReceiptUploadCard status={status} onFile={handleFile} />
+      <ReceiptUploadCard
+        status={status}
+        previewUrl={receiptPreview}
+        onPick={openPicker}
+        onView={() => setPhotoOpen(true)}
+      />
+      {/* capture 속성은 넣지 않는다 — 안드로이드에서 갤러리 선택이 막힌다 */}
+      <input
+        ref={inputRef}
+        type="file"
+        accept={ACCEPTED_MIME_TYPES.join(',')}
+        hidden
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          e.target.value = ''; // 같은 파일을 다시 골라도 change가 나게
+          if (file) void handleFile(file);
+        }}
+      />
       <TreatmentForm value={state.treatment} errors={errors} today={today} onChange={handleChange} />
       <ApplyActions onNext={handleNext} />
+      <ReceiptPhotoDialog
+        open={photoOpen}
+        url={receiptPreview}
+        onClose={closePhoto}
+        onReupload={() => {
+          setPhotoOpen(false);
+          openPicker();
+        }}
+      />
       <Toast message={toast} onClose={closeToast} />
     </>
   );
