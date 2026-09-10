@@ -112,11 +112,14 @@ alter table public.claims enable row level security;
 - **적용은 사람이** Supabase 대시보드 SQL Editor에 붙여 넣는다(에이전트는 대시보드 접근이 없다). `create … if not exists`라 두 번
   돌려도 안전하다
 
-### 2. 서버 순수 로직 — `server/claims.ts` · `server/supabase.ts` · `server/slack.ts` (+ `server/claims.test.ts`)
+### 2. 서버 순수 로직 — `server/claims.ts` 한 파일 (+ `server/claims.test.ts`)
 
-세 파일 전부 브라우저 import 금지(머리 주석). `src/`를 import하지 않는다.
+브라우저 import 금지(머리 주석). `src/`를 import하지 않는다. **PostgREST·슬랙·검증·접수를 한 파일의 절(section)로 나눈다** —
+처음엔 `server/supabase.ts`·`server/slack.ts`로 쪼갰는데, `server/` 파일끼리의 import는 Vercel·Vite 규칙상 `.js` 확장자여야 하고
+`node --test`는 `.js`를 `.ts`로 되돌리지 않아 테스트가 모듈을 못 찾았다(`server/notion.ts → otp.js`가 테스트가 없는 이유). 이유는 파일
+머리 주석에도 있다.
 
-**`server/supabase.ts`** — PostgREST 얇은 호출 4개. 공통 헤더 `apikey: <key>` · `Authorization: Bearer <key>` · `Content-Type`.
+**PostgREST 절** — 얇은 호출 4개. 공통 헤더 `apikey: <key>` · `Authorization: Bearer <key>` · `Content-Type`.
 호출마다 `AbortSignal.timeout(5000)`. 네트워크 예외는 잡아서 `{ ok: false, status: 0 }`류로 돌려주고 throw하지 않는다.
 
 | 함수 | 요청 | 반환 |
@@ -130,7 +133,7 @@ alter table public.claims enable row level security;
   `'receipt_no'`, `claims_client_id_key`면 `'client_id'`, 둘 다 아니면 `null`
 - `receipt_no`는 `BGN-`·숫자·하이픈뿐이라 like 패턴에 이스케이프가 필요 없다. `client_id`는 UUID 검증을 통과한 값만 온다
 
-**`server/slack.ts`**
+**슬랙 절**
 
 - `buildClaimMessage({ receiptNo, hospitalName, visitDate, insurer, refCode, boardUrl }): string` — 순수 함수. **이름·전화번호·
   생년월일·반려동물 이름은 받지도 않는다**(타입에 없다):
@@ -147,7 +150,7 @@ alter table public.claims enable row level security;
 - `boardUrl`은 `SUPABASE_URL`(`https://<ref>.supabase.co`)의 첫 호스트 라벨로 `https://supabase.com/dashboard/project/<ref>/editor`를
   만든다(`server/claims.ts`의 `boardUrlFrom(supabaseUrl)`, 순수). 새 env를 만들지 않는다(**결정 4**). 대시보드 URL이 바뀌면 이 한 곳
 
-**`server/claims.ts`**
+**검증·접수 절**
 
 `validateClaimInput(input: unknown, todayKst: string): { ok: true; row: ClaimRow } | { ok: false; field: string }` — 순수. `ClaimRow`는
 insert 본문 타입(= `ClaimPayload` + `client_id: string | null`, `consented_at` 없음). 클라이언트(`validateApplicant`·`validateTreatment`)
@@ -264,8 +267,7 @@ GEMINI_MODEL=gemini-3-flash-preview
 
 ```
 Project/supabase/schema.sql                                    1절 — claims DDL append
-Project/server/claims.ts · server/claims.test.ts               2절 — 검증·접수번호·createClaim
-Project/server/supabase.ts · server/slack.ts                   2절 — PostgREST 호출 · 슬랙 문안/전송
+Project/server/claims.ts · server/claims.test.ts               2절 — PostgREST·슬랙·검증·접수번호·createClaim (한 파일)
 Project/api/claims.ts                                          3절 — 서버리스 (신규)
 Project/vite.config.ts                                         3절 — dev 미들웨어
 Project/src/apply/ApplyContext.tsx                             4절 — clientId

@@ -12,43 +12,43 @@
 
 ## 1. 스키마 — spec 1절
 
-- [ ] `Project/supabase/schema.sql` — `public.claims` DDL + 인덱스 + RLS on(정책 없음) append
-- [ ] **커밋** `feat: claims 테이블 DDL 추가 — RLS on, anon 정책 없음`
+- [x] `Project/supabase/schema.sql` — `public.claims` DDL + 인덱스 + RLS on(정책 없음) append
+- [x] **커밋** `feat: claims 테이블 DDL 추가 — RLS on, anon 정책 없음`
 - [ ] **사람**: Supabase 대시보드 SQL Editor에 적용 (에이전트는 못 한다 — 적용됐는지 확인받고 검증으로)
 
 ## 2. 서버 순수 로직 — spec 2절
 
-- [ ] `Project/server/supabase.ts` — `findByClientId` · `lastReceiptNoOfDay` · `insertClaim`(23505 충돌 분류) · `markSlackNotified`
-- [ ] `Project/server/slack.ts` — `buildClaimMessage`(이름·전화 없음) · `notifySlack`
-- [ ] `Project/server/claims.ts` — `validateClaimInput` · `receiptPrefix` · `nextReceiptNo` · `todayKst` · `boardUrlFrom` · `createClaim`
-- [ ] `Project/server/claims.test.ts` — spec 2절 테스트 목록 전부
-- [ ] **커밋** `feat: claims 서버 로직 — 입력 검증·접수번호·Supabase insert·슬랙 알림`
+- [x] `Project/server/claims.ts` — 한 파일, 절 4개: PostgREST(`findByClientId` · `lastReceiptNoOfDay` · `insertClaim` 23505 분류 · `markSlackNotified`) ·
+      슬랙(`buildClaimMessage` 이름·전화 없음 · `notifySlack`) · 검증(`validateClaimInput` · `todayKst` · `receiptPrefix` · `nextReceiptNo` · `boardUrlFrom`) · `createClaim`.
+      `supabase.ts`·`slack.ts`로 나눴다가 합침 — `node --test`가 `.js` import를 `.ts`로 못 찾는다
+- [x] `Project/server/claims.test.ts` — 19건
+- [x] **커밋** `feat: claims 서버 로직 — 입력 검증·접수번호·Supabase insert·슬랙 알림`
 
 ## 3. 엔드포인트 — spec 3절
 
-- [ ] `Project/api/claims.ts` — `POST` 핸들러(`subscribe.ts` 패턴)
-- [ ] `Project/vite.config.ts` — `claimsApi(env)` 플러그인 + plugins 등록
-- [ ] **커밋** `feat: POST /api/claims 서버리스 함수와 dev 미들웨어 추가`
+- [x] `Project/api/claims.ts` — `POST` 핸들러(`subscribe.ts` 패턴)
+- [x] `Project/vite.config.ts` — `claimsApi(env)` 플러그인 + plugins 등록
+- [x] **커밋** `feat: POST /api/claims 서버리스 함수와 dev 미들웨어 추가`
 
 ## 4. 클라이언트 멱등 키 — spec 4절
 
-- [ ] `Project/src/apply/ApplyContext.tsx` — `clientId`(randomUUID, `reset`에서 갱신)
-- [ ] `Project/src/apply/claimPayload.ts` + `claimPayload.test.ts` — `client_id` 필드·인자
-- [ ] `Project/src/apply/steps/StepConsent.tsx` — `toClaimPayload(state, getRefCode(), clientId)`
-- [ ] `Project/src/lib/claims.ts` — 머리 주석 갱신
-- [ ] **커밋** `feat: 신청 본문에 client_id 멱등 키 추가 — 재시도 중복 접수 방지`
+- [x] `Project/src/apply/ApplyContext.tsx` — `clientId`(randomUUID, `reset`에서 갱신)
+- [x] `Project/src/apply/claimPayload.ts` + `claimPayload.test.ts` — `client_id` 필드·인자
+- [x] `Project/src/apply/steps/StepConsent.tsx` — `toClaimPayload(state, getRefCode(), clientId)`
+- [x] `Project/src/lib/claims.ts` — 머리 주석 갱신
+- [x] **커밋** `feat: 신청 본문에 client_id 멱등 키 추가 — 재시도 중복 접수 방지`
 
 ## 5. 환경변수 — spec 5절
 
-- [ ] `Project/.env.example` — `SUPABASE_URL` · `SUPABASE_SERVICE_ROLE_KEY` · `SLACK_WEBHOOK_URL` · `GEMINI_API_KEY` · `GEMINI_MODEL`
-- [ ] **커밋** `chore: .env.example에 Supabase·슬랙·Gemini 변수 추가`
+- [x] `Project/.env.example` — `SUPABASE_URL` · `SUPABASE_SERVICE_ROLE_KEY` · `SLACK_WEBHOOK_URL` · `GEMINI_API_KEY` · `GEMINI_MODEL`
+- [x] **커밋** `chore: .env.example에 Supabase·슬랙·Gemini 변수 추가`
 - [ ] **사람**: Vercel Preview·Production 환경변수 등록 · 로컬 `.env`
 
 ## 6. 검증 — spec 「검증」
 
-- [ ] `npm run build` · `npm run lint` · `npm test`
+- [x] `npm run build` · `npm run lint` · `npm test` — 80건(claims 19 신규), 2026-09-10
 - [ ] 로컬 `/apply?r=test` 끝까지 → S6 접수번호 · Table Editor 행 · 2번째 `-02`
-- [ ] `curl` 멱등 2회 · 400 케이스 · env 없이 500
+- [ ] `curl` 멱등 2회 · 400 케이스 · env 없이 500 — env 없이 500 `server_not_configured`·JSON 아님 400 `bad_request`는 확인(2026-09-10), 나머지는 DDL·env 뒤
 - [ ] Vercel 프리뷰 끝까지 (환경변수 등록 뒤)
 - [ ] 슬랙 1통 + `slack_notified` — **webhook 생기면**(그 전엔 「남은 검증」으로 PR 본문에)
 - [ ] S6 접수번호 1440 스크린샷 → `docs/spec/SSH-544/`
