@@ -34,12 +34,12 @@
 
 ## 4. 웹 CI — spec 4절
 
-- [ ] `.github/workflows/web-ci.yml` · `Project/package.json` `engines`
+- [ ] `.github/workflows/web-ci.yml`(job 안 변경 감지, 문서만이면 건너뜀) · `Project/package.json` `engines`
 - [ ] **커밋** `chore: 웹 lint·빌드·테스트 CI 추가`
 
 ## 5. .github 문서 — spec 5절
 
-- [ ] `pull_request_template.md` 교체 · `CONTRIBUTING.md` 교체 · `CODEOWNERS` · `ISSUE_TEMPLATE/` 삭제
+- [ ] `pull_request_template.md` 교체 · `CONTRIBUTING.md` 교체 · `CODEOWNERS` (이슈 템플릿은 둔다)
 - [ ] **커밋** `docs: PR 템플릿·CONTRIBUTING을 새 작업 방식으로 교체`
 
 ## 6. 검증 — spec 「검증」

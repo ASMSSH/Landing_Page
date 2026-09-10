@@ -67,7 +67,8 @@ Boheomgaenyang 루트 CLAUDE.md를 단일 스택·`dev` base로 줄인다.
 
 ### 4. `.github/workflows/web-ci.yml`
 
-- `pull_request`(dev·main, `draft != true`) + `push`(dev·main). **`paths` 없음** — 빌드가 1분 안쪽이고 required check로 쓰려면 job이 항상 생겨야 한다
+- `pull_request`(dev·main, `draft != true`) + `push`(dev·main). **`paths` 필터 대신 job 안에서 변경 감지** — 워크플로는 항상 트리거되어 required check가 가능하고,
+  `Project/`에서 `.md` 제외 변경이 없으면(문서만 고친 PR) 뒤 스텝을 건너뛰고 바로 초록(1차 리뷰 결정)
 - `concurrency: web-ci-${{ github.ref }}`, `cancel-in-progress: true`
 - `checkout@v5` → `setup-node@v4`(`node-version: 26`, npm 캐시, `Project/package-lock.json`) → `Project/`에서 `npm ci` → `lint` → `build` → `test`
 - Node 26 고정 이유(테스트가 TS를 그대로 실행)를 주석에. `Project/package.json`에 `engines.node >=26`
@@ -77,7 +78,7 @@ Boheomgaenyang 루트 CLAUDE.md를 단일 스택·`dev` base로 줄인다.
 - `pull_request_template.md` — 5섹션(`📌 관련 이슈 / 🙋 남기는 말 / 📍 PR Point / ✨ 세부 내용 / 📸 스크린샷`). 제목 규칙 `작업 내용(SSH-XXX)`, 스크린샷 표 `1440 | 768 | 390`, 「390 예외 없음」
 - `CONTRIBUTING.md` — **전면 교체**. Feature Flow · 컨벤션 · `dev → main` · CI가 검사하는 것 · 리뷰 두 번 + Pn · 라벨 · AI 협업 · `CLAUDE.md` 관리
 - `CODEOWNERS` — `* @alstjr7437 @dbsghdz1 @ppaangss`
-- `ISSUE_TEMPLATE/issue-template.md` — **삭제**(백로그는 Jira 하나)
+- `ISSUE_TEMPLATE/issue-template.md` — **그대로 둔다**(1차 리뷰 결정)
 
 ### 6. 파일 목록
 
@@ -96,7 +97,6 @@ CLAUDE.md                                   신규
 .github/pull_request_template.md            교체
 .github/CONTRIBUTING.md                     교체
 .github/CODEOWNERS                          신규
-.github/ISSUE_TEMPLATE/issue-template.md    삭제
 Project/package.json                        engines.node
 docs/spec/SSH-546/{spec,tasks}.md           이 문서
 ```
@@ -125,8 +125,8 @@ docs/spec/SSH-546/{spec,tasks}.md           이 문서
 - Ready for review · Jira 검토 중 · Squash Merge(→ `dev`) · `dev → main` PR
 - GitHub 설정 — `dev`·`main` 브랜치 보호(required checks `규칙 검사`·`웹 CI`, PR 필수) · **Default commit message = Pull request title** · Delete branch on merge · (선택) `feat→dev`는 squash, `dev→main`은 merge commit
 
-## 확인 사항 (1차 리뷰)
+## 1차 리뷰 결정 (2026-09-10)
 
-1. 커밋 전 검증 훅(`verify-web.sh`)을 넣을지 — `tsc -b` + oxlint라 5초 안쪽. 뺄 수 있다
-2. 이슈 템플릿 삭제 — GitHub Issues를 앞으로도 안 쓴다는 전제
-3. `web-ci`에 `paths` 필터를 안 두는 것 — 문서만 고친 PR에도 1분 CI가 돈다. required check를 위해 감수
+1. **커밋 전 검증 훅은 넣는다** — 판단은 에이전트에 위임됨. `tsc -b` + oxlint 5초 안쪽이고 `SKIP_WEB_VERIFY=1` 우회가 있어 급할 때 비용이 없다. 타입 오류가 CI까지 가서 왕복하는 비용이 더 크다
+2. **이슈 템플릿은 둔다** — 삭제하지 않는다
+3. **문서만 고친 PR은 웹 CI를 돌리지 않는다** — 단 `paths` 필터가 아니라 job 안 변경 감지로. required check가 pending에 걸리지 않게(4절)
