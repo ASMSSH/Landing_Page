@@ -187,7 +187,7 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 .apply-consent-row { display:flex; align-items:center; gap:12px; padding:16px 0; border-top:1px solid var(--border); }
 .apply-consent-row:first-child { border-top:0; }
 .apply-consent-label { flex:1 1 0; min-width:0; font-size:15px; font-weight:600; color:var(--text-primary); cursor:pointer; overflow-wrap:anywhere; }
-.apply-consent-required { color:var(--primary-600); font-weight:700; }
+.apply-consent-required { color:var(--primary-600); font-weight:700; white-space:nowrap; }
 .apply-consent-view { flex-shrink:0; background:none; padding:6px 8px; font-size:14px; font-weight:700; color:var(--primary-600); cursor:pointer; border-radius:8px; text-decoration:underline; text-underline-offset:3px; }
 .apply-consent-view:hover { background:var(--primary-50); }
 /* 커스텀 체크 — 원형 22px, 체크 시 코랄 채움 + 흰 체크 */
@@ -207,7 +207,8 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 .apply-consent-error-btns .apply-btn-ghost { padding:9px 16px; font-size:14px; }
 
 /* ---------- S5-a: 동의 전문 (SSH-486) ---------- */
-.apply-consent-doc { display:flex; flex-direction:column; gap:12px; }
+/* section 전역 padding(index.css)을 끈다 — 레일 .apply-card와 같은 이유 */
+.apply-consent-doc { display:flex; flex-direction:column; gap:12px; padding:0; }
 .apply-consent-doc-chip { align-self:flex-start; padding:5px 10px; border-radius:999px; background:var(--primary-50); color:var(--primary-600); font-size:12px; font-weight:700; }
 .apply-consent-doc-title { margin-top:4px; font-family:var(--font-display); font-size:20px; color:var(--text-primary); }
 .apply-consent-doc-meta { margin:0; font-size:14px; color:var(--text-secondary); }
@@ -225,7 +226,7 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 .apply-consent-doc-close { width:auto; padding:12px 28px; font-size:16px; }
 
 /* ---------- S6: 접수 완료 (SSH-486) ---------- */
-.apply-done { display:flex; flex-direction:column; gap:20px; }
+.apply-done { display:flex; flex-direction:column; gap:20px; padding:0; }
 .apply-done-head { display:flex; flex-direction:column; align-items:center; gap:10px; padding-top:8px; text-align:center; }
 .apply-done-icon { width:64px; height:64px; border-radius:999px; background:var(--success-500); color:var(--neutral-0); display:grid; place-items:center; margin-bottom:6px; }
 .apply-done-title { font-family:var(--font-display); font-size:22px; color:var(--text-primary); }
