@@ -12,7 +12,9 @@ export type IconName =
   | 'wallet'
   | 'chevron-down'
   | 'instagram'
-  | 'check';
+  | 'check'
+  | 'camera'
+  | 'info';
 
 // 채우기(fill) 기반으로 그릴 아이콘 — 나머지는 stroke 기반
 const FILLED: IconName[] = ['quote'];
@@ -60,6 +62,19 @@ const PATHS: Record<IconName, ReactNode> = {
   ),
   'chevron-down': <path d="m6 9 6 6 6-6" />,
   check: <path d="M20 6 9 17l-5-5" />,
+  camera: (
+    <>
+      <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+      <circle cx="12" cy="13" r="3" />
+    </>
+  ),
+  info: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4" />
+      <path d="M12 8h.01" />
+    </>
+  ),
   instagram: (
     <>
       <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />

@@ -6,15 +6,32 @@ import ApplyRail from './ApplyRail';
 import ApplyActions from './ApplyActions';
 import ApplyFooter from './ApplyFooter';
 import StepHeading from './StepHeading';
+import StepInsurance from './steps/StepInsurance';
 import StepPlaceholder from './steps/StepPlaceholder';
+import StepTreatment from './steps/StepTreatment';
 import { stepDef } from './steps';
+import type { ApplyStep } from './state';
 import { useApplyMeta } from './useApplyMeta';
 import '../styles/apply.css';
+
+// 단계 본문. S1·S2는 헤딩·액션 행까지 자기가 그린다(SSH-543 spec 5절). S3~S5는 빈 패널(형제 티켓이 채운다).
+function StepBody({ step }: { step: ApplyStep }) {
+  if (step === 1) return <StepTreatment />;
+  if (step === 2) return <StepInsurance />;
+  const def = stepDef(step);
+  if (!def) return <StepPlaceholder message="접수가 완료됐어요" />;
+  return (
+    <>
+      <StepHeading number={def.number} title={def.title} description={def.description} />
+      <StepPlaceholder />
+      <ApplyActions />
+    </>
+  );
+}
 
 function ApplyShell() {
   useApplyMeta();
   const { state } = useApply();
-  const def = stepDef(state.step);
   return (
     <div className="apply-page">
       <Nav variant="apply" />
@@ -23,15 +40,7 @@ function ApplyShell() {
         <ApplyProgress />
         <div className="apply-body">
           <main className="apply-main">
-            {def ? (
-              <>
-                <StepHeading number={def.number} title={def.title} description={def.description} />
-                <StepPlaceholder />
-                <ApplyActions />
-              </>
-            ) : (
-              <StepPlaceholder message="접수가 완료됐어요" />
-            )}
+            <StepBody step={state.step} />
           </main>
           <ApplyRail />
         </div>
