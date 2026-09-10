@@ -60,10 +60,13 @@ function fallbackNote(insurer: string): string {
   if (insurer === UNKNOWN_INSURER) {
     return '보험사를 아직 몰라도 괜찮아요. 신청하면 담당자가 보험사를 확인해서 필요한 서류를 알려드려요. 아래는 어느 보험사든 공통으로 필요한 서류예요.';
   }
-  return `${insurer} 기준 서류를 자동으로 찾지 못했어요. 신청하면 담당자가 보험사에 확인해서 알려드려요. 아래는 어느 보험사든 공통으로 필요한 서류예요.`;
+  return `${insurer} 기준 서류를 지금은 찾지 못했어요. 신청하면 담당자가 보험사에 확인해서 알려드려요. 아래는 어느 보험사든 공통으로 필요한 서류예요.`;
 }
 
-function DocsSummary({ snapshot }: { snapshot: RequiredDocsSnapshot }) {
+function DocsSummary({ snapshot, onRetry }: { snapshot: RequiredDocsSnapshot; onRetry: () => void }) {
+  // 조회 실패로 온 fallback(기타/모름이 아닌 보험사)만 다시 찾을 수 있다 — 한 번 실패한 스냅샷이
+  // 세션 동안 굳지 않게 (AI 리뷰 P3). 기타/모름은 서버가 항상 404라 버튼이 의미 없다
+  const retryable = snapshot.fallback && canLookupDocs(snapshot.insurer);
   return (
     <div className={`apply-docs-summary${snapshot.fallback ? ' is-fallback' : ''}`}>
       <div className="apply-docs-summary-copy">
@@ -73,6 +76,11 @@ function DocsSummary({ snapshot }: { snapshot: RequiredDocsSnapshot }) {
             ? fallbackNote(snapshot.insurer)
             : '최종 요건은 보험사가 정해요. 담당자가 병원에 확인한 뒤 알려드려요.'}
         </p>
+        {retryable && (
+          <button type="button" className="btn apply-btn-ghost apply-btn-white apply-docs-retry" onClick={onRetry}>
+            다시 찾아보기
+          </button>
+        )}
       </div>
       <span className="apply-docs-badge is-source">{snapshot.fallback ? '기본 안내' : '보험사 기준'}</span>
     </div>
@@ -131,6 +139,8 @@ export default function StepDocuments() {
   const loading = snapshot === null;
   const [toast, setToast] = useState<string | null>(null);
   const closeToast = useCallback(() => setToast(null), []);
+  // 스냅샷을 비우면 아래 effect가 다시 조회한다
+  const retry = useCallback(() => dispatch({ type: 'setRequiredDocs', docs: null }), [dispatch]);
 
   useEffect(() => {
     if (snapshot) return;
@@ -159,7 +169,7 @@ export default function StepDocuments() {
       <StepHeading number={def.number} title={def.title} description={description} />
       {snapshot ? (
         <>
-          <DocsSummary snapshot={snapshot} />
+          <DocsSummary snapshot={snapshot} onRetry={retry} />
           <DocsList snapshot={snapshot} />
           <DocsBetaCard />
         </>
