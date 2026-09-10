@@ -274,7 +274,7 @@ docs/spec/SSH-486/{spec,tasks}.md · 스크린샷                          이 �
 | 단계 단위 브라우저 back(`history.state` ↔ step) | SSH-547 — 여기서는 전문 닫기 한 엔트리만 |
 | 모바일 S5의 인라인 「신청 요약」 카드 | 하지 않음 — 레일이 ≤768에서 본문 아래로 내려와 이미 보인다 |
 | 모바일 S5-a의 nav 축소·상단 ✕ | 하지 않음 — 하단 「닫기」로 통일(결정 8) |
-| S4 안내 카드 연파랑 토큰 신설 | 하지 않음 — `.apply-note` 중립색(결정 7) |
+| ~~S4 안내 카드 연파랑 토큰 신설~~ | 1차 리뷰에서 뒤집힘 — Figma 변수 `tint/info`·`on-tint/info`를 `index.css` 토큰으로 추가(아래 「1차 리뷰 결정」) |
 | 위임장 서명·신분증·통장 사본 업로드·마케팅 동의·동의 철회 UI·진행 상태 조회 | 백로그(위키 ①) |
 | 개인정보처리방침 v3 링크 교체 | SSH-545 |
 | `mvp/*`·`index.css` 잔재 정리 | SSH-545 |
@@ -306,3 +306,14 @@ docs/spec/SSH-486/{spec,tasks}.md · 스크린샷                          이 �
 9. **트래킹 5개는 SSH-545** — 이 PR은 기존 `cta_click`만 2곳(S5 오류·S6 인스타)
 10. **`ApplyActions.nextLabel?` prop** — 「전송 중…」 표시용
 11. **`StepPlaceholder` 삭제** — S3까지 머지되어 사용처가 없어진다
+
+## 1차 리뷰 결정 (2026-09-10)
+
+Draft PR #32에서 사용자가 **1~11 전부 추천안대로 확정**하고 두 가지를 더 지시했다.
+
+1. **결정 6(오류 배너) — Figma에도 그린다.** 구현 뒤 데스크톱 `S5-1 · 전송 실패`·모바일 `S5-1 · 전송 실패` 프레임을 S5 복제 + 앰버 배너로 추가했다
+2. **결정 7(S4 안내 카드) — Figma 변수에 있는 색을 쓴다.** Figma 변수 `tint/info`(#D6E6F5)·`on-tint/info`(#305A8A)를 같은 이름의 토큰
+   `--tint-info`·`--on-tint-info`로 `index.css`에 추가하고 `.apply-note.is-info`가 쓴다. 「`index.css`는 건드리지 않는다」(8절)의 예외 — 토큰 두 줄뿐
+
+구현 중 추가한 것: `ApplyProgress`가 접수 완료(잠금)에서 완료 단계를 숫자 대신 체크로 그린다(Figma S6) · 전문·접수 완료 `section`에
+`padding:0`(`index.css` 전역 `section` padding) · 5절의 커밋 2개는 전문·전송이 한 컴포넌트라 하나로 합쳤다.

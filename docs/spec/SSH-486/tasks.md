@@ -70,7 +70,8 @@
 - [x] `npm run build` · `npm run lint` · `npm test` — consents 7 · birth 2 · validateApplicant 8 · claimPayload 4 신규, 총 61건 (2026-09-10)
 - [x] 로컬 S4 검증 동선 7케이스 · S5 체크 동선 · S5-a 전문·뒤로가기 · 전송 실패 배너
 - [x] 헤드리스 fetch 스텁 → S6 → 「처음으로」
-- [ ] Vercel 프리뷰(새로고침 포함)
+- [x] Vercel 프리뷰(새로고침 포함) — 로드·토큰 반영 확인. 「신청하기」는 API 전이라 실패 배너(정상). 웹 CI는 Draft라 skip, 로컬 초록 (2026-09-10)
+- [x] Figma: 전송 실패 배너 프레임 추가 — 데스크톱 `S5-1 · 전송 실패`, 모바일 `S5-1 · 전송 실패` (1차 리뷰 지시)
 - [x] 스크린샷 S5 1440·768·390 + S4·S5-a·S6·오류 1440 → `docs/spec/SSH-486/`
 - [x] **커밋** `docs: SSH-486 검증 스크린샷 추가`
 
