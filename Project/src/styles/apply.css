@@ -106,10 +106,10 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 /* ---------- S2: 보험사 그리드 ---------- */
 .apply-insurance { display:flex; flex-direction:column; gap:20px; }
 .apply-insurers { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:12px; }
-.apply-insurer { display:flex; flex-direction:column; align-items:flex-start; gap:4px; padding:14px 16px; min-height:72px; text-align:left; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-sm); cursor:pointer; font:inherit; color:inherit; transition:border-color .15s, background .15s; }
+.apply-insurer { display:flex; flex-direction:column; align-items:flex-start; gap:4px; padding:14px 12px; min-height:72px; text-align:left; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-sm); cursor:pointer; font:inherit; color:inherit; transition:border-color .15s, background .15s; }
 .apply-insurer:hover { border-color:var(--primary-300); }
 .apply-insurer.is-selected { background:var(--primary-100); border-color:var(--primary-500); }
-.apply-insurer-name { font-size:15px; font-weight:700; color:var(--text-primary); overflow-wrap:anywhere; }
+.apply-insurer-name { font-size:14px; font-weight:700; letter-spacing:-0.3px; color:var(--text-primary); overflow-wrap:anywhere; }
 .apply-insurer-product { font-size:12px; color:var(--text-secondary); overflow-wrap:anywhere; }
 .apply-insurer.is-selected .apply-insurer-product { color:var(--primary-700); }
 .apply-note { display:flex; align-items:flex-start; gap:8px; margin:0; padding:12px 16px; border-radius:var(--radius-sm); background:var(--neutral-100); font-size:13px; line-height:1.5; color:var(--text-secondary); }
