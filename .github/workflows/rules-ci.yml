@@ -1,0 +1,115 @@
+name: 규칙 검사
+
+# ⚠️ 커밋 type(TYPES) 목록이 이 파일과 문서 양쪽에 있다.
+#    바꿀 때는 .github/CONTRIBUTING.md 와 CLAUDE.md 도 같이 고칠 것.
+#
+# 검사하지 않는 것과 그 이유:
+#   - PR 범위         티켓 내용을 읽어야 관련 여부를 안다. 기계가 판정할 수 없다. pr-reviewer가 본다
+#   - PR 본문 빈 섹션  "해당 없음"만 채워도 통과한다. 기계가 구분 못 한다
+#   - 스크린샷 유무    UI 변경인지를 기계가 모른다. pr-reviewer가 본다
+#
+# dev → main 릴리스 PR은 예외다. 사람이 dev에 쌓인 것을 main으로 올리는 PR이라 브랜치명·제목에
+# 이슈 키가 없고, 커밋은 Squash된 PR 제목들이라 `<type>: 제목` 형식이 아니다. 그 PR에서는 ① AI 서명만 본다.
+#
+# paths 필터를 두지 않는다. 항상 돌아야 브랜치 보호의 필수 체크로 걸 수 있다(체크가 안 생기면 영원히 pending).
+
+on:
+  pull_request:
+    # edited 가 있어야 제목을 고쳤을 때 다시 돈다.
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+    branches: [dev, main]
+
+jobs:
+  rules:
+    name: 협업 규칙
+    runs-on: ubuntu-latest
+
+    steps:
+      # v4는 Node 20이라 러너가 Node 24로 강제 실행하며 경고를 낸다. v5부터 Node 24다.
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # 커밋 메시지 검사에 전체 히스토리가 필요하다
+
+      - name: 검사
+        # PR 제목·본문은 사용자가 넣는 값이다. run: 안에 직접 보간하면
+        # 제목에 셸 명령을 심어 실행시킬 수 있다. 반드시 env로 넘기고 "$VAR"로 받는다.
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -uo pipefail
+
+          TYPES='feat|fix|chore|style|refactor|docs|test'
+
+          # AI 서명은 반드시 줄 시작으로만 찾는다.
+          # 느슨하게 잡으면 "chore: Claude Code 스킬 추가" 같은 정상 커밋이 걸린다.
+          SIGN='^(Co-Authored-By:|Claude-Session:|🤖 Generated with|Generated with \[Claude Code\])'
+
+          FAILED=0
+          fail() { echo "::error::$1"; FAILED=1; }
+
+          # ── ① AI 서명 ──────────────────────────────────────────
+          if git log "$BASE_SHA..$HEAD_SHA" --format=%B | grep -qE "$SIGN"; then
+            fail "커밋 메시지에 AI 서명이 있습니다. Co-Authored-By / Claude-Session / Generated with 는 넣지 않습니다."
+          fi
+          if printf '%s' "$PR_BODY" | grep -qE "$SIGN"; then
+            fail "PR 본문에 AI 서명이 있습니다."
+          fi
+
+          # ── dev → main 릴리스 PR은 여기서 끝낸다 ──────────────
+          if [ "$HEAD_REF" = "dev" ] && [ "$BASE_REF" = "main" ]; then
+            if [ "$FAILED" -ne 0 ]; then
+              echo "::error::협업 규칙 검사 실패 (릴리스 PR — AI 서명만 검사)."
+              exit 1
+            fi
+            echo "::notice::릴리스 PR(dev → main) — AI 서명 검사만 통과. 제목·브랜치·커밋 형식은 검사하지 않습니다."
+            exit 0
+          fi
+
+          # ── ② PR 제목 ──────────────────────────────────────────
+          if ! printf '%s' "$PR_TITLE" | grep -qE "^.+\(SSH-[0-9]+\)$"; then
+            fail "PR 제목 형식이 어긋납니다: '$PR_TITLE'
+          형식) 작업한 내용(SSH-번호)
+          예시) /apply 진입점 + 페이지 셸 구성(SSH-542)"
+          fi
+
+          # ── ③ 커밋 메시지 ──────────────────────────────────────
+          while IFS= read -r msg; do
+            [ -z "$msg" ] && continue
+            if ! printf '%s' "$msg" | grep -qE "^($TYPES): .+$"; then
+              fail "커밋 메시지 형식이 어긋납니다: '$msg'
+          형식) <type>: <제목>   type) $TYPES"
+              continue
+            fi
+            # 한글은 바이트가 아니라 문자로 센다. ${#var}·wc -m 은 로케일을 탄다.
+            len=$(python3 -c 'import sys; print(len(sys.argv[1]))' "$msg")
+            if [ "$len" -gt 50 ]; then
+              fail "커밋 제목이 50자를 넘습니다 (${len}자): '$msg'"
+            fi
+          done < <(git log "$BASE_SHA..$HEAD_SHA" --no-merges --format=%s)
+
+          # ── ④ 브랜치명 ─────────────────────────────────────────
+          if ! printf '%s' "$HEAD_REF" | grep -qE "^($TYPES)/SSH-[0-9]+$"; then
+            fail "브랜치명 형식이 어긋납니다: '$HEAD_REF'
+          형식) <type>/SSH-<번호>   예시) feat/SSH-543
+          이슈 키가 있어야 Jira 개발 패널에 연결됩니다."
+          fi
+
+          # ── ⑤ 이슈 키 일치 ─────────────────────────────────────
+          BRANCH_KEY=$(printf '%s' "$HEAD_REF" | grep -oE 'SSH-[0-9]+' | head -1)
+          TITLE_KEY=$(printf '%s' "$PR_TITLE" | grep -oE 'SSH-[0-9]+' | head -1)
+          if [ -n "$BRANCH_KEY" ] && [ -n "$TITLE_KEY" ] && [ "$BRANCH_KEY" != "$TITLE_KEY" ]; then
+            fail "브랜치와 PR 제목의 이슈 키가 다릅니다. 브랜치=$BRANCH_KEY 제목=$TITLE_KEY"
+          fi
+
+          # ── 결과 ───────────────────────────────────────────────
+          # 하나 걸릴 때마다 끝내지 않고 모아서 한 번에 보고한다.
+          if [ "$FAILED" -ne 0 ]; then
+            echo "::error::협업 규칙 검사 실패. 위 항목을 고쳐주세요. 규칙 원문은 .github/CONTRIBUTING.md 에 있습니다."
+            exit 1
+          fi
+          echo "::notice::협업 규칙 검사 통과 (AI 서명 · PR 제목 · 커밋 메시지 · 브랜치명 · 이슈 키)"
