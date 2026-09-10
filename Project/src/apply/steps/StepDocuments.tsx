@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { fetchClaimDocuments } from '../../lib/claimDocuments';
+import { useCallback, useEffect } from 'react';
+import { fetchClaimDocumentsOrGeneral } from '../../lib/claimDocuments';
 import { inferClaimTypeFromText } from '../../lib/claimType';
 import ApplyActions from '../ApplyActions';
 import { useApply } from '../ApplyContext';
@@ -15,15 +15,14 @@ import {
 import type { RequiredDocsSnapshot } from '../state';
 import StepHeading from '../StepHeading';
 import { stepDef } from '../steps';
-import Toast from '../Toast';
 
 // S3 필요 서류 추천. S1 병명 → 청구 유형, S2 보험사와 함께 /api/claim-documents를 조회해 2열로 보여 준다.
+// 액션 행은 다른 단계와 같은 「← 이전」 + 주 버튼이다 — Figma의 「서류만 확인할게요」는 2차 피드백(2026-09-10)에서 뺐다.
 // 로컬 로딩 상태를 두지 않는다 — 결과(실패도 fallback 스냅샷)는 전부 state.requiredDocs에 들어가고,
 // 그 스냅샷이 지금 입력으로 만든 것인지(isSnapshotCurrent)로 로딩 여부를 판정한다 (SSH-473 spec 2절).
 // S4에 갔다 돌아오면 로더 없이 결과가 보이고, S1 병명·S2 보험사를 바꾸면 자연히 다시 조회한다.
 
 const STEP = 3;
-const CHECK_ONLY_MESSAGE = '서류는 위 목록에서 확인하면 돼요. 맡기고 싶어지면 언제든 「무료로 대신 청구 맡기기」를 눌러 주세요';
 const SKELETON_ROWS = [0, 1, 2];
 
 function DocsLoader() {
@@ -137,8 +136,6 @@ export default function StepDocuments() {
   const claimType = inferClaimTypeFromText(state.treatment.diagnosis);
   const snapshot = isSnapshotCurrent(state.requiredDocs, insurer, claimType) ? state.requiredDocs : null;
   const loading = snapshot === null;
-  const [toast, setToast] = useState<string | null>(null);
-  const closeToast = useCallback(() => setToast(null), []);
   // 스냅샷을 비우면 아래 effect가 다시 조회한다
   const retry = useCallback(() => dispatch({ type: 'setRequiredDocs', docs: null }), [dispatch]);
 
@@ -150,7 +147,8 @@ export default function StepDocuments() {
       return;
     }
     const controller = new AbortController();
-    fetchClaimDocuments(claimType, insurer, controller.signal)
+    // 그 유형 행이 없으면(404) 같은 보험사의 질병(통원) 서류로 한 번 더 — 노션에 예방/검진 행이 없는 보험사가 있다
+    fetchClaimDocumentsOrGeneral(claimType, insurer, controller.signal)
       .then((guide) => dispatch({ type: 'setRequiredDocs', docs: toRequiredDocsSnapshot(guide, insurer, claimType) }))
       .catch(() => {
         // StrictMode 1회차·언마운트로 취소된 요청은 무시한다. 그 외 실패(404·501·502·네트워크·타임아웃)는 fallback
@@ -179,11 +177,7 @@ export default function StepDocuments() {
           <DocsSkeleton />
         </>
       )}
-      <ApplyActions
-        nextDisabled={loading}
-        secondary={{ label: '서류만 확인할게요', onClick: () => setToast(CHECK_ONLY_MESSAGE), disabled: loading }}
-      />
-      <Toast message={toast} onClose={closeToast} />
+      <ApplyActions nextDisabled={loading} />
     </>
   );
 }

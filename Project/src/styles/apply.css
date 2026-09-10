@@ -175,7 +175,6 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 .apply-docs-beta-icon { font-size:20px; line-height:1.2; flex-shrink:0; }
 .apply-docs-beta-title { margin:0 0 4px; font-size:15px; font-weight:700; color:var(--text-primary); }
 .apply-docs-beta-sub { margin:0; font-size:13px; line-height:1.5; color:var(--text-secondary); }
-.apply-btn-ghost:disabled { cursor:default; opacity:.5; }
 
 /* ---------- Footer ---------- */
 .apply-foot { margin-top:auto; padding:24px 32px 32px; background:none; text-align:center; font-size:13px; color:var(--text-tertiary); }
@@ -207,10 +206,6 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
   .apply-actions { flex-wrap:wrap; }
   .apply-actions-btns { margin-left:auto; }
   .apply-btn-next { padding:12px 20px; font-size:15px; }
-  /* 보조 버튼이 있는 단계(S3)는 버튼 둘을 세로 전폭으로 — 주 버튼 위, 고스트 아래 (모바일 시안) */
-  .apply-actions.has-secondary { flex-direction:column; align-items:stretch; gap:12px; }
-  .apply-actions.has-secondary .apply-actions-btns { flex-direction:column-reverse; margin-left:0; width:100%; }
-  .apply-actions.has-secondary .apply-actions-btns .btn { width:100%; }
   .apply-docs-loader { padding:32px 18px; }
   .apply-docs-summary { flex-direction:column; align-items:flex-start; }
   .apply-foot { padding:20px 18px 28px; }
