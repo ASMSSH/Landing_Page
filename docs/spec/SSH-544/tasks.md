@@ -6,8 +6,8 @@
 
 - [x] `docs/spec/SSH-544/spec.md` — 배경·범위 6절·범위 밖·검증·1차 리뷰 결정 요청 8건
 - [x] `docs/spec/SSH-544/tasks.md`
-- [ ] **커밋** `docs: SSH-544 spec·tasks 작성`
-- [ ] **Draft PR 생성 후 멈춘다** — `Supabase claims 테이블 + POST /api/claims 구현(SSH-544)`, base `dev`.
+- [x] **커밋** `docs: SSH-544 spec·tasks 작성`
+- [x] **Draft PR 생성 후 멈춘다** — #33 `Supabase claims 테이블 + POST /api/claims 구현(SSH-544)`, base `dev`.
       1차 리뷰(작업 계획)를 받은 뒤 아래 1~7을 같은 브랜치에서 잇는다
 
 ## 1. 스키마 — spec 1절
