@@ -14,7 +14,7 @@
 
 - [x] `Project/supabase/schema.sql` — `public.claims` DDL + 인덱스 + RLS on(정책 없음) append
 - [x] **커밋** `feat: claims 테이블 DDL 추가 — RLS on, anon 정책 없음`
-- [ ] **사람**: Supabase 대시보드 SQL Editor에 적용 (에이전트는 못 한다 — 적용됐는지 확인받고 검증으로)
+- [x] **사람**: Supabase 대시보드 SQL Editor에 적용 — 2026-09-10 완료(파일 전체를 붙이면 `events` 정책이 42710으로 막힌다 → `claims` 블록만)
 
 ## 2. 서버 순수 로직 — spec 2절
 
@@ -42,17 +42,18 @@
 
 - [x] `Project/.env.example` — `SUPABASE_URL` · `SUPABASE_SECRET_KEY` · `SLACK_WEBHOOK_URL` · `GEMINI_API_KEY` · `GEMINI_MODEL`
 - [x] **커밋** `chore: .env.example에 Supabase·슬랙·Gemini 변수 추가`
-- [ ] **사람**: Vercel Preview·Production 환경변수 등록 · 로컬 `.env`
+- [x] 로컬 `.env` — `SUPABASE_URL`·`SUPABASE_SECRET_KEY`(2026-09-10, `.env.example`과 같은 절 구조로 재정리)
+- [ ] **사람**: Vercel Preview·Production 환경변수 `SUPABASE_URL`·`SUPABASE_SECRET_KEY` — 아직(프리뷰 `/api/claims`가 500 `server_not_configured`)
 
 ## 6. 검증 — spec 「검증」
 
 - [x] `npm run build` · `npm run lint` · `npm test` — 80건(claims 19 신규), 2026-09-10
-- [ ] 로컬 `/apply?r=test` 끝까지 → S6 접수번호 · Table Editor 행 · 2번째 `-02`
-- [ ] `curl` 멱등 2회 · 400 케이스 · env 없이 500 — env 없이 500 `server_not_configured`·JSON 아님 400 `bad_request`는 확인(2026-09-10), 나머지는 DDL·env 뒤
-- [ ] Vercel 프리뷰 끝까지 (환경변수 등록 뒤)
+- [x] 로컬 `/apply?r=test` 끝까지(헤드리스) → S6 `BGN-260910-03` · `claims` 3행(`consented_at` 채워짐·`status` 신규·`slack_notified` false·`ref_code`) · curl 1번째 `-01` → 2번째 `-02` (2026-09-10)
+- [x] `curl` 같은 `client_id` 2회 → 같은 `-01`·행 1개 · 400 `guardian_phone`·`consent_unique_id` · JSON 아님 400 `bad_request` · env 없이 500 `server_not_configured` · anon 키 select `[]`·insert 401 (2026-09-10)
+- [ ] Vercel 프리뷰 끝까지 — **Preview 환경변수 등록 뒤**(사람)
 - [ ] 슬랙 1통 + `slack_notified` — **webhook 생기면**(그 전엔 「남은 검증」으로 PR 본문에)
-- [ ] S6 접수번호 1440 스크린샷 → `docs/spec/SSH-544/`
-- [ ] **커밋** `docs: SSH-544 검증 기록·스크린샷 추가`
+- [x] S6 접수번호 1440·390 스크린샷 → `docs/spec/SSH-544/apply-s6-{1440,390}.png`
+- [x] **커밋** `docs: SSH-544 검증 기록·스크린샷 추가`
 
 ## 7. 마무리
 

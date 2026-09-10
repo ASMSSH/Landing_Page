@@ -290,15 +290,15 @@ docs/spec/SSH-544/{spec,tasks}.md                              이 문서
 
 ## 검증
 
-- [ ] `npm run build`(`tsc -b`) · `npm run lint` · `npm test` — `server/claims.test.ts` 신규, `claimPayload.test.ts` 갱신
-- [ ] **사람**: SQL Editor에 1절 DDL 적용 · 로컬 `.env`에 `SUPABASE_URL`·`SUPABASE_SECRET_KEY` · Vercel Preview 환경변수
-- [ ] 로컬 `npm run dev` `/apply?r=test` S1~S5 → 「신청하기」 → S6 접수번호 `BGN-YYMMDD-01` · Table Editor 행 1개(`consented_at` 채워짐 ·
+- [x] `npm run build`(`tsc -b`) · `npm run lint` · `npm test` — `server/claims.test.ts` 신규 19건, `claimPayload.test.ts` 갱신 (80건, 2026-09-10)
+- [x] **사람**: SQL Editor에 1절 DDL 적용 · 로컬 `.env`에 `SUPABASE_URL`·`SUPABASE_SECRET_KEY` (2026-09-10) · [ ] Vercel Preview 환경변수 — 아직
+- [x] 로컬 `npm run dev` `/apply?r=test` S1~S5 → 「신청하기」 → S6 접수번호(`BGN-260910-03`, curl 2건 뒤) · Table Editor 행 1개(`consented_at` 채워짐 ·
       `status` 신규 · `slack_notified` false · `ref_code` test) · 같은 날 2번째 → `-02`
-- [ ] 멱등: `curl`로 같은 `client_id` 본문 2회 → 행 1개, 같은 `receipt_no`
-- [ ] `curl` 400: 전화 형식 · 동의 하나 false · JSON 아님(`bad_request`) · env 없이 500 `server_not_configured`
+- [x] 멱등: `curl`로 같은 `client_id` 본문 2회 → 행 1개, 같은 `receipt_no`
+- [x] `curl` 400: 전화 형식 · 동의 하나 false · JSON 아님(`bad_request`) · env 없이 500 `server_not_configured` · anon 키 select 빈 배열·insert 401(RLS)
 - [ ] 슬랙: 테스트(스텁)로만. **webhook이 생기면** 로컬 `.env`에 넣고 1통 + `slack_notified` true 확인 — PR 본문에 「남은 검증」
 - [ ] Vercel 프리뷰 `/apply?r=test`에서 끝까지(환경변수 등록 뒤)
-- [ ] UI 변경 없음 → 스크린샷 「해당 없음」. S6에 실제 접수번호가 뜬 1440 한 장은 검증 기록으로 첨부
+- [x] UI 변경 없음 → 스크린샷 「해당 없음」. S6에 실제 접수번호가 뜬 1440·390을 검증 기록으로 첨부
 
 ## 1차 리뷰 결정 요청
 
