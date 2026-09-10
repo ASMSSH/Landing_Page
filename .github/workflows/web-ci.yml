@@ -103,7 +103,9 @@ jobs:
         working-directory: Project
         run: npm run build
 
+      # --if-present: test 스크립트가 없는 브랜치(main 은 SSH-542 가 올라가기 전까지 없다)에서는 건너뛴다.
+      # 스크립트가 있으면 평소처럼 돌고 실패하면 빨강이다.
       - name: 테스트
         if: steps.changes.outputs.run == 'true'
         working-directory: Project
-        run: npm test
+        run: npm run test --if-present
