@@ -55,7 +55,7 @@ function getUtm(): Record<string, string> {
   }
 }
 
-function getRefCode(): string | null {
+export function getRefCode(): string | null {
   try {
     const stored = sessionStorage.getItem(REF_KEY);
     if (stored !== null) return stored || null;
