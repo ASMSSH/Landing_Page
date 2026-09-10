@@ -11,43 +11,43 @@
 
 ## 1. CLAUDE.md — spec 1절
 
-- [ ] `CLAUDE.md` 200줄 이하
-- [ ] `.gitignore`에 `CLAUDE.local.md` · `.claude/settings.local.json`
-- [ ] `CLAUDE.local.md` 로컬 생성(커밋 안 함)
-- [ ] **커밋** `docs: CLAUDE.md 작업 규약 추가`
+- [x] `CLAUDE.md` 200줄 이하
+- [x] `.gitignore`에 `CLAUDE.local.md` · `.claude/settings.local.json`
+- [x] `CLAUDE.local.md` 로컬 생성(커밋 안 함)
+- [x] **커밋** `docs: CLAUDE.md 작업 규약 추가`
 
 ## 2. .claude — spec 2절
 
-- [ ] `.claude/skills/commit/SKILL.md`
-- [ ] `.claude/skills/pr/SKILL.md`
-- [ ] `.claude/skills/pr-review/SKILL.md`
-- [ ] `.claude/agents/pr-reviewer.md`
-- [ ] `.claude/skills/kickoff/SKILL.md`
-- [ ] **커밋** `chore: Claude Code 스킬과 리뷰 에이전트 추가`
-- [ ] `.claude/settings.json` · `.claude/hooks/verify-web.sh` (실행 권한)
-- [ ] **커밋** `chore: 커밋 전 웹 검증 훅 추가`
+- [x] `.claude/skills/commit/SKILL.md`
+- [x] `.claude/skills/pr/SKILL.md`
+- [x] `.claude/skills/pr-review/SKILL.md`
+- [x] `.claude/agents/pr-reviewer.md`
+- [x] `.claude/skills/kickoff/SKILL.md`
+- [x] **커밋** `chore: Claude Code 스킬과 리뷰 에이전트 추가`
+- [x] `.claude/settings.json` · `.claude/hooks/verify-web.sh` (실행 권한)
+- [x] **커밋** `chore: 커밋 전 웹 검증 훅 추가`
 
 ## 3. 규칙 검사 CI — spec 3절
 
-- [ ] `.github/workflows/rules-ci.yml`
-- [ ] **커밋** `chore: 규칙 검사 CI 추가`
+- [x] `.github/workflows/rules-ci.yml`
+- [x] **커밋** `chore: 규칙 검사 CI 추가`
 
 ## 4. 웹 CI — spec 4절
 
-- [ ] `.github/workflows/web-ci.yml`(job 안 변경 감지, 문서만이면 건너뜀) · `Project/package.json` `engines`
-- [ ] **커밋** `chore: 웹 lint·빌드·테스트 CI 추가`
+- [x] `.github/workflows/web-ci.yml`(job 안 변경 감지, 문서만이면 건너뜀) · `Project/package.json` `engines`
+- [x] **커밋** `chore: 웹 lint·빌드·테스트 CI 추가`
 
 ## 5. .github 문서 — spec 5절
 
-- [ ] `pull_request_template.md` 교체 · `CONTRIBUTING.md` 교체 · `CODEOWNERS` (이슈 템플릿은 둔다)
-- [ ] **커밋** `docs: PR 템플릿·CONTRIBUTING을 새 작업 방식으로 교체`
+- [x] `pull_request_template.md` 교체 · `CONTRIBUTING.md` 교체 · `CODEOWNERS` (이슈 템플릿은 둔다)
+- [x] **커밋** `docs: PR 템플릿·CONTRIBUTING을 새 작업 방식으로 교체`
 
 ## 6. 검증 — spec 「검증」
 
 - [ ] 푸시 후 이 PR에서 두 워크플로 초록
 - [ ] 제목 음성 테스트(빨강 확인 후 복구)
-- [ ] 훅 손 실행 2건
-- [ ] 로컬 `npm ci && lint && build && test`
+- [x] 훅 손 실행 2건
+- [x] 로컬 `npm ci && lint && build && test`
 - [ ] PR 본문 갱신(문서 요약 → 실제 구현) → `/pr-review` 별도 서브에이전트 1회 → P1·P2 반영
 
 ## 7. 마무리
