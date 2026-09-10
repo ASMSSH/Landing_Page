@@ -59,6 +59,12 @@
 - [x] `vercel.json` — SPA rewrite, `api/` 제외
 - [x] **커밋** `chore: /apply 새로고침용 Vercel SPA rewrite 추가`
 
+## 6-a. 랜딩 진입 버튼 — 프리뷰 확인 후 추가 (2026-09-10)
+
+- [x] `Nav` 랜딩 CTA → 「무료로 청구 맡기기」 `/apply` · `Hero` 주 버튼 → 같은 라벨 `/apply`
+- [x] P4 반영: 요약 레일 진료비 NaN 방지 · `route.test.ts`
+- [x] **커밋** `feat: 랜딩 Nav·Hero 주 CTA를 /apply로 연결`
+
 ## 7. 검증 — spec 「검증」
 
 - [x] `npm run build` · `npm run lint` · `node --test src/apply/state.test.ts`

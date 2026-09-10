@@ -81,7 +81,7 @@ Figma 데스크톱 S2 프레임(`1640-1331`) 기준. 위에서 아래로.
 
 | 영역 | 내용 | 컴포넌트 |
 | --- | --- | --- |
-| Nav | 기존 `Nav` 재사용. `/apply`에선 앵커(`#problem` 등)가 없으므로 링크를 `/#problem` 절대 경로로. **오른쪽 CTA 자리는 「문의 · 인스타 DM」 링크**(`INSTAGRAM_URL`, 새 탭)로 바꾼다 — 신청 페이지에서 「무료로 청구 맡기기」를 눌러 봐야 자기 자신이라, 모바일 시안(`1544-658`)의 헤더 오른쪽과 같은 링크를 둔다(1차 리뷰 결정, 2026-09-10). 이 링크는 `.nav-cta`와 달리 **모바일에서도 숨기지 않는다** | `components/Nav.tsx`에 `variant?: 'landing' \| 'apply'` prop. 랜딩 CTA 라벨(「사전 신청하기」→「무료로 청구 맡기기」) 교체는 SSH-545 |
+| Nav | 기존 `Nav` 재사용. 랜딩 variant의 CTA도 「무료로 청구 맡기기」·`/apply`로 바꾼다(Hero 주 버튼과 함께, 아래 「범위 밖」 참고). `/apply`에선 앵커(`#problem` 등)가 없으므로 링크를 `/#problem` 절대 경로로. **오른쪽 CTA 자리는 「문의 · 인스타 DM」 링크**(`INSTAGRAM_URL`, 새 탭)로 바꾼다 — 신청 페이지에서 「무료로 청구 맡기기」를 눌러 봐야 자기 자신이라, 모바일 시안(`1544-658`)의 헤더 오른쪽과 같은 링크를 둔다(1차 리뷰 결정, 2026-09-10). 이 링크는 `.nav-cta`와 달리 **모바일에서도 숨기지 않는다** | `components/Nav.tsx`에 `variant?: 'landing' \| 'apply'` prop. 랜딩 CTA 라벨(「사전 신청하기」→「무료로 청구 맡기기」) 교체는 SSH-545 |
 | 페이지 헤더 | 좌: 「대리청구 신청」(display 폰트) + 「베타 기간 무료 · 로그인 없이 5분이면 끝나요」 / 우: `BETA` 배지 | `apply/ApplyHeader.tsx` |
 | 프로그레스 | 가로 5단계. 원(26px) + 라벨 + 연결선. **완료=체크 아이콘·코랄 채움 / 현재=코랄 채움·숫자 / 미완=보더·숫자·회색 라벨.** 완료된 단계의 연결선도 코랄 | `apply/ApplyProgress.tsx` |
 | 본문 · 메인(680) | 단계 헤딩(원 번호 + 제목 + 설명) + 단계 본문. **이 티켓에선 본문이 빈 패널** | `apply/StepHeading.tsx` + `apply/steps/StepPlaceholder.tsx` |
@@ -135,7 +135,9 @@ type ApplyAction =
 - reducer는 순수 함수라 **`node:test`로 테스트한다** (`src/apply/state.test.ts`, `npm test`로 실행 —
   Node 26이라 TS를 그대로 돌린다. `server/gemini.test.ts`와 같은 방식). 경계(1에서 prev, 5에서 next, goto 앞으로 금지,
   6 종착)와 patch 병합을 본다. 테스트 파일은 `tsconfig.app.json`(브라우저)에서 빼고 `tsconfig.node.json`에 넣어
-  `tsc -b`가 타입 검사한다 (AI 리뷰 P3 반영)
+  `tsc -b`가 타입 검사한다 (AI 리뷰 P3 반영). 경로 판정 `isApplyPath`도 `src/lib/route.test.ts`로 본다 (P4 반영)
+- 요약 레일의 진료비는 숫자만 골라 `12,000원`으로 그린다. `"12,000"`·`"12000원"`이 들어와도 `NaN원`이 뜨지 않는다 (P4 반영).
+  정규화 자체는 S1(SSH-543)이 숫자 문자열로 맞추는 것이 원칙이다
 - **세션 저장은 하지 않는다.** 새로고침하면 1단계로 돌아간다. 개인정보(S4)를 `sessionStorage`에 두는 건
   처리방침에 없는 저장이고, S1~S3은 저장 없는 이탈 구간이다(위키 ②). 뒤 티켓이 필요해지면 그때 연다
 
@@ -202,10 +204,12 @@ docs/spec/SSH-542/{spec,tasks}.md           이 문서
 | S3 필요 서류 룩업·로딩·실패 상태 | SSH-473 |
 | S4~S6 폼·동의·전송·접수 완료 | SSH-486 |
 | `POST /api/claims`·`claims` 테이블 | SSH-544 |
-| 랜딩 CTA 「무료로 청구 맡기기」 통일, 체험 모달·OTP·사전 알림 제거, `apply_*` 트래킹 5개 | SSH-545 |
+| 랜딩 CTA 통일의 나머지(Features·SignupCta·Footer, Hero 칩·보조 CTA), 체험 모달·OTP·사전 알림 제거, `apply_*` 트래킹 5개 | SSH-545 |
 | `/apply` 전용 OG 프리렌더 | 미정 — 위 3절 |
 
-**랜딩은 한 줄도 바뀌지 않는다.** `Nav`에 prop이 하나 생기지만 기본값이 지금 동작이다.
+**랜딩에서 바뀌는 것은 진입 버튼 둘뿐이다** — Nav CTA와 Hero 주 버튼이 「무료로 청구 맡기기」·`/apply`로 간다
+(프리뷰 확인 후 사람 요청, 2026-09-10. 셸만 있고 들어갈 길이 없으면 프리뷰 검증이 안 된다). Nav CTA는 640px 이하에서
+숨겨지므로 모바일 진입은 Hero 버튼이 맡는다. 체험 모달·사전 알림 섹션·나머지 CTA는 SSH-545 그대로.
 
 ## 검증
 
