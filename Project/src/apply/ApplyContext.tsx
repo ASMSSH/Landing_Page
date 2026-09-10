@@ -28,6 +28,13 @@ interface ApplyContextValue {
    */
   submitting: boolean;
   setSubmitting: (value: boolean) => void;
+  /**
+   * 신청 1건의 멱등 키 — POST /api/claims 본문의 client_id. 서버(server/claims.ts)는 같은 값이 다시 오면 insert 대신
+   * 이미 접수된 접수번호를 돌려준다. 15초 타임아웃 뒤 「다시 시도」가 같은 신청을 두 번 접수하는 것을 막는다 (SSH-544).
+   * reducer 상태(initialApplyState)는 상수라 거기 두면 reset 뒤에도 같은 값이 남는다 — 「처음으로」 뒤의 새 신청이 이전
+   * 접수번호를 돌려받는 사고. 그래서 Provider가 들고 reset에서만 새로 만든다.
+   */
+  clientId: string;
 }
 
 const ApplyContext = createContext<ApplyContextValue | null>(null);
@@ -36,6 +43,7 @@ export function ApplyProvider({ children }: { children: ReactNode }) {
   const [state, rawDispatch] = useReducer(applyReducer, initialApplyState);
   const [receiptPreview, setPreviewState] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [clientId, setClientId] = useState(() => crypto.randomUUID());
   const previewRef = useRef<string | null>(null);
 
   const setReceiptPreview = useCallback((url: string | null) => {
@@ -45,11 +53,14 @@ export function ApplyProvider({ children }: { children: ReactNode }) {
     setPreviewState(url);
   }, []);
 
-  // reset(S6 「처음으로」)이면 사진도 같이 지운다
+  // reset(S6 「처음으로」)이면 사진도 같이 지우고, 멱등 키도 새로 만든다
   const dispatch = useCallback<Dispatch<ApplyAction>>(
     (action) => {
       rawDispatch(action);
-      if (action.type === 'reset') setReceiptPreview(null);
+      if (action.type === 'reset') {
+        setReceiptPreview(null);
+        setClientId(crypto.randomUUID());
+      }
     },
     [setReceiptPreview],
   );
@@ -58,7 +69,7 @@ export function ApplyProvider({ children }: { children: ReactNode }) {
   useEffect(() => () => setReceiptPreview(null), [setReceiptPreview]);
 
   return (
-    <ApplyContext.Provider value={{ state, dispatch, receiptPreview, setReceiptPreview, submitting, setSubmitting }}>
+    <ApplyContext.Provider value={{ state, dispatch, receiptPreview, setReceiptPreview, submitting, setSubmitting, clientId }}>
       {children}
     </ApplyContext.Provider>
   );

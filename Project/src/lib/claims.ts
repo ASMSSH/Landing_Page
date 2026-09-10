@@ -1,4 +1,4 @@
-// 브라우저에서 POST /api/claims(서버는 SSH-544 — server/claims.ts + api/claims.ts)를 부르는 얇은 클라이언트.
+// 브라우저에서 POST /api/claims(서버는 server/claims.ts + api/claims.ts)를 부르는 얇은 클라이언트.
 // 본문은 src/apply/claimPayload.ts#toClaimPayload가 만든다. 이 파일은 요청·응답 계약만 안다.
 //
 // 계약 (SSH-486 spec 4절):

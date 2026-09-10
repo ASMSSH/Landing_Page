@@ -1,13 +1,16 @@
 // S5 「신청하기」가 POST /api/claims로 보내는 본문. 순수 함수 — node:test로 검증한다 (claimPayload.test.ts).
 //
-// 키는 SSH-544의 Supabase `claims` 컬럼 이름(snake_case) 그대로다. 서버(server/claims.ts)가 매핑 없이 검증 → 접수번호 →
+// 키는 Supabase `claims` 컬럼 이름(snake_case) 그대로다. 서버(server/claims.ts)가 매핑 없이 검증 → 접수번호 →
 // insert만 하게 하기 위해서다. `consented_at`은 보내지 않는다 — 클라이언트 시계를 믿지 않고 서버 insert 시각으로 둔다
-// (SSH-486 spec 4절).
+// (SSH-486 spec 4절). `client_id`는 Provider가 만든 멱등 키다 — 같은 값으로 다시 보내면 서버가 새 행 대신 기존 접수번호를
+// 돌려준다 (SSH-544).
 
 import { CONSENT_VERSION } from './consents.ts';
 import type { ApplyState, RequiredDocsSnapshot } from './state.ts';
 
 export interface ClaimPayload {
+  /** 멱등 키 (UUID). ApplyProvider가 만들고 reset에서만 바뀐다 */
+  client_id: string;
   guardian_name: string;
   /** 010-XXXX-XXXX */
   guardian_phone: string;
@@ -42,9 +45,10 @@ const optional = (value: string): string | null => {
   return v ? v : null;
 };
 
-export function toClaimPayload(state: ApplyState, refCode: string | null): ClaimPayload {
+export function toClaimPayload(state: ApplyState, refCode: string | null, clientId: string): ClaimPayload {
   const { treatment, insurance, requiredDocs, applicant, consents } = state;
   return {
+    client_id: clientId,
     guardian_name: applicant.name.trim(),
     guardian_phone: applicant.phone.trim(),
     guardian_birth: applicant.birth.trim(),
