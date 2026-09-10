@@ -125,7 +125,7 @@ test('buildClaimMessage — 이름·마스킹 전화·반려동물·병원·진�
     refCode: null,
     boardUrl: 'https://example.com/board',
   });
-  assert.match(text, /^<!channel> /);
+  assert.doesNotMatch(text, /<!channel>|<!here>/);
   assert.match(text, /BGN-260910-01/);
   assert.match(text, /홍길동 \(010-\*\*\*\*-5678\) · 반려동물: 코코/);
   assert.doesNotMatch(text, /010-1234-5678/);
