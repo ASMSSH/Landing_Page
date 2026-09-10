@@ -12,9 +12,9 @@
 
 ## 1. 서버 — spec 1절
 
-- [ ] `server/gemini.ts` — `GeminiAnalysis`·`RESPONSE_SCHEMA`(properties + required)·`PROMPT`·`normalizeAnalysis`에 `hospital`·`address`
-- [ ] `server/gemini.test.ts` — fetch 스텁으로 두 필드 통과 + 누락 시 빈 문자열
-- [ ] **커밋** `feat: 영수증 분석 응답에 병원 이름·주소 추가`
+- [x] `server/gemini.ts` — `GeminiAnalysis`·`RESPONSE_SCHEMA`(properties + required)·`PROMPT`·`normalizeAnalysis`에 `hospital`·`address`
+- [x] `server/gemini.test.ts` — fetch 스텁으로 두 필드 통과 + 누락 시 빈 문자열
+- [x] **커밋** `feat: 영수증 분석 응답에 병원 이름·주소 추가`
 
 ## 2. 클라이언트 변환 — spec 2절
 
