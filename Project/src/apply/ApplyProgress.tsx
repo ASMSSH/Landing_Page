@@ -29,7 +29,10 @@ export default function ApplyProgress() {
               </button>
             ) : (
               <span className="apply-step-node">
-                <span className="apply-step-circle">{step.number}</span>
+                {/* 접수 완료(잠금)에서는 완료 단계를 버튼 없이 체크로만 그린다 — Figma S6 (SSH-486) */}
+                <span className="apply-step-circle">
+                  {status === 'done' ? <Icon name="check" size={13} strokeWidth={3} /> : step.number}
+                </span>
                 <span className="apply-step-label">{step.label}</span>
               </span>
             )}
