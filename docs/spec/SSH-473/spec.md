@@ -104,12 +104,12 @@ SSH-543과 같은 이유 — `tsconfig.app.json`은 `src`만 포함하고 `serve
 ```ts
 export const UNKNOWN_INSURER = '기타 / 모름';                 // data/insurers.ts 마지막 항목과 같은 문자열
 export function canLookupDocs(insurer: string): boolean;      // INSURERS에 있는 실제 보험사만 true. 빈 값·기타/모름은 false
-export function toRequiredDocsSnapshot(guide: ClaimDocumentGuide, insurer: string): RequiredDocsSnapshot;
+export function toRequiredDocsSnapshot(guide: ClaimDocumentGuide, insurer: string, claimType: ClaimType): RequiredDocsSnapshot;
 export function fallbackRequiredDocs(insurer: string, claimType: ClaimType): RequiredDocsSnapshot;
 export function isSnapshotCurrent(s: RequiredDocsSnapshot | null, insurer: string, claimType: ClaimType): s is RequiredDocsSnapshot;
 export function docsSummaryLine(s: RequiredDocsSnapshot): string;
 ```
-- `toRequiredDocsSnapshot`: `hospitalDocs`·`selfDocs`의 `name`만 trim해 담고 중복 제거. `claimType`은 guide 것. `fallback: guide.source !== 'notion'`
+- `toRequiredDocsSnapshot`: `hospitalDocs`·`selfDocs`의 `name`만 trim해 담고 중복 제거. `claimType`은 **조회에 쓴 값**(서버 echo와 같지만, 어긋나면 `isSnapshotCurrent`가 영영 false라 재조회가 반복된다). `fallback: guide.source !== 'notion'`
 - `fallbackRequiredDocs`: **공통 기준 3건** — 병원 발급 「진료비 영수증」「진료비 세부내역서」 / 직접 준비 「보험금 청구서」, `fallback: true`.
   (실측한 7개 보험사 목록에 전부 들어 있는 항목만 골랐다. `resultDocs.ts`의 옛 목록은 삼성화재·35만원 같은 문맥이 박혀 있어 쓰지 않는다)
 - `isSnapshotCurrent`: `s`가 있고 `insurer`·`claimType`이 모두 같을 때만 true — **재조회 규칙의 유일한 근거**
