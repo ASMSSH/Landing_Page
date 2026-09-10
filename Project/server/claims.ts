@@ -1,7 +1,7 @@
 // 대리청구 신청 접수 핸들러 — 서버 전용 (브라우저에서 import 금지).
 // Vite dev 미들웨어(vite.config.ts)와 Vercel 서버리스(api/claims.ts)가 같이 쓴다. server/notion.ts와 같은 모양.
 //
-// 흐름: 입력 검증 → (멱등 키로 기존 행 조회) → 접수번호 BGN-YYMMDD-NN → Supabase insert → 슬랙 1통 → { ok, receipt_no }
+// 흐름: 입력 검증 → (멱등 키로 기존 행 갱신) → 접수번호 BGN-YYMMDD-NN → Supabase insert → 슬랙 1통 → { ok, receipt_no }
 //
 // 입력은 SSH-486 클라이언트(src/apply/claimPayload.ts)가 보내는 claims 컬럼 snake_case 그대로다 — 매핑이 없다.
 // 검증 규칙은 클라이언트(src/apply/validateApplicant.ts·validateTreatment.ts)와 같은 수준으로 **복제**했다.
@@ -117,9 +117,23 @@ async function firstReceiptNo(env: SupabaseEnv, query: string): Promise<LookupRe
   return { ok: true, value: typeof first?.receipt_no === 'string' ? first.receipt_no : null };
 }
 
-/** 멱등 키로 이미 접수된 행을 찾는다. clientId는 UUID 검증을 통과한 값만 온다 */
-export function findByClientId(env: SupabaseEnv, clientId: string): Promise<LookupResult> {
-  return firstReceiptNo(env, `?client_id=eq.${encodeURIComponent(clientId)}&select=receipt_no&limit=1`);
+/**
+ * 멱등 키로 이미 접수된 행이 있으면 **내용을 이 요청으로 갱신**하고 그 행의 receipt_no를 돌려준다. 없으면 null.
+ * 갱신하는 이유: 타임아웃으로 실패 배너를 본 사용자가 S4로 돌아가 전화번호를 고치고 다시 보내는 경우, 접수번호는 같아야 하지만
+ * 담당자가 연락할 값은 마지막에 보낸 것이어야 한다 (AI 리뷰 P2). receipt_no·created_at·consented_at·status·assignee·memo는
+ * 본문에 없으니 그대로 남는다. clientId는 UUID 검증을 통과한 값만 온다.
+ */
+export async function updateByClientId(env: SupabaseEnv, clientId: string, row: object): Promise<LookupResult> {
+  const res = await request(env, `?client_id=eq.${encodeURIComponent(clientId)}&select=receipt_no`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=representation' },
+    body: JSON.stringify(row),
+  });
+  if (!res) return { ok: false, status: 0 };
+  if (!res.ok) return { ok: false, status: res.status };
+  const rows = (await res.json().catch(() => [])) as Array<{ receipt_no?: string }>;
+  const first = Array.isArray(rows) ? rows[0] : undefined;
+  return { ok: true, value: typeof first?.receipt_no === 'string' ? first.receipt_no : null };
 }
 
 /**
@@ -398,9 +412,10 @@ export async function createClaim(input: unknown, env: ClaimsEnv, now = new Date
   if (!validated.ok) return { status: 400, body: { ok: false, error: 'invalid_input', field: validated.field } };
   const { row } = validated;
 
-  // 멱등: 같은 client_id가 이미 접수됐으면 그 번호를 돌려준다 (「다시 시도」가 만드는 중복 접수 방지)
+  // 멱등: 같은 client_id가 이미 접수됐으면 내용을 갱신하고 그 번호를 돌려준다 (「다시 시도」가 만드는 중복 접수 방지).
+  // 슬랙은 다시 보내지 않는다 — 처음 insert 때 이미 갔다
   if (row.client_id) {
-    const existing = await findByClientId(db, row.client_id);
+    const existing = await updateByClientId(db, row.client_id, row);
     if (!existing.ok) return SUPABASE_ERROR;
     if (existing.value) return { status: 200, body: { ok: true, receipt_no: existing.value } };
   }
@@ -416,8 +431,8 @@ export async function createClaim(input: unknown, env: ClaimsEnv, now = new Date
     if (result.ok) {
       inserted = { id: result.id, receiptNo };
     } else if (result.conflict === 'client_id' && row.client_id) {
-      // 같은 신청이 동시에 두 번 온 경합 — 먼저 들어간 행의 번호를 돌려준다
-      const existing = await findByClientId(db, row.client_id);
+      // 같은 신청이 동시에 두 번 온 경합 — 먼저 들어간 행을 갱신하고 그 번호를 돌려준다
+      const existing = await updateByClientId(db, row.client_id, row);
       if (existing.ok && existing.value) return { status: 200, body: { ok: true, receipt_no: existing.value } };
       return SUPABASE_ERROR;
     } else if (result.conflict !== 'receipt_no') {

@@ -161,7 +161,7 @@ function fakeFetch(b: Backend, calls: Call[]): typeof fetch {
       return new Response('ok', { status: b.slack === 'fail' ? 500 : 200 });
     }
     assert.ok(url.startsWith('https://abcdefgh.supabase.co/rest/v1/claims'), url);
-    if (method === 'GET' && url.includes('client_id=eq.')) {
+    if (method === 'PATCH' && url.includes('client_id=eq.')) {
       const v = byClientId.shift() ?? null;
       return json(200, v ? [{ receipt_no: v }] : []);
     }
@@ -196,7 +196,8 @@ async function run(b: Backend, input: unknown = payload, env: ClaimsEnv = ENV) {
 
 const inserts = (calls: Call[]) => calls.filter((c) => c.method === 'POST' && c.url.includes('supabase.co'));
 const slacks = (calls: Call[]) => calls.filter((c) => c.url.startsWith('https://hooks.slack.com/'));
-const patches = (calls: Call[]) => calls.filter((c) => c.method === 'PATCH');
+const patches = (calls: Call[]) => calls.filter((c) => c.method === 'PATCH' && c.url.includes('id=eq.') && !c.url.includes('client_id'));
+const upserts = (calls: Call[]) => calls.filter((c) => c.method === 'PATCH' && c.url.includes('client_id=eq.'));
 
 test('createClaim — 성공: 조회 → insert → 슬랙 → slack_notified', async () => {
   const { result, calls } = await run({ last: [null] });
@@ -245,11 +246,16 @@ test('createClaim — receipt_no 충돌 2회면 409', async () => {
   assert.equal(slacks(calls).length, 0);
 });
 
-test('createClaim — client_id가 이미 접수됐으면 기존 번호, insert·슬랙 없음', async () => {
-  const { result, calls } = await run({ byClientId: ['BGN-260910-07'] });
+test('createClaim — client_id가 이미 접수됐으면 내용을 갱신하고 기존 번호, insert·슬랙 없음', async () => {
+  const { result, calls } = await run({ byClientId: ['BGN-260910-07'] }, { ...payload, guardian_phone: '010-9999-0000' });
   assert.deepEqual(result.body, { ok: true, receipt_no: 'BGN-260910-07' });
   assert.equal(inserts(calls).length, 0);
   assert.equal(slacks(calls).length, 0);
+  const [up] = upserts(calls);
+  assert.equal(upserts(calls).length, 1);
+  assert.equal(up.body?.guardian_phone, '010-9999-0000');
+  assert.ok(!('receipt_no' in up.body!));
+  assert.ok(!('consented_at' in up.body!));
 });
 
 test('createClaim — client_id insert 충돌(동시 재시도)이면 재조회로 기존 번호', async () => {
