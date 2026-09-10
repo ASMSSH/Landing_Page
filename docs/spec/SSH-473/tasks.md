@@ -54,7 +54,7 @@
 - [x] `ApplyActions` secondary prop·`has-secondary` CSS·S3 토스트 제거 → 「← 이전」 (**커밋** `fix: S3 액션 행을 「← 이전」으로 — 「서류만 확인할게요」 제거`)
 - [x] `lib/claimDocuments.ts` `fetchClaimDocumentsOrGeneral` + `claimDocuments.test.ts` 3건 (**커밋** `fix: 청구 유형 서류가 없으면 같은 보험사 질병 서류로 다시 조회`)
 - [x] 스크린샷 다시 찍기(액션 행 바뀜) · spec·tasks 갱신 (**커밋** `docs: SSH-473 2차 피드백 반영 기록·스크린샷 교체`)
-- [ ] Figma S3 프레임 「서류만 확인할게요」 → 「← 이전」 (사람 확인 뒤)
+- [x] Figma S3 프레임 「서류만 확인할게요」 → 「← 이전」 — 데스크톱 S3, 모바일 S3·S3 로딩(모바일은 S2와 같은 가로 한 줄로) (2026-09-10)
 
 ## 7. 마무리
 
