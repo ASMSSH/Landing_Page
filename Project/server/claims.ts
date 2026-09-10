@@ -211,7 +211,7 @@ export function maskPhone(phone: string): string {
 /** mrkdwn 한 통. 순수 함수 — 테스트에서 전화번호 원문·생년월일이 없는지 확인한다 */
 export function buildClaimMessage(n: ClaimNotice): string {
   return [
-    `🐾 새 대리청구 신청 *${n.receiptNo}*`,
+    `<!channel> 🐾 새 대리청구 신청 *${n.receiptNo}*`, // <!channel>: 봇 메시지는 기본 알림 대상이 아니라 전원에게 푸시가 가게 (24시간 안에 전화)
     `• 보호자: ${n.guardianName} (${maskPhone(n.guardianPhone)}) · 반려동물: ${n.petName}`,
     `• 병원: ${n.hospitalName}`,
     `• 진료일: ${n.visitDate}`,
