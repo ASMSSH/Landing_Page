@@ -135,16 +135,18 @@ alter table public.claims enable row level security;
 
 **슬랙 절**
 
-- `buildClaimMessage({ receiptNo, hospitalName, visitDate, insurer, refCode, boardUrl }): string` — 순수 함수. **이름·전화번호·
-  생년월일·반려동물 이름은 받지도 않는다**(타입에 없다):
+- `buildClaimMessage({ receiptNo, guardianName, guardianPhone, petName, hospitalName, visitDate, insurer, refCode, boardUrl }): string` — 순수 함수.
+  보호자 이름·반려동물 이름은 넣고 **전화번호는 `maskPhone`으로 뒤 4자리만**(010-****-5678), 생년월일은 넣지 않는다 — 처음 구현은 설계 §6-2대로
+  이름·전화를 아예 뺐는데, 실제 슬랙을 받아 본 사용자가 "누구 신청인지 보여야 한다"고 해서 2026-09-10 이렇게 완화했다(「슬랙 문안 변경」):
 
   ```
   🐾 새 대리청구 신청 *BGN-260910-01*
+  • 보호자: 홍길동 (010-****-5678) · 반려동물: 코코
   • 병원: 개냥동물병원
   • 진료일: 2026-09-08
   • 보험사: 삼성화재
   • 유입 코드: test          ← 없으면 「-」
-  <https://supabase.com/dashboard/project/xxxx/editor|Supabase Table Editor에서 보기>
+  <https://supabase.com/dashboard/project/xxxx/editor|Table Editor에서 전화번호 보기>
   ```
 - `notifySlack(webhookUrl, text): Promise<boolean>` — `POST webhookUrl { text }`, `AbortSignal.timeout(3000)`, 비-2xx·예외는 `false`
 - `boardUrl`은 `SUPABASE_URL`(`https://<ref>.supabase.co`)의 첫 호스트 라벨로 `https://supabase.com/dashboard/project/<ref>/editor`를
@@ -325,3 +327,11 @@ P1 없음 · P2 2건 · P3 2건 — 전부 반영.
 4. **(P3) 본문 100KB 상한이 dev 미들웨어에만 있었다.** `api/claims.ts`도 `request.text()` 길이로 413 `payload_too_large`. dev도 연결을 끊는 대신 413
 
 로컬 검증 중 발견한 S1 분석 실패 토스트 문제는 이 PR 범위 밖 → **SSH-550**.
+
+## 슬랙 문안 변경 (2026-09-10, 실제 webhook 확인 뒤 사용자)
+
+webhook(성식)이 생겨 로컬 `.env`에 넣고 1통 받아 봤다. 사용자가 "병원·진료일·보험사만 보이고 누구 신청인지가 없다"고 해서 문안에
+**보호자 이름 · 전화번호 마스킹(010-****-5678) · 반려동물 이름**을 추가했다. 전체 전화번호와 생년월일은 여전히 슬랙에 안 들어간다 —
+슬랙에 개인정보 원문이 남지 않아 처리방침 v3 수탁자 목록에 Slack을 추가하지 않고 가는 선이다(전체 번호를 넣는 안은 수탁자 추가가
+필요해 보류). 설계 §6-2·위키 ⑤의 「이름·전화번호는 넣지 않는다」와 어긋나므로 위키 갱신이 필요하다(사람). Slack 앱 표시 이름은
+**「보험찾개냥 접수함」**(아이콘 🐾)으로 — Incoming Webhook은 페이로드로 이름을 못 바꾸니 Slack 앱 설정에서.

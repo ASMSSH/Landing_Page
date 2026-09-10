@@ -51,7 +51,7 @@
 - [x] 로컬 `/apply?r=test` 끝까지(헤드리스) → S6 `BGN-260910-03` · `claims` 3행(`consented_at` 채워짐·`status` 신규·`slack_notified` false·`ref_code`) · curl 1번째 `-01` → 2번째 `-02` (2026-09-10)
 - [x] `curl` 같은 `client_id` 2회 → 같은 `-01`·행 1개 · 400 `guardian_phone`·`consent_unique_id` · JSON 아님 400 `bad_request` · env 없이 500 `server_not_configured` · anon 키 select `[]`·insert 401 (2026-09-10)
 - [ ] Vercel 프리뷰 끝까지 — **Preview 환경변수 등록 뒤**(사람)
-- [ ] 슬랙 1통 + `slack_notified` — **webhook 생기면**(그 전엔 「남은 검증」으로 PR 본문에)
+- [x] 슬랙 1통 + `slack_notified` — 2026-09-10 webhook을 `.env`에 넣고 로컬에서 사용자가 수신 확인. 문안에 이름·마스킹 전화·반려동물 추가(spec 「슬랙 문안 변경」)
 - [x] S6 접수번호 1440·390 스크린샷 → `docs/spec/SSH-544/apply-s6-{1440,390}.png`
 - [x] **커밋** `docs: SSH-544 검증 기록·스크린샷 추가`
 
