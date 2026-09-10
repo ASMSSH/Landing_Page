@@ -114,10 +114,10 @@ docs/spec/SSH-546/{spec,tasks}.md           이 문서
 
 ## 검증
 
-- [ ] 이 PR에서 `규칙 검사`·`웹 CI`가 실제로 돌고 초록 (브랜치·제목이 규칙을 만족하므로 그 자체가 테스트)
-- [ ] 규칙 CI 음성 테스트 — 제목을 잠깐 `(SSH-546)` 없이 바꿔 `edited`로 빨간불 확인 후 되돌린다
-- [ ] 훅 — `echo '{"tool_input":{"command":"git commit -m x"}}' | .claude/hooks/verify-web.sh`: Project 변경 없으면 exit 0·출력 없음, 타입 오류를 넣으면 deny JSON
-- [ ] `cd Project && npm ci && npm run lint && npm run build && npm test` 로컬 초록
+- [x] 이 PR에서 `규칙 검사`·`웹 CI`가 실제로 돌고 초록 (브랜치·제목이 규칙을 만족하므로 그 자체가 테스트)
+- [x] 규칙 CI 음성 테스트 — 제목을 잠깐 `(SSH-546)` 없이 바꿔 `edited`로 빨간불 확인 후 되돌린다
+- [x] 훅 — `echo '{"tool_input":{"command":"git commit -m x"}}' | .claude/hooks/verify-web.sh`: Project 변경 없으면 exit 0·출력 없음, 타입 오류를 넣으면 deny JSON
+- [x] `cd Project && npm ci && npm run lint && npm run build && npm test` 로컬 초록
 - [ ] `/pr-review`를 이 PR에 별도 서브에이전트로 1회 등록(dogfood) → P1·P2 반영
 - [ ] 새 세션에서 `/kickoff`·`/commit`·`/pr`·`/pr-review`가 스킬 목록에 뜬다
 
