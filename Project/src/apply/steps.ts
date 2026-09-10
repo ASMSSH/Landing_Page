@@ -38,7 +38,8 @@ export const STEPS: readonly StepDef[] = [
     key: 'documents',
     label: '필요 서류',
     title: '필요 서류',
-    description: '이 청구에 필요한 서류예요. 병원 발급 서류는 저희가 대신 받아드려요',
+    // 로딩 중 문구. 결과가 오면 StepDocuments가 요약 한 줄(docsSummaryLine)로 바꾼다 (SSH-473)
+    description: '가입한 보험사 기준으로 필요한 서류를 찾고 있어요',
     nextLabel: '무료로 대신 청구 맡기기 →',
   },
   {
