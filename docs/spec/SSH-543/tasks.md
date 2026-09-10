@@ -35,6 +35,16 @@
 - [x] `src/apply/steps/StepTreatment.tsx` — 헤딩(OCR done이면 설명 교체) + 카드 + 폼 + `ApplyActions onNext`(검증 통과 시 `next`)
 - [x] **커밋** `feat: S1 진료 정보 등록 화면 추가`
 
+## 3-a. 올린 사진 확인 — spec 3절 「올린 사진 확인」 (2026-09-10 사용자 요청, Figma 먼저 → 확인 → 구현)
+
+- [x] Figma: 데스크톱·모바일 S1-a 카드에 썸네일 + 「사진 보기」, 새 프레임 S1-c(모달·시트). 색은 전부 Semantic 변수로
+- [x] `src/apply/ApplyContext.tsx` — `receiptPreview`·`setReceiptPreview` (object URL, revoke, reset 시 해제)
+- [x] `src/apply/steps/ReceiptUploadCard.tsx` — done 상태 썸네일(+배지, onError 아이콘 대체) · 「사진 보기」·「다시 올리기」
+- [x] `src/apply/steps/ReceiptPhotoDialog.tsx` — 모달/시트, Esc·배경 클릭·닫기, 스크롤 잠금
+- [x] `src/apply/steps/StepTreatment.tsx` — 파일 input 소유, 미리보기 URL 저장, 실패 시 이전 상태 유지
+- [x] `src/styles/apply.css` — `.apply-upload-thumb*` · `.apply-dialog*` · ≤480 시트
+- [x] **커밋** `feat: S1 올린 영수증 사진 확인 — 썸네일과 사진 보기 모달 추가`
+
 ## 4. S2 화면 — spec 4절
 
 - [x] `src/apply/steps/StepInsurance.tsx` — 카드 8개(`role="radio"`), `company`만 저장, 상품명 입력, 제한 안내 행, `nextDisabled`
@@ -63,7 +73,7 @@
 - [x] 로컬 OCR 성공 경로(로컬에 GEMINI 키가 없어 브라우저에서 fetch를 모킹) · 직접 입력 경로 · 실패 토스트(실서버 500) · S2 비활성 · 랜딩 select 8개
 - [ ] 실제 영수증 사진 OCR · 4MB 초과 폰 사진 축소(실기기) — GEMINI 키 있는 환경에서 사람이 확인
 - [ ] Vercel 프리뷰 `/apply?r=test` (GEMINI env 유무는 사람 확인)
-- [x] 스크린샷 1440 · 768 · 390(S1) + S1-a · S2 · 실패 토스트 1440 → `docs/spec/SSH-543/`
+- [x] 스크린샷 1440 · 768 · 390(S1) + S1-a(1440·390) · 사진 보기(1440·390) · S2 · 실패 토스트 1440 → `docs/spec/SSH-543/`
 - [x] **커밋** `docs: SSH-543 검증 스크린샷 추가`
 
 ## 10. 마무리

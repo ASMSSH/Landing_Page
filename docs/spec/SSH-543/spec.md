@@ -116,7 +116,7 @@ receiptToTreatment(a: GeminiAnalysis): Partial<Treatment>
 | --- | --- | --- | --- |
 | `idle` | 점선 코랄 보더, 연코랄 배경, 카메라 아이콘 | **영수증을 올리면 자동으로 채워드려요** / JPG·PNG · 사진은 저장하지 않고 인식에만 써요 · 없으면 아래에 직접 적어도 돼요 | 「파일 선택」(앰버, `.btn`) |
 | `loading` | 같은 카드, 아이콘 자리에 스피너 | **영수증을 읽고 있어요…** / 보통 10초 안에 끝나요 | 비활성 |
-| `done` | sage 배경(`--success-50`)·보더, 체크 아이콘 | **영수증 1장을 읽었어요** / 읽은 내용을 아래에서 확인하고 틀린 곳은 고쳐 주세요 | 「다시 올리기」(고스트) |
+| `done` | sage 배경(`--success-50`)·보더, **올린 사진 썸네일(56px) + 체크 배지** | **영수증 1장을 읽었어요** / 읽은 내용을 아래에서 확인하고 틀린 곳은 고쳐 주세요 | 「사진 보기」 + 「다시 올리기」(흰 배경 고스트 둘) |
 | 실패 | `idle`로 되돌린다 + **토스트** | 토스트 문안은 오류별(아래) | — |
 
 - `<input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif">`를 숨기고 버튼이 연다.
@@ -130,6 +130,20 @@ receiptToTreatment(a: GeminiAnalysis): Partial<Treatment>
   서버·네트워크 → 서버가 준 `error` 문자열(없으면 `영수증을 읽지 못했어요. 직접 입력해 주세요`)
 - `Toast.tsx`: 화면 하단 고정, 4초 뒤 자동 닫힘, `role="status"`. S1 로컬 상태로 띄운다(전역 토스트 시스템은 만들지 않는다 —
   쓰는 곳이 여기뿐이다)
+
+**올린 사진 확인** (2026-09-10 사용자 요청, Figma S1-a·S1-c 추가)
+- OCR 성공 시 `URL.createObjectURL(file)`을 **`ApplyContext.receiptPreview`** 에 둔다 — S1 로컬이 아니라 Provider인 이유는 S2에 갔다
+  돌아와도 썸네일이 보여야 해서다. **서버·스토리지에는 저장하지 않는다**(위키 ⑪-③). 새 URL을 넣거나 `reset`·언마운트 때 이전
+  URL을 `revokeObjectURL`한다. 새로고침하면 사라진다(SSH-542 「세션 저장 없음」과 같은 원칙)
+- 카드 `done` 상태: 왼쪽이 썸네일(클릭하면 모달) + sage 체크 배지, 오른쪽 「사진 보기」·「다시 올리기」. 파일 input은
+  `StepTreatment`가 갖고 카드·모달 둘 다 그 input을 연다
+- 모달 `ReceiptPhotoDialog` (Figma S1-c): 제목 「올린 영수증 사진」 + ✕ · 사진(원본 비율, `object-fit: contain`, 최대 60vh) ·
+  안내 「사진은 서버에 저장하지 않고 이 화면에서만 보여요. 창을 닫아도 폼에 채운 값은 그대로예요.」 · 「다시 올리기」 고스트 +
+  「닫기」 주 버튼. 배경 클릭·Esc·닫기로 닫고 열린 동안 `body` 스크롤 잠금. **≤480은 아래에서 올라오는 시트**(CSS만 다르다,
+  버튼은 「닫기」 전폭 위·「다시 올리기」 아래)
+- 브라우저가 못 그리는 형식(Chrome의 HEIC)은 `<img onError>`로 썸네일은 영수증 아이콘, 모달은 「이 브라우저에서는 사진을 미리 볼 수
+  없어요」 안내로 대체한다
+- 실패한 재업로드는 이전에 읽은 사진·값을 지우지 않는다 — 카드만 이전 상태(`receiptRead`면 `done`)로 돌아가고 토스트
 
 **폼** — `.apply-panel` 안, 제목 「진료 정보」, 2열 그리드(≤768에서 1열). 값은 입력 즉시 `setTreatment` patch
 
@@ -190,6 +204,8 @@ validateTreatment(t: Treatment, today: string): Partial<Record<keyof Treatment, 
 | `.apply-spinner` + `@keyframes apply-spin` | 로더 |
 | `.apply-form` · `.apply-form-title` · `.apply-form-grid`(2열 → ≤768 1열) · `.apply-form-full` | 폼 |
 | `.apply-field` · `.apply-field-label` · `.apply-field-hint` · `.apply-field-error` · `.apply-field-msg` | 칸·라벨·힌트·오류 |
+| `.apply-upload-thumb` · `.apply-upload-badge` · `.apply-upload-btns` · `.apply-btn-white` | 읽은 뒤 썸네일·배지·버튼 둘 |
+| `.apply-dialog-backdrop` · `.apply-dialog` · `.apply-dialog-head/-title/-close/-image/-note/-btns` (≤480 시트) | 사진 보기 모달 |
 | `.apply-toast` | 하단 고정 토스트 |
 | `.apply-insurers`(4열 → ≤768 2열) · `.apply-insurer` (+`.is-selected`) · `.apply-insurer-name` · `.apply-insurer-product` | 보험사 그리드 |
 | `.apply-note` | S2 제한 안내 행 |
@@ -222,7 +238,10 @@ src/apply/validateTreatment.test.ts         신규 — node:test
 src/apply/imageToDataUrl.ts                 신규 — 축소·dataURL
 src/apply/Toast.tsx                         신규
 src/apply/steps/StepTreatment.tsx           신규 — S1 조립(헤딩·카드·폼·액션)
-src/apply/steps/ReceiptUploadCard.tsx       신규
+src/apply/steps/ReceiptUploadCard.tsx       신규 — 썸네일·사진 보기 포함
+src/apply/steps/ReceiptPhotoDialog.tsx      신규 — 사진 보기 모달/시트
+src/apply/steps/treatmentFields.ts          신규 — 폼 칸 id·순서 상수
+src/apply/ApplyContext.tsx                  receiptPreview (object URL, 메모리)
 src/apply/steps/TreatmentForm.tsx           신규
 src/apply/steps/StepInsurance.tsx           신규 — S2
 src/apply/ApplyPage.tsx                     단계 분기
@@ -230,7 +249,7 @@ src/components/icons.tsx                    camera · info
 src/components/SignupCta.tsx                INSURER_OPTIONS → INSURERS
 src/styles/apply.css                        6절 클래스 추가
 docs/spec/SSH-543/{spec,tasks}.md           이 문서
-docs/spec/SSH-543/apply-s1-{1440,768,390}.png · apply-s1a-1440.png · apply-s2-1440.png
+docs/spec/SSH-543/apply-s1-{1440,768,390}.png · apply-s1a-{1440,390}.png · apply-s1-photo-{1440,390}.png · apply-s1-fail-1440.png · apply-s2-1440.png
 ```
 
 ## 범위 밖 — 형제 티켓이 한다
