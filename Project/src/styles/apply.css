@@ -70,6 +70,51 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 .apply-btn-next { padding:14px 26px; font-size:16px; }
 .apply-btn-next:disabled { cursor:default; opacity:.5; box-shadow:none; }
 
+/* ---------- S1: 영수증 업로드 카드 (SSH-543) ---------- */
+.apply-upload { display:flex; align-items:center; gap:16px; padding:18px 20px; border:1.5px dashed var(--primary-300); border-radius:var(--radius-md); background:var(--primary-50); }
+.apply-upload.is-done { border-style:solid; border-color:var(--success-300); background:var(--success-50); }
+.apply-upload-icon { width:48px; height:48px; border-radius:999px; background:var(--surface); display:grid; place-items:center; flex-shrink:0; color:var(--text-primary); }
+.apply-upload.is-done .apply-upload-icon { color:var(--success-700); }
+.apply-upload-copy { display:flex; flex-direction:column; gap:4px; flex:1 1 0; min-width:0; }
+.apply-upload-title { font-size:16px; font-weight:700; color:var(--primary-600); }
+.apply-upload.is-done .apply-upload-title { color:var(--text-primary); }
+.apply-upload-sub { font-size:13px; line-height:1.5; color:var(--text-secondary); }
+.apply-upload-btn { padding:11px 22px; font-size:15px; background:var(--secondary-500); color:var(--text-primary); flex-shrink:0; white-space:nowrap; }
+.apply-upload-btn:hover { background:var(--secondary-600); }
+.apply-upload-btn:disabled { cursor:default; opacity:.6; }
+.apply-upload .apply-btn-ghost { flex-shrink:0; white-space:nowrap; }
+.apply-spinner { width:22px; height:22px; border-radius:999px; border:3px solid var(--primary-100); border-top-color:var(--primary-500); animation:apply-spin .8s linear infinite; }
+@keyframes apply-spin { to { transform:rotate(360deg); } }
+
+/* ---------- S1: 폼 ---------- */
+.apply-form { display:flex; flex-direction:column; gap:18px; }
+.apply-form-title { font-size:15px; font-weight:700; color:var(--text-primary); }
+.apply-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px 20px; align-items:start; }
+.apply-form-full { grid-column:1 / -1; }
+.apply-field { display:flex; flex-direction:column; gap:6px; min-width:0; }
+.apply-field-label { font-size:13px; font-weight:700; color:var(--text-primary); }
+.apply-field .field { flex:0 0 auto; width:100%; height:52px; min-height:52px; padding:0 18px; }
+.apply-field input[type="date"].field { appearance:none; -webkit-appearance:none; display:flex; align-items:center; }
+.apply-field-hint, .apply-field-error { margin:0; font-size:12px; line-height:1.45; }
+.apply-field-hint { color:var(--text-tertiary); }
+.apply-field-error { color:var(--error-700); font-weight:600; }
+.apply-field.has-error .field { border-color:var(--error-500); }
+
+/* ---------- 토스트 ---------- */
+.apply-toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); z-index:50; max-width:min(92vw, 480px); padding:12px 18px; border-radius:var(--radius-sm); background:var(--neutral-900); color:var(--neutral-0); font-size:14px; line-height:1.45; box-shadow:var(--shadow-card); }
+
+/* ---------- S2: 보험사 그리드 ---------- */
+.apply-insurance { display:flex; flex-direction:column; gap:20px; }
+.apply-insurers { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:12px; }
+.apply-insurer { display:flex; flex-direction:column; align-items:flex-start; gap:4px; padding:14px 16px; min-height:72px; text-align:left; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-sm); cursor:pointer; font:inherit; color:inherit; transition:border-color .15s, background .15s; }
+.apply-insurer:hover { border-color:var(--primary-300); }
+.apply-insurer.is-selected { background:var(--primary-100); border-color:var(--primary-500); }
+.apply-insurer-name { font-size:15px; font-weight:700; color:var(--text-primary); overflow-wrap:anywhere; }
+.apply-insurer-product { font-size:12px; color:var(--text-secondary); overflow-wrap:anywhere; }
+.apply-insurer.is-selected .apply-insurer-product { color:var(--primary-700); }
+.apply-note { display:flex; align-items:flex-start; gap:8px; margin:0; padding:12px 16px; border-radius:var(--radius-sm); background:var(--neutral-100); font-size:13px; line-height:1.5; color:var(--text-secondary); }
+.apply-note svg { flex-shrink:0; margin-top:2px; color:var(--text-tertiary); }
+
 /* ---------- Footer ---------- */
 .apply-foot { margin-top:auto; padding:24px 32px 32px; background:none; text-align:center; font-size:13px; color:var(--text-tertiary); }
 .apply-foot a { color:inherit; text-decoration:underline; text-underline-offset:2px; }
@@ -82,6 +127,8 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
   .apply-body { grid-template-columns:1fr; }
   .apply-rail { order:2; }
   .apply-main { order:1; }
+  .apply-form-grid { grid-template-columns:1fr; }
+  .apply-insurers { grid-template-columns:repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width:480px) {
   .apply-container { padding:24px 18px 36px; gap:22px; }
@@ -98,4 +145,9 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
   .apply-actions-btns { margin-left:auto; }
   .apply-btn-next { padding:12px 20px; font-size:15px; }
   .apply-foot { padding:20px 18px 28px; }
+  /* 업로드 카드는 세로로 — 모바일 시안(1544-658) */
+  .apply-upload { flex-direction:column; align-items:center; text-align:center; padding:22px 18px; }
+  .apply-upload-btn, .apply-upload .apply-btn-ghost { width:100%; }
+  .apply-panel { padding:18px; }
+  .apply-toast { bottom:16px; }
 }

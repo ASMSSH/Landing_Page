@@ -28,34 +28,34 @@
 
 ## 3. S1 화면 — spec 3절 · 7절
 
-- [ ] `src/components/icons.tsx` — `camera` · `info`
-- [ ] `src/apply/Toast.tsx` — 하단 고정, 4초 자동 닫힘, `role="status"`
-- [ ] `src/apply/steps/ReceiptUploadCard.tsx` — idle / loading / done, 숨긴 file input(`accept` 5종, `capture` 없음), AbortController
-- [ ] `src/apply/steps/TreatmentForm.tsx` — 2열 폼 5칸, 진료비 쉼표 표시·숫자만 저장, 오류 표시·포커스
-- [ ] `src/apply/steps/StepTreatment.tsx` — 헤딩(OCR done이면 설명 교체) + 카드 + 폼 + `ApplyActions onNext`(검증 통과 시 `next`)
-- [ ] **커밋** `feat: S1 진료 정보 등록 화면 추가`
+- [x] `src/components/icons.tsx` — `camera` · `info`
+- [x] `src/apply/Toast.tsx` — 하단 고정, 4초 자동 닫힘, `role="status"`
+- [x] `src/apply/steps/ReceiptUploadCard.tsx` — idle / loading / done, 숨긴 file input(`accept` 5종, `capture` 없음), AbortController
+- [x] `src/apply/steps/TreatmentForm.tsx` — 2열 폼 5칸, 진료비 쉼표 표시·숫자만 저장, 오류 표시·포커스
+- [x] `src/apply/steps/StepTreatment.tsx` — 헤딩(OCR done이면 설명 교체) + 카드 + 폼 + `ApplyActions onNext`(검증 통과 시 `next`)
+- [x] **커밋** `feat: S1 진료 정보 등록 화면 추가`
 
 ## 4. S2 화면 — spec 4절
 
-- [ ] `src/apply/steps/StepInsurance.tsx` — 카드 8개(`role="radio"`), `company`만 저장, 상품명 입력, 제한 안내 행, `nextDisabled`
-- [ ] **커밋** `feat: S2 보험 선택 화면 추가`
+- [x] `src/apply/steps/StepInsurance.tsx` — 카드 8개(`role="radio"`), `company`만 저장, 상품명 입력, 제한 안내 행, `nextDisabled`
+- [x] **커밋** `feat: S2 보험 선택 화면 추가`
 
 ## 5. 셸 연결 — spec 5절
 
-- [ ] `src/apply/ApplyPage.tsx` — step 1 → `StepTreatment`, 2 → `StepInsurance`, 3~5 placeholder(기존), 6 기존
-- [ ] **커밋** `feat: /apply 단계 본문을 S1·S2 컴포넌트로 연결`
+- [x] `src/apply/ApplyPage.tsx` — step 1 → `StepTreatment`, 2 → `StepInsurance`, 3~5 placeholder(기존), 6 기존
+- [x] **커밋** `feat: /apply 단계 본문을 S1·S2 컴포넌트로 연결`
 
 ## 6. 스타일 — spec 6절
 
-- [ ] `src/styles/apply.css` — `.apply-upload*` · `.apply-spinner` · `.apply-form*` · `.apply-field*` · `.apply-toast` · `.apply-insurers` · `.apply-insurer*` · `.apply-note`
-  - [ ] 폼 그리드 2열 → ≤768 1열 · 보험사 그리드 4열 → ≤768 2열
-  - [ ] 토큰만, 하드코딩 없음
-- [ ] **커밋** `style: S1·S2 업로드 카드·폼·보험사 그리드 스타일 추가`
+- [x] `src/styles/apply.css` — `.apply-upload*` · `.apply-spinner` · `.apply-form*` · `.apply-field*` · `.apply-toast` · `.apply-insurers` · `.apply-insurer*` · `.apply-note`
+  - [x] 폼 그리드 2열 → ≤768 1열 · 보험사 그리드 4열 → ≤768 2열
+  - [x] 토큰만, 하드코딩 없음
+- [x] **커밋** `style: S1·S2 업로드 카드·폼·보험사 그리드 스타일 추가`
 
 ## 8. 랜딩 SignupCta — spec 8절
 
-- [ ] `src/components/SignupCta.tsx` — `INSURER_OPTIONS` 삭제 → `INSURERS` 기반, 「기타 / 모름」 라벨 유지
-- [ ] **커밋** `refactor: 사전 신청 폼 보험사 옵션을 INSURERS 데이터로 통일`
+- [x] `src/components/SignupCta.tsx` — `INSURER_OPTIONS` 삭제 → `INSURERS` 기반, 「기타 / 모름」 라벨 유지
+- [x] **커밋** `refactor: 사전 신청 폼 보험사 옵션을 INSURERS 데이터로 통일`
 
 ## 9. 검증 — spec 「검증」
 
