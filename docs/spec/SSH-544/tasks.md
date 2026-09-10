@@ -40,10 +40,10 @@
 
 ## 5. 환경변수 — spec 5절
 
-- [x] `Project/.env.example` — `SUPABASE_URL` · `SUPABASE_SECRET_KEY` · `SLACK_WEBHOOK_URL` · `GEMINI_API_KEY` · `GEMINI_MODEL`
+- [x] `Project/.env.example` — `SUPABASE_SECRET_KEY`(URL은 `VITE_SUPABASE_URL` 공용, 2026-09-11) · `SLACK_WEBHOOK_URL` · `GEMINI_API_KEY` · `GEMINI_MODEL`
 - [x] **커밋** `chore: .env.example에 Supabase·슬랙·Gemini 변수 추가`
-- [x] 로컬 `.env` — `SUPABASE_URL`·`SUPABASE_SECRET_KEY`(2026-09-10, `.env.example`과 같은 절 구조로 재정리)
-- [ ] **사람**: Vercel Preview·Production 환경변수 `SUPABASE_URL`·`SUPABASE_SECRET_KEY` — 아직(프리뷰 `/api/claims`가 500 `server_not_configured`)
+- [x] 로컬 `.env` — `SUPABASE_SECRET_KEY`(2026-09-10, `.env.example`과 같은 절 구조로 재정리)
+- [ ] **사람**: Vercel Preview·Production 환경변수 `SUPABASE_SECRET_KEY`·`SLACK_WEBHOOK_URL`(`VITE_SUPABASE_URL`은 이미 있음) — 아직(프리뷰 `/api/claims`가 500 `server_not_configured`)
 
 ## 6. 검증 — spec 「검증」
 

@@ -18,7 +18,7 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ ok: false, error: 'bad_request' }, { status: 400 });
   }
   const result = await createClaim(input, {
-    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseUrl: process.env.VITE_SUPABASE_URL, // URL은 비밀이 아니라 브라우저용 변수를 같이 쓴다 — 서버 전용은 SECRET_KEY뿐
     secretKey: process.env.SUPABASE_SECRET_KEY,
     slackWebhookUrl: process.env.SLACK_WEBHOOK_URL,
   });

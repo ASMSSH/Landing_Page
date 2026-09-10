@@ -149,7 +149,7 @@ alter table public.claims enable row level security;
   <https://supabase.com/dashboard/project/xxxx/editor|Table Editor에서 전화번호 보기>
   ```
 - `notifySlack(webhookUrl, text): Promise<boolean>` — `POST webhookUrl { text }`, `AbortSignal.timeout(3000)`, 비-2xx·예외는 `false`
-- `boardUrl`은 `SUPABASE_URL`(`https://<ref>.supabase.co`)의 첫 호스트 라벨로 `https://supabase.com/dashboard/project/<ref>/editor`를
+- `boardUrl`은 `VITE_SUPABASE_URL`(`https://<ref>.supabase.co`)의 첫 호스트 라벨로 `https://supabase.com/dashboard/project/<ref>/editor`를
   만든다(`server/claims.ts`의 `boardUrlFrom(supabaseUrl)`, 순수). 새 env를 만들지 않는다(**결정 4**). 대시보드 URL이 바뀌면 이 한 곳
 
 **검증·접수 절**
@@ -226,7 +226,7 @@ export async function POST(request: Request): Promise<Response> {
   let input: unknown;
   try { input = await request.json(); } catch { return Response.json({ ok: false, error: 'bad_request' }, { status: 400 }); }
   const result = await createClaim(input, {
-    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseUrl: process.env.VITE_SUPABASE_URL,
     secretKey: process.env.SUPABASE_SECRET_KEY,
     slackWebhookUrl: process.env.SLACK_WEBHOOK_URL,
   });
@@ -307,7 +307,7 @@ docs/spec/SSH-544/{spec,tasks}.md                              이 문서
 1. **`client_id` 멱등 키** — 컬럼 unique · 서버는 같은 값이면 기존 번호 200 · 클라이언트는 Provider가 UUID를 들고 `reset`에서만 갱신 (계획 단계 사용자 확정)
 2. **접수번호 NN = 당일 마지막 NN + 1** — 티켓의 「행 수 + 1」과 결과는 같고 행이 지워져도 충돌하지 않는다. unique + 1회 재시도는 그대로 — 「배경」
 3. **`status` check 제약**(신규·확인중·서류확보·청구완료) — Table Editor 오타 방지. 상태를 늘리려면 `alter table … drop/add constraint`
-4. **슬랙 링크는 `SUPABASE_URL`에서 프로젝트 ref를 뽑아** 대시보드 editor로 — 새 env 없음
+4. **슬랙 링크는 `VITE_SUPABASE_URL`에서 프로젝트 ref를 뽑아** 대시보드 editor로 — 새 env 없음
 5. **서버 검증은 클라이언트 규칙 복제** — `server/`가 `src/`를 import하지 않는 경계 유지 — 「배경」
 6. **`SLACK_WEBHOOK_URL` 없으면 알림만 건너뛰고 200** — webhook이 아직 없어도 프리뷰 insert 검증이 된다
 7. **`consented_at`은 DB default `now()`** — 서버가 값을 만들지 않는다
@@ -338,3 +338,9 @@ webhook(성식)이 생겨 로컬 `.env`에 넣고 1통 받아 봤다. 사용자�
 
 멘션은 넣지 않는다 — `<!channel>`을 넣어 봤다가 2026-09-11 사용자 결정으로 뺐다. 봇 메시지는 Slack 기본 알림 대상이 아니므로 받을 사람이 채널 알림을
 「모든 새 메시지」로 켠다(사람, 각자).
+
+## 환경변수 정리 (2026-09-11, 사용자)
+
+`SUPABASE_URL`을 없애고 서버도 `VITE_SUPABASE_URL`을 읽는다 — URL은 비밀이 아니고 같은 프로젝트라 변수를 둘 둘 이유가 없다(5절의 「이름을
+따로 둔다」를 뒤집음). Vercel에는 `VITE_SUPABASE_URL`이 이미 있으니 새로 넣을 것은 `SUPABASE_SECRET_KEY`·`SLACK_WEBHOOK_URL` 둘.
+publishable 키의 `VITE_`는 뺄 수 없다 — 스타일이 아니라 Vite가 브라우저 번들에 넣는 스위치라, 빼면 `analytics.ts`의 `events` 트래킹이 멈춘다.

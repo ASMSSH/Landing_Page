@@ -14,6 +14,7 @@
 // 그래서 절(section)로만 나눴다 — 「PostgREST」 「슬랙」 「검증」 「접수」.
 
 export interface ClaimsEnv {
+  /** VITE_SUPABASE_URL — 브라우저 트래킹과 같은 프로젝트라 변수를 하나만 둔다 (URL은 비밀이 아니다) */
   supabaseUrl?: string;
   secretKey?: string;
   /** 없으면 슬랙만 건너뛴다 — 저장은 된다 */
