@@ -7,7 +7,7 @@
 - [x] Jira SSH-546 생성 (에픽 SSH-152, 스프린트 12)
 - [x] `docs/spec/SSH-546/spec.md` · `tasks.md`
 - [x] **커밋** `docs: SSH-546 spec·tasks 작성`
-- [ ] **Draft PR 생성 후 멈춘다** — `작업 방식·규칙 CI 도입(SSH-546)`, base `dev`. 1차 리뷰(작업 계획) 뒤 아래를 같은 브랜치에서 잇는다
+- [x] **Draft PR 생성 후 멈춘다** — `작업 방식·규칙 CI 도입(SSH-546)`, base `dev`. 1차 리뷰(작업 계획) 뒤 아래를 같은 브랜치에서 잇는다
 
 ## 1. CLAUDE.md — spec 1절
 
