@@ -65,5 +65,5 @@
 - [x] 로컬 `/apply?r=test` 왕복 · 랜딩 `/` 무변화 (headless Chromium으로 확인)
 - [x] Vercel 프리뷰: `/apply?r=test` 새로고침 · 정적 파일 4종 원본 · `/api/claim-documents` JSON
 - [x] 스크린샷 1440 · 1024 · 768 · 390 → `docs/spec/SSH-542/apply-shell-*.png`, PR 본문
-- [ ] PR 본문 갱신(문서 요약 → 실제 구현) + `/pr-review`는 별도 서브에이전트로
+- [x] PR 본문 갱신(문서 요약 → 실제 구현) + `/pr-review`는 별도 서브에이전트로 — 1회 등록(P2 1·P3 1·P4 3). P2·P3 반영, 2차 리뷰 등록은 사람 확인 뒤
 - [ ] Ready 전환·Jira 검토 중 이동은 사람이 한다 — 남았다고 보고

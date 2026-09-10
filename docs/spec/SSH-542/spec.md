@@ -128,10 +128,14 @@ type ApplyAction =
   이 상태를 그대로 `POST /api/claims` 본문으로 보낼 수 있게. 컬럼 목록은 위키 ⑤
 - `next`는 5에서 멈춘다(6은 S5 제출 성공 시 `setReceiptNo` 뒤 `goto 6`으로만 간다). `prev`는 1에서 멈춘다.
   `goto`는 **현재보다 앞 단계로만** 허용 — 프로그레스 클릭으로 뒤로 돌아가는 건 되고 앞으로 건너뛰는 건 안 된다
+- **6은 종착이다.** 거기서는 `prev`·`next`·`goto` 전부 막힌다 — 되돌아가 「신청하기」를 또 누르면 중복 접수다.
+  처음으로 돌아가는 길은 `reset`뿐이고(S6 「처음으로」), 프로그레스도 6에서는 버튼으로 그리지 않는다
+  (AI 리뷰 P2 반영, 2026-09-10)
 - 요약 레일은 `useApply()`로 이 상태를 읽어 채운다. 빈 문자열·null은 `—`
-- reducer는 순수 함수라 **`node:test`로 테스트한다** (`src/apply/state.test.ts`, `node --test`로 실행 —
-  Node 26이라 TS를 그대로 돌린다. `server/gemini.test.ts`와 같은 방식). 경계(1에서 prev, 5에서 next, goto 앞으로 금지)와
-  patch 병합을 본다
+- reducer는 순수 함수라 **`node:test`로 테스트한다** (`src/apply/state.test.ts`, `npm test`로 실행 —
+  Node 26이라 TS를 그대로 돌린다. `server/gemini.test.ts`와 같은 방식). 경계(1에서 prev, 5에서 next, goto 앞으로 금지,
+  6 종착)와 patch 병합을 본다. 테스트 파일은 `tsconfig.app.json`(브라우저)에서 빼고 `tsconfig.node.json`에 넣어
+  `tsc -b`가 타입 검사한다 (AI 리뷰 P3 반영)
 - **세션 저장은 하지 않는다.** 새로고침하면 1단계로 돌아간다. 개인정보(S4)를 `sessionStorage`에 두는 건
   처리방침에 없는 저장이고, S1~S3은 저장 없는 이탈 구간이다(위키 ②). 뒤 티켓이 필요해지면 그때 연다
 
@@ -205,15 +209,15 @@ docs/spec/SSH-542/{spec,tasks}.md           이 문서
 
 ## 검증
 
-- [ ] `npm run build` 통과 (`tsc -b` 포함) · `npm run lint`
-- [ ] `node --test src/apply/state.test.ts` 초록
-- [ ] `npm run dev`에서 `/apply?r=test` 진입 → 5단계 「다음/이전」 왕복, `n / 5` 카운트, 프로그레스 상태 변화
-- [ ] 랜딩 `/`는 이전과 동일 (모달·섹션 트래킹 포함)
-- [ ] Vercel 프리뷰에서 `/apply?r=test` **새로고침** → 404 없음
-- [ ] 프리뷰에서 `/sitemap.xml`·`/robots.txt`·`/og.png`·검색엔진 소유확인 HTML이 rewrite에 안 먹히고 원본으로 열림
-- [ ] 프리뷰에서 `/api/claim-documents?claimType=...`가 여전히 JSON을 돌려줌 (rewrite가 `api/`를 비껴감)
-- [ ] 1440 · 1024 · 768 · 390 폭 스크린샷 — 768에서 레일이 아래로, 390에서 프로그레스 압축
-- [ ] 개발자 도구에서 `/apply`의 `document.title`·canonical이 바뀌어 있음
+- [x] `npm run build` 통과 (`tsc -b` 포함) · `npm run lint`
+- [x] `npm test` 초록 (state 8건 + gemini)
+- [x] `npm run dev`에서 `/apply?r=test` 진입 → 5단계 「다음/이전」 왕복, `n / 5` 카운트, 프로그레스 상태 변화
+- [x] 랜딩 `/`는 이전과 동일 (모달·섹션 트래킹 포함)
+- [x] Vercel 프리뷰에서 `/apply?r=test` **새로고침** → 404 없음
+- [x] 프리뷰에서 `/sitemap.xml`·`/robots.txt`·`/og.png`·검색엔진 소유확인 HTML이 rewrite에 안 먹히고 원본으로 열림
+- [x] 프리뷰에서 `/api/claim-documents?claimType=...`가 여전히 JSON을 돌려줌 (rewrite가 `api/`를 비껴감)
+- [x] 1440 · 1024 · 768 · 390 폭 스크린샷 — 768에서 레일이 아래로, 390에서 프로그레스 압축
+- [x] 개발자 도구에서 `/apply`의 `document.title`·canonical이 바뀌어 있음
 
 ## 1차 리뷰 결정 (2026-09-10)
 
