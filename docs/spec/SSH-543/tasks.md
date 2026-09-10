@@ -7,7 +7,7 @@
 - [x] `docs/spec/SSH-543/spec.md` — 배경·범위 9절·범위 밖·검증·1차 리뷰 결정 요청
 - [x] `docs/spec/SSH-543/tasks.md`
 - [x] **커밋** `docs: SSH-543 spec·tasks 작성`
-- [ ] **Draft PR 생성 후 멈춘다** — `S1 진료 정보 등록 + S2 보험 선택 구현(SSH-543)`, base `dev`.
+- [x] **Draft PR 생성 후 멈춘다** — `S1 진료 정보 등록 + S2 보험 선택 구현(SSH-543)`, base `dev`.
       1차 리뷰(작업 계획)를 받은 뒤 아래 1~9를 같은 브랜치에서 잇는다
 
 ## 1. 서버 — spec 1절
