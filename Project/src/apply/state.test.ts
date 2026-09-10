@@ -22,12 +22,15 @@ test('goto는 뒤로만 간다 — 앞으로 건너뛰지 못한다', () => {
   assert.equal(applyReducer(at(3), { type: 'goto', step: 3 }).step, 3);
 });
 
-test('접수 완료(6)는 접수번호가 있어야 갈 수 있고, 거기서 prev는 안 된다', () => {
+test('접수 완료(6)는 접수번호가 있어야 갈 수 있고, 종착이라 prev·next·goto로 못 나간다', () => {
   assert.equal(applyReducer(at(5), { type: 'goto', step: 6 }).step, 5);
   const done = applyReducer(at(5, { receiptNo: 'BGN-260910-01' }), { type: 'goto', step: 6 });
   assert.equal(done.step, 6);
   assert.equal(applyReducer(done, { type: 'prev' }).step, 6);
   assert.equal(applyReducer(done, { type: 'next' }).step, 6);
+  assert.equal(applyReducer(done, { type: 'goto', step: 2 }).step, 6);
+  assert.equal(applyReducer(done, { type: 'goto', step: 1 }).step, 6);
+  assert.equal(applyReducer(done, { type: 'reset' }).step, 1);
 });
 
 test('set* patch는 해당 묶음만 병합하고 나머지는 그대로 둔다', () => {

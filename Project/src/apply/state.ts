@@ -94,9 +94,12 @@ export function applyReducer(state: ApplyState, action: ApplyAction): ApplyState
       if (state.step <= 1 || state.step === DONE_STEP) return state;
       return { ...state, step: (state.step - 1) as ApplyStep };
     case 'goto':
-      // 프로그레스 클릭으로 뒤로 돌아가는 건 되고, 앞으로 건너뛰는 건 안 된다.
-      // 예외는 접수 완료(6) — 제출 성공 뒤 setReceiptNo와 함께 앞으로 간다.
+      // 접수 완료(6)는 종착이다. 거기서는 어디로도 못 간다 — 되돌아가 「신청하기」를 또 누르면 중복 접수다.
+      // 처음으로 돌아가려면 reset뿐이다.
+      if (state.step === DONE_STEP) return state;
+      // 6으로 가는 것은 제출 성공 뒤(setReceiptNo 이후)에만 된다.
       if (action.step === DONE_STEP) return state.receiptNo ? { ...state, step: DONE_STEP } : state;
+      // 프로그레스 클릭으로 뒤로 돌아가는 건 되고, 앞으로 건너뛰는 건 안 된다.
       if (action.step >= state.step) return state;
       return { ...state, step: action.step };
     case 'reset':
