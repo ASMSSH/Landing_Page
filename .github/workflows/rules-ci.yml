@@ -87,8 +87,8 @@ jobs:
             fi
             # 한글은 바이트가 아니라 문자로 센다. ${#var}·wc -m 은 로케일을 탄다.
             len=$(python3 -c 'import sys; print(len(sys.argv[1]))' "$msg")
-            if [ "$len" -gt 50 ]; then
-              fail "커밋 제목이 50자를 넘습니다 (${len}자): '$msg'"
+            if [ "$len" -gt 100 ]; then
+              fail "커밋 제목이 100자를 넘습니다 (${len}자): '$msg'"
             fi
           done < <(git log "$BASE_SHA..$HEAD_SHA" --no-merges --format=%s)
 

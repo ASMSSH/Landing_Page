@@ -77,7 +77,7 @@ git add <경로> <경로>
 git commit -m "feat: 요약 레일에 진료비 표시"
 ```
 
-- 제목 한 줄, 50자 이내, 한국어, `<type>: <subject>`
+- 제목 한 줄, 100자 이내, 한국어, `<type>: <subject>`
 - type: `feat` `fix` `chore` `style` `refactor` `docs` `test`
 - 커밋에 이슈 키를 붙이지 않는다
 - 본문은 대개 불필요하다. **왜** 이렇게 했는지가 코드에서 안 보일 때만 한두 줄 덧붙인다

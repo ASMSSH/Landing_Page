@@ -36,7 +36,7 @@ Boheomgaenyang 루트 CLAUDE.md를 단일 스택·`dev` base로 줄인다.
 - **작업 흐름** 8단계 — Jira → 브랜치 → 위키 읽고 spec·tasks → Draft PR ⏸ 1차 → 구현 → `/pr-review`(별도 서브에이전트, P1·P2 반영,
   2회째 등록 전 사람 확인) → Ready·Jira(사람) ⏸ 2차 → Squash Merge(사람)
 - **spec·tasks 골격** — spec: 배경(참고 위키·Figma 노드·형제 티켓) / 범위 / 범위 밖 / 검증 / N차 리뷰 결정. tasks: 0. 문서·Draft PR / 1..N 구현(커밋 메시지 명기) / 검증 / 마무리 / 하지 않는 것. 본보기 `docs/spec/SSH-542/`
-- **브랜치·커밋·PR** — `<type>/SSH-N` base `dev` · `<type>: 제목` 50자 한국어, 이슈 키 없음 · PR 제목 `작업 내용(SSH-N)` · 한 PR 티켓 하나 ·
+- **브랜치·커밋·PR** — `<type>/SSH-N` base `dev` · `<type>: 제목` 100자 한국어, 이슈 키 없음 · PR 제목 `작업 내용(SSH-N)` · 한 PR 티켓 하나 ·
   UI 변경 PR은 **1440·768·390 스크린샷 3장** + Vercel 프리뷰 링크
 - **dev → main** — `dev`에 쌓인 것을 사람이 `dev → main` PR로 올린다. 시점은 사람이 정한다
 - **큰 작업은 나눈다**(핵심만) · **보안**(public. 키·실제 값·Figma 파일 키 금지, `VITE_` 접두사는 번들에 들어간다) · **저 문맥** · **순리** · **한국어**
@@ -61,7 +61,7 @@ Boheomgaenyang 루트 CLAUDE.md를 단일 스택·`dev` base로 줄인다.
 
 - 트리거 `pull_request: [opened, edited, synchronize, reopened, ready_for_review]`, `branches: [dev, main]`, `paths` 없음(항상 돌아 required check 가능)
 - `TYPES='feat|fix|chore|style|refactor|docs|test'`, `SIGN` 정규식은 원본 그대로(줄 시작 앵커). SCOPES 없음
-- ① AI 서명(커밋 본문 + PR 본문) ② 제목 `^.+\(SSH-[0-9]+\)$` ③ 커밋 `^($TYPES): .+$` + 50자(python `len`) ④ 브랜치 `^($TYPES)/SSH-[0-9]+$` ⑤ 브랜치 키 == 제목 키
+- ① AI 서명(커밋 본문 + PR 본문) ② 제목 `^.+\(SSH-[0-9]+\)$` ③ 커밋 `^($TYPES): .+$` + 100자(python `len`) ④ 브랜치 `^($TYPES)/SSH-[0-9]+$` ⑤ 브랜치 키 == 제목 키
 - **예외** — `head_ref == dev && base_ref == main`(릴리스 PR)이면 ①만. 이유는 파일 머리 주석에
 - 실패 누적(`fail()`), 제목·본문은 `env:`로(인젝션 방지)
 
@@ -137,3 +137,4 @@ docs/spec/SSH-546/{spec,tasks}.md           이 문서
 1. **`engines.node >=26`을 넣었다가 뺐다** — 넣은 커밋에서 Vercel 프리뷰 배포가 실패했다(직전 문서 커밋은 성공). Vercel은 `engines.node`로
    빌드·서버리스 런타임을 고르는데 26을 제공하지 않는다. 26이 필요한 것은 `node --test`뿐이므로 `Project/.nvmrc`로 옮기고 CI가 그 파일을 읽는다
 2. **`web-ci`에 `workflow_dispatch` 추가** — Draft 동안은 자동으로 안 돌기 때문에, 이 PR처럼 CI 자체를 검증해야 할 때 사람이 Actions 탭에서 돌린다
+3. **커밋 제목 상한 50자 → 100자** — 이 PR의 51자 커밋이 규칙 CI에 걸렸고, 사람이 "50자는 너무 빡빡하다"고 정했다(2026-09-10). Boheomgaenyang과 달라지는 유일한 상수다
