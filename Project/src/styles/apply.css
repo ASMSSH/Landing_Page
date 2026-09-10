@@ -135,6 +135,8 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 .apply-insurer.is-selected .apply-insurer-product { color:var(--primary-700); }
 .apply-note { display:flex; align-items:flex-start; gap:8px; margin:0; padding:12px 16px; border-radius:var(--radius-sm); background:var(--neutral-100); font-size:13px; line-height:1.5; color:var(--text-secondary); }
 .apply-note svg { flex-shrink:0; margin-top:2px; color:var(--text-tertiary); }
+/* S4 안내 카드 — Figma 변수 tint/info (SSH-486) */
+.apply-note.is-info { background:var(--tint-info); color:var(--on-tint-info); }
 
 /* ---------- S3: 필요 서류 (SSH-473) ---------- */
 /* 로더 카드 — Figma S3-0. 스피너 원은 S1 업로드 카드의 .apply-upload-icon을 그대로 쓴다 */

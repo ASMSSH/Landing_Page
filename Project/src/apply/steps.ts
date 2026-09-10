@@ -47,7 +47,7 @@ export const STEPS: readonly StepDef[] = [
     key: 'applicant',
     label: '신청 정보',
     title: '신청 정보',
-    description: '담당자가 전화로 확인할 수 있게 보호자 정보를 알려 주세요',
+    description: '로그인·인증 없이 신청해요. 담당자가 전화로 확인한 뒤 진행해요',
     nextLabel: '다음 →',
   },
   {
@@ -55,7 +55,7 @@ export const STEPS: readonly StepDef[] = [
     key: 'consent',
     label: '동의',
     title: '동의',
-    description: '대리 청구에 필요한 동의 5가지예요. 전문은 「보기」에서 읽을 수 있어요',
+    description: '5개 모두 필수예요. 「보기」를 누르면 전문을 읽을 수 있어요',
     nextLabel: '신청하기',
   },
 ];
