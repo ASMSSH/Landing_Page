@@ -60,9 +60,12 @@ gh pr list --head "$(git branch --show-current)" --state all --json number,isDra
 
 | 상황 | 조건 | 동작 |
 | --- | --- | --- |
-| **Draft 생성** | 열린 PR 없음 + 변경이 `docs/`·문서·설정뿐 | `gh pr create --draft --base dev` |
-| **본문 갱신** | 이미 Draft PR이 있고 코드가 추가됨 | `gh pr edit`로 본문만 갱신. **Draft로 둔다** |
-| **바로 Ready** | 열린 PR 없음 + 코드 포함 | `gh pr create --base dev` — 1차 리뷰를 건너뛴 경우다. 왜 그랬는지 보고에 적는다 |
+| **Draft 생성** | 열린 PR 없음 + 변경이 **`docs/spec/<키>/` 안뿐** | `gh pr create --draft --base dev` |
+| **본문 갱신** | 이미 Draft PR이 있고 **`docs/spec/` 밖** 파일이 바뀜 | `gh pr edit`로 본문만 갱신. **Draft로 둔다** |
+| **바로 Ready** | 열린 PR 없음 + `docs/spec/` 밖 변경 포함 | `gh pr create --base dev` — 1차 리뷰를 건너뛴 경우다. 왜 그랬는지 보고에 적는다 |
+
+기준은 "코드가 있나"가 아니라 **"`docs/spec/` 밖이 바뀌었나"**다. `.claude/`·`.github/`·`vercel.json`만 바꾸는 chore 티켓도
+결과물이 있고, 그것은 spec 폴더 밖에 있다. 코드 유무로 가르면 그런 PR은 어느 행에도 안 걸린다(SSH-546 리뷰 P2).
 
 ### 리뷰를 요청하는 전환은 내가 하지 않는다
 
