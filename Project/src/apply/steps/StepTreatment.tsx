@@ -27,7 +27,8 @@ export default function StepTreatment() {
   const def = stepDef(1);
   const today = useMemo(() => todayIso(), []);
 
-  const [status, setStatus] = useState<UploadStatus>('idle');
+  // 다른 단계에 갔다 돌아와도 「읽었어요」 카드가 유지되게 초기값은 상태에서 온다 (사진은 저장하지 않는다)
+  const [status, setStatus] = useState<UploadStatus>(state.receiptRead ? 'done' : 'idle');
   const [errors, setErrors] = useState<TreatmentErrors>({});
   const [submitted, setSubmitted] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -56,6 +57,7 @@ export default function StepTreatment() {
         return;
       }
       dispatch({ type: 'setTreatment', patch });
+      dispatch({ type: 'setReceiptRead', read: true });
       if (submitted) setErrors(validateTreatment({ ...state.treatment, ...patch }, today));
       setStatus('done');
     } catch (error) {

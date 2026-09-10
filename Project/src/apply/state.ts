@@ -60,6 +60,12 @@ export interface ApplyState {
   consents: Consents;
   /** S5 제출 성공 시 서버가 준 접수번호 (BGN-YYMMDD-NN) */
   receiptNo: string | null;
+  /**
+   * S1에서 영수증을 읽어 폼을 채운 적이 있는가. 사진 자체는 저장하지 않지만(위키 ⑪-③) 이 표시는 남겨야
+   * 다른 단계에 갔다 돌아왔을 때 업로드 카드가 「읽었어요」 상태로 보인다 — 아니면 실패한 줄 알고 다시 올려
+   * 고쳐 둔 값을 OCR이 덮어쓴다. claims 컬럼이 아니라 treatment 밖에 둔다 (SSH-543)
+   */
+  receiptRead: boolean;
 }
 
 export type ApplyAction =
@@ -72,7 +78,8 @@ export type ApplyAction =
   | { type: 'setRequiredDocs'; docs: RequiredDocsSnapshot | null }
   | { type: 'setApplicant'; patch: Partial<Applicant> }
   | { type: 'setConsents'; patch: Partial<Consents> }
-  | { type: 'setReceiptNo'; receiptNo: string };
+  | { type: 'setReceiptNo'; receiptNo: string }
+  | { type: 'setReceiptRead'; read: boolean };
 
 export const initialApplyState: ApplyState = {
   step: 1,
@@ -82,6 +89,7 @@ export const initialApplyState: ApplyState = {
   applicant: { name: '', phone: '', birth: '', petName: '' },
   consents: { terms: false, privacy: false, uniqueId: false, hospital3p: false, insurer3p: false },
   receiptNo: null,
+  receiptRead: false,
 };
 
 export function applyReducer(state: ApplyState, action: ApplyAction): ApplyState {
@@ -116,5 +124,7 @@ export function applyReducer(state: ApplyState, action: ApplyAction): ApplyState
       return { ...state, consents: { ...state.consents, ...action.patch } };
     case 'setReceiptNo':
       return { ...state, receiptNo: action.receiptNo };
+    case 'setReceiptRead':
+      return { ...state, receiptRead: action.read };
   }
 }

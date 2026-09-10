@@ -122,7 +122,9 @@ receiptToTreatment(a: GeminiAnalysis): Partial<Treatment>
 - `<input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif">`를 숨기고 버튼이 연다.
   `capture` 속성은 **넣지 않는다** — 안드로이드에서 갤러리 선택이 막힌다. 드래그앤드롭은 Figma에 없으니 안 한다
 - 흐름: 파일 선택 → `imageToDataUrl` → `analyzeReceiptWithGemini(dataUrl, signal)` → `receiptToTreatment` →
-  `dispatch({ type: 'setTreatment', patch })` → `done`. 파일·dataURL은 컴포넌트 로컬 변수로만 쓰고 **상태·스토리지에
+  `dispatch({ type: 'setTreatment', patch })` + `setReceiptRead(true)` → `done`. **`receiptRead`는 상태(`ApplyState` 최상위,
+  `treatment` 밖)에 두어 S2에 갔다 돌아와도 카드가 「읽었어요」로 남는다** — 로컬 상태였을 때는 돌아오면 카드가 빈 상태로
+  보여 실패한 줄 알고 다시 올리게 됐다(2026-09-10 사용자 지적). 사진은 여전히 저장하지 않는다. 파일·dataURL은 컴포넌트 로컬 변수로만 쓰고 **상태·스토리지에
   넣지 않는다.** 언마운트·재업로드 시 `AbortController`로 진행 중 요청을 취소한다
 - 토스트 문안: 너무 큼 → `사진이 너무 커요. 3MB 이하 JPG·PNG로 올려 주세요` / 형식 → `JPG·PNG·WEBP·HEIC 사진만 올릴 수 있어요` /
   서버·네트워크 → 서버가 준 `error` 문자열(없으면 `영수증을 읽지 못했어요. 직접 입력해 주세요`)

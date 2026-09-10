@@ -6,6 +6,14 @@ function at(step: ApplyState['step'], extra: Partial<ApplyState> = {}): ApplySta
   return { ...initialApplyState, step, ...extra };
 }
 
+test('영수증을 읽은 표시는 단계를 오가도 남고 reset에서만 지워진다', () => {
+  const read = applyReducer(at(1), { type: 'setReceiptRead', read: true });
+  assert.equal(read.receiptRead, true);
+  const back = applyReducer(applyReducer(read, { type: 'next' }), { type: 'prev' });
+  assert.equal(back.receiptRead, true);
+  assert.equal(applyReducer(back, { type: 'reset' }).receiptRead, false);
+});
+
 test('next는 1→2로 가고 5에서 멈춘다', () => {
   assert.equal(applyReducer(at(1), { type: 'next' }).step, 2);
   assert.equal(applyReducer(at(5), { type: 'next' }).step, 5);
