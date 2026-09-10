@@ -225,7 +225,7 @@ docs/spec/SSH-473/apply-s3-{1440,768,390}.png · apply-s3-loading-1440.png · ap
 - [x] 마이브라운(직접 준비 0건) → 오른쪽 열 「없어요」
 - [x] 「서류만 확인할게요」 → 토스트, 화면 유지. ≤480에서 버튼 두 개 전폭 세로
 - [x] S1·S2 액션 행이 그대로인지(「← 이전」 유지)
-- [ ] Vercel 프리뷰 `/apply?r=test` — **Vercel에 `NOTION_TOKEN`·`NOTION_DOCS_DATA_SOURCE_ID`가 있는지 사람이 확인**(프로덕션에는 있다 — 실측)
+- [x] Vercel 프리뷰 `/apply?r=test` — 프리뷰 환경에도 NOTION env가 있어 실데이터로 동작 확인(2026-09-10)
 - [x] 스크린샷 1440 · 768 · 390(결과, 대표) + 로딩 1440 + fallback 1440 → `docs/spec/SSH-473/`, PR 본문 임베드
 
 ## 1차 리뷰 결정 요청
