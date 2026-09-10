@@ -240,3 +240,10 @@ docs/spec/SSH-473/apply-s3-{1440,768,390}.png · apply-s3-loading-1440.png · ap
 8. **`inferClaimTypeFromText` 추가 + 기존 함수는 구조적 타입으로 위임** — mvp 파일 무수정. 「배경」
 9. **재조회 규칙** — 스냅샷의 `insurer`·`claimType`이 현재 입력과 같으면 재조회하지 않는다(S4 갔다 와도 로더 없음). 2절
 10. **`RequiredDocsSnapshot` 모양 확정** — SSH-542가 둔 그대로(이름 배열 + fallback). title·notes는 넣지 않는다
+
+## 1차 리뷰 결정 (2026-09-10)
+
+Draft PR #31을 연 뒤 사용자가 "판단해서 구현도 시작"으로 위임했다. **1~10 전부 추천안대로 확정**: 빈 병명 `illness` · 「기타 / 모름」은
+API 미호출 + 공통 3건 · 실패도 fallback 스냅샷 저장 · 「서류만 확인할게요」는 토스트 · notes·downloads 미표시 · fallback 카드는 배너
+앰버 변형(Figma 프레임은 구현 뒤 스크린샷을 보고 그린다) · `ApplyActions.secondary` · `inferClaimTypeFromText` 위임 · 재조회 규칙 ·
+스냅샷 모양 그대로.
