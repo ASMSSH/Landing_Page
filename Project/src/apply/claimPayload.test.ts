@@ -3,6 +3,8 @@ import test from 'node:test';
 import { toClaimPayload } from './claimPayload.ts';
 import { initialApplyState, type ApplyState } from './state.ts';
 
+const CLIENT_ID = '6f1c2a3e-9b4d-4c5e-8f7a-1b2c3d4e5f60';
+
 const filled: ApplyState = {
   ...initialApplyState,
   step: 5,
@@ -20,8 +22,9 @@ const filled: ApplyState = {
 };
 
 test('상태를 claims 컬럼 이름(snake_case)으로 옮긴다', () => {
-  const p = toClaimPayload(filled, 'insta01');
+  const p = toClaimPayload(filled, 'insta01', CLIENT_ID);
   assert.deepEqual(p, {
+    client_id: CLIENT_ID,
     guardian_name: '김민석',
     guardian_phone: '010-1234-5678',
     guardian_birth: '1995-03-02',
@@ -53,6 +56,7 @@ test('선택 칸이 비면 null, 유입 코드 없으면 null, 스냅샷 없으�
       requiredDocs: null,
     },
     null,
+    CLIENT_ID,
   );
   assert.equal(p.hospital_address, null);
   assert.equal(p.diagnosis, null);
@@ -62,12 +66,12 @@ test('선택 칸이 비면 null, 유입 코드 없으면 null, 스냅샷 없으�
 });
 
 test('진료비는 숫자만 남겨 정수로, 비어 있으면 0', () => {
-  assert.equal(toClaimPayload({ ...filled, treatment: { ...filled.treatment, treatmentCost: '12000원' } }, null).treatment_cost, 12000);
-  assert.equal(toClaimPayload({ ...filled, treatment: { ...filled.treatment, treatmentCost: '' } }, null).treatment_cost, 0);
+  assert.equal(toClaimPayload({ ...filled, treatment: { ...filled.treatment, treatmentCost: '12000원' } }, null, CLIENT_ID).treatment_cost, 12000);
+  assert.equal(toClaimPayload({ ...filled, treatment: { ...filled.treatment, treatmentCost: '' } }, null, CLIENT_ID).treatment_cost, 0);
 });
 
 test('동의 boolean은 그대로 옮긴다 — 미체크는 false', () => {
-  const p = toClaimPayload({ ...filled, consents: { ...filled.consents, uniqueId: false } }, null);
+  const p = toClaimPayload({ ...filled, consents: { ...filled.consents, uniqueId: false } }, null, CLIENT_ID);
   assert.equal(p.consent_unique_id, false);
   assert.equal(p.consent_terms, true);
 });

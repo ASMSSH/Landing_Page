@@ -74,7 +74,7 @@ function SubmitError({ onRetry }: { onRetry: () => void }) {
 }
 
 export default function StepConsent() {
-  const { state, dispatch, submitting, setSubmitting } = useApply();
+  const { state, dispatch, submitting, setSubmitting, clientId } = useApply();
   const def = stepDef(STEP);
   const { consents } = state;
   const [viewing, setViewing] = useState<ConsentKey | null>(null);
@@ -119,7 +119,7 @@ export default function StepConsent() {
     abortRef.current = controller;
     setFailed(false);
     setSubmitting(true);
-    submitClaim(toClaimPayload(state, getRefCode()), controller.signal)
+    submitClaim(toClaimPayload(state, getRefCode(), clientId), controller.signal)
       .then(({ receiptNo }) => {
         dispatch({ type: 'setReceiptNo', receiptNo });
         dispatch({ type: 'goto', step: 6 });

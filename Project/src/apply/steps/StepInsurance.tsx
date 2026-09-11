@@ -9,6 +9,8 @@ import { stepDef } from '../steps';
 // 저장값은 company 문자열만 — claims.insurer 컬럼과 SSH-473 서류 룩업이 보험사 단위다.
 
 const PRODUCT_FIELD_ID = 'apply-field-productName';
+/** 서버(server/claims.ts) product_name 상한과 같은 값. 자유 입력이라 maxLength로 막는다 (SSH-544 AI 리뷰 P2) */
+const PRODUCT_NAME_MAX_LENGTH = 100;
 
 export default function StepInsurance() {
   const { state, dispatch } = useApply();
@@ -46,6 +48,7 @@ export default function StepInsurance() {
             type="text"
             autoComplete="off"
             placeholder="예) 위풍당당 다이렉트"
+            maxLength={PRODUCT_NAME_MAX_LENGTH}
             value={productName}
             onChange={(e) => dispatch({ type: 'setInsurance', patch: { productName: e.target.value } })}
           />
