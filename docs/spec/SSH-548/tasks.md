@@ -12,26 +12,26 @@
 
 ## 1. 데스크톱 열 안 sticky — spec 1절
 
-- [ ] `src/styles/apply.css` — `.apply-actions` sticky bottom · 배경(`--bg-app` 82% + 블러) · 패딩
-- [ ] **커밋** `fix: /apply 액션 행이 본문이 넘칠 때 메인 열 안에서 화면 아래에 붙게`
+- [x] `src/styles/apply.css` — `.apply-actions` sticky bottom · 배경(`--bg-app` 82% + 블러) · 패딩
+- [x] **커밋** `fix: /apply 액션 행이 본문이 넘칠 때 메인 열 안에서 화면 아래에 붙게`
 
 ## 2. 768 이하 고정 바 — spec 2절
 
-- [ ] `src/styles/apply.css` — `@media (max-width:768px)` fixed 바 · `--apply-bar-h` · `:has(.apply-actions)` 아래 여백·푸터·토스트 · `scroll-padding-bottom` · ≤480 패딩
-- [ ] **커밋** `fix: /apply 768 이하에서 액션 행을 화면 아래 고정 바로`
+- [x] `src/styles/apply.css` — `@media (max-width:768px)` fixed 바 · `--apply-bar-h` · `:has(.apply-actions)` 아래 여백·푸터·토스트 · `scroll-padding-bottom` · ≤480 패딩
+- [x] **커밋** `fix: /apply 768 이하에서 액션 행을 화면 아래 고정 바로`
 
 ## 3. 단계 전환 스크롤 복귀 — spec 3절
 
-- [ ] `src/apply/ApplyPage.tsx` — `ApplyShell`에 `useEffect(scrollTo 0, [state.step])`
-- [ ] **커밋** `fix: /apply 단계가 바뀌면 스크롤을 맨 위로`
+- [x] `src/apply/ApplyPage.tsx` — `ApplyShell`에 `useEffect(scrollTo 0, [state.step])`
+- [x] **커밋** `fix: /apply 단계가 바뀌면 스크롤을 맨 위로`
 
 ## 4. 검증 — spec 「검증」
 
-- [ ] `npm run build` · `npm run lint` · `npm test`
-- [ ] 로컬 동선(headless Chromium) 1440 · 768 · 390 — spec 「검증」 항목
+- [x] `npm run build` · `npm run lint` · `npm test`
+- [x] 로컬 동선(headless Chromium) 1440 · 768 · 390 — spec 「검증」 항목
 - [ ] Vercel 프리뷰
-- [ ] 스크린샷 S1 1440 · 768 · 390 → `docs/spec/SSH-548/apply-actions-*.png`
-- [ ] **커밋** `docs: SSH-548 검증 기록·스크린샷`
+- [x] 스크린샷 S1 1440 · 768 · 390 → `docs/spec/SSH-548/apply-actions-*.png`
+- [x] **커밋** `docs: SSH-548 검증 기록·스크린샷`
 
 ## 5. 마무리
 

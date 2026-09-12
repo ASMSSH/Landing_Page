@@ -140,16 +140,24 @@ useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [state.st
 
 ## 검증
 
-- [ ] `npm run build` · `npm run lint` · `npm test`
-- [ ] 1440×900: S1 첫 화면에서 「다음 →」이 열 아래에 붙어 보임 → 끝까지 내리면 폼 아래 제자리 · S2·S4·S5는 흐름 위치 그대로 · S3 붙음
-- [ ] 1440: S1 빈 채로 「다음」 → 오류 메시지가 생겨도 버튼 그대로 보임 · OCR 배너(S1-a) 상태도 같음
-- [ ] 768×1024 · 390×844: S1~S5 첫 화면 안에 고정 바 · 끝까지 내리면 진행 카드·푸터가 바에 안 가림 · S6는 바 없고 아래 여백 없음
-- [ ] 390: 「다음」으로 S1→S2 뒤 첫 화면이 「2 보험 선택」 헤딩 · 「← 이전」·브라우저 뒤로가기도 맨 위
-- [ ] 390: 토스트(OCR 실패 등)가 바 위에 뜸 · 사진 보기 시트·동의 전문 시트가 바 위를 덮음
-- [ ] S5 전송 중 「전송 중…」 비활성 그대로
+2026-09-12 로컬(`npm run dev`, headless Chromium)에서 확인. S6는 `/api/claims`를 페이지 안에서 mock해(실제 접수·슬랙 알림 없이) 갔다.
+수치는 스크롤 0 기준 액션 행 top/bottom(px).
+
+- [x] `npm run build` · `npm run lint`(경고 2건은 기존 것) · `npm test` 93건
+- [x] 1440×900: S1 첫 화면에서 행이 832~900에 붙음(sticky) → 끝까지 내리면 폼 아래 제자리(행 bottom = 메인 bottom 776) ·
+      S2 745 · S4 724 · S5 795는 흐름 위치 · S3 붙음(832)
+- [x] 1440: S1 빈 채로 「다음」 → 오류 3건이 생겨도 행 832~900 그대로 · OCR 배너 상태는 실제 사진 없이 미확인(레이아웃상 S1과 같은 흐름)
+- [x] 768×1024: 고정 바 955~1024(69px) · 390×844: 779~844(65px) — S1~S5 전부 첫 화면 안. 끝까지 내리면 푸터 bottom = 뷰포트 bottom(844),
+      바 위로 푸터 텍스트가 보임(푸터 padding-bottom 82px) · S6는 `.apply-actions` 없음, 푸터 padding 28px로 복귀, 토스트 bottom 16px로 복귀
+- [x] 390·768·1440: 「다음」으로 S1→S2, S2→S3, S3→S4, S4→S5 뒤 scrollY 0 · S6에서 브라우저 뒤로가기 뒤에도 0
+- [x] 390: 토스트 computed bottom 82px(바 65 + 16, 바 위) · 동의 전문 시트 backdrop z 60이 바(z 40) 위를 덮음. 1440은 바 z 10
+- [x] S5 전송 실패 상태에서 바 안 「← 이전」·「신청하기」 그대로 · 전송 중 비활성은 SSH-486 코드 그대로(이번 변경 없음)
+- [x] 콘솔 에러 없음
 - [ ] Vercel 프리뷰(새로고침 포함)
-- [ ] 스크린샷 S1 1440 · 768 · 390 → `docs/spec/SSH-548/`
-- [ ] 모바일 실기기(iOS Safari·Android Chrome) 키보드 올라올 때 바·포커스 칸 — 실기기 없으면 미확인으로 남긴다
+- [x] 스크린샷 S1 첫 화면 `apply-actions-1440.png` · `apply-actions-768.png` · `apply-actions-390.png`
+- [ ] 모바일 실기기(iOS Safari·Android Chrome) 키보드 올라올 때 바·포커스 칸 — **미확인**(실기기 없음)
+
+참고: `html { scroll-behavior: smooth }`(index.css)라 검증 스크립트의 `scrollTo`는 `behavior: 'instant'`로 쟀다. 단계 전환 효과도 `instant`다.
 
 ## 1차 리뷰 결정 (2026-09-12)
 
