@@ -13,42 +13,42 @@
 
 ## 1. `applyHref` — spec 1절
 
-- [ ] `src/lib/route.ts` — `applyHref(refCode)` · `src/lib/route.test.ts` 3건
-- [ ] **커밋** `feat: 유입 코드를 붙인 /apply 링크 헬퍼 applyHref 추가`
+- [x] `src/lib/route.ts` — `applyHref(refCode)` · `src/lib/route.test.ts` 3건
+- [x] **커밋** `feat: 유입 코드를 붙인 /apply 링크 헬퍼 applyHref 추가`
 
 ## 2. 랜딩 CTA 통일 — spec 2절
 
-- [ ] `src/components/ApplyCta.tsx` 신규(Second CTA) · `src/index.css` `.cta-box`·`.cta-caption`·`.cta-note`(`.signup-box` 이름 교체)
-- [ ] `Hero.tsx` 칩·노트·세이지 버튼 삭제 · `Features.tsx` 하단 코랄 버튼 · `Nav.tsx`·`Footer.tsx` `applyHref` + 처리방침 링크
-- [ ] `src/App.tsx` — `SignupCta` → `ApplyCta`, `MvpProvider`·`MvpModal` 제거
-- [ ] `src/data/faq.ts` 5·6번 · `index.html` JSON-LD 같은 문답
-- [ ] **커밋** `feat: 랜딩 CTA를 「무료로 청구 맡기기」→ /apply 하나로 통일하고 사전 알림 폼을 Second CTA로 교체`
+- [x] `src/components/ApplyCta.tsx` 신규(Second CTA) · `src/index.css` `.cta-box`·`.cta-caption`·`.cta-note`(`.signup-box` 이름 교체)
+- [x] `Hero.tsx` 칩·노트·세이지 버튼 삭제 · `Features.tsx` 하단 코랄 버튼 · `Nav.tsx`·`Footer.tsx` `applyHref` + 처리방침 링크
+- [x] `src/App.tsx` — `SignupCta` → `ApplyCta`, `MvpProvider`·`MvpModal` 제거
+- [x] `src/data/faq.ts` 5·6번 · `index.html` JSON-LD 같은 문답
+- [x] **커밋** `feat: 랜딩 CTA를 「무료로 청구 맡기기」→ /apply 하나로 통일하고 사전 알림 폼을 Second CTA로 교체`
 
 ## 3. 제거 — spec 3절
 
-- [ ] `git rm` — `src/mvp/` · `components/OtpPanel.tsx` · `components/SignupCta.tsx` · `lib/useOtp.ts` · `lib/ocrFields.ts` · `lib/receiptSVG.ts` · `data/examples.ts` · `data/resultDocs.ts` · `App.css` · `api/subscribe.ts` · `api/request-otp.ts` · `api/verify-otp.ts` · `server/notion.ts` · `server/otp.ts`
-- [ ] `vite.config.ts` `subscribeApi`·`otpApi` 삭제 · `npm uninstall tesseract.js` · `.env.example` 3개 삭제
-- [ ] `src/lib/claimType.ts` `inferClaimType` + 테스트 삭제 · `analytics.ts` `mvp_modal` 분기 · 주석 정리(`claimDocuments.ts`·`server/documents.ts`·`server/claims.ts`)
-- [ ] `src/index.css` 모달·OTP·폼·`.field` 블록 삭제 (반응형 포함)
-- [ ] **커밋** `chore: 체험 모달·OTP·사전 알림 서버리스와 tesseract 의존성 제거`
+- [x] `git rm` — `src/mvp/` · `components/OtpPanel.tsx` · `components/SignupCta.tsx`(2절 커밋에서) · `lib/useOtp.ts` · `lib/ocrFields.ts` · `lib/receiptSVG.ts` · `data/examples.ts` · `data/resultDocs.ts` · `App.css` · `api/subscribe.ts` · `api/request-otp.ts` · `api/verify-otp.ts` · `server/notion.ts` · `server/otp.ts`
+- [x] `vite.config.ts` `subscribeApi`·`otpApi` 삭제 · `npm uninstall tesseract.js` · `.env.example` 3개 삭제
+- [x] `src/lib/claimType.ts` `inferClaimType` + 테스트 삭제 · `analytics.ts` `mvp_modal` 분기 · 주석 정리(`claimDocuments.ts`·`server/documents.ts`·`server/claims.ts`)
+- [x] `src/index.css` 모달·OTP·폼·`.field` 블록 삭제 (반응형 포함)
+- [x] **커밋** `chore: 체험 모달·OTP·사전 알림 서버리스와 tesseract 의존성 제거`
 
 ## 4. `/apply` 트래킹 5개 — spec 4절
 
-- [ ] `src/apply/ApplyPage.tsx` `apply_step` · `steps/StepTreatment.tsx` `apply_ocr`(ok/fail/skip) · `steps/StepDocuments.tsx` `apply_docs` · `steps/StepConsent.tsx` `apply_submit`·`apply_done`·`apply_error`
-- [ ] **커밋** `feat: /apply 퍼널 트래킹 이벤트 5개 추가`
+- [x] `src/apply/ApplyPage.tsx` `apply_step` · `steps/StepTreatment.tsx` `apply_ocr`(ok/fail/skip) · `steps/StepDocuments.tsx` `apply_docs` · `steps/StepConsent.tsx` `apply_submit`·`apply_done`·`apply_error`
+- [x] **커밋** `feat: /apply 퍼널 트래킹 이벤트 5개 추가`
 
 ## 5. 쿼리 — spec 5절
 
-- [ ] `supabase/queries.sql` — 전환율 `apply_done` · 퍼널 `apply_step` · OCR·서류·오류 분포 · `section` 이름 주석
-- [ ] **커밋** `docs: Supabase 퍼널 쿼리를 체험 모달에서 /apply 기준으로 교체`
+- [x] `supabase/queries.sql` — 전환율 `apply_done` · 퍼널 `apply_step` · OCR·서류·오류 분포 · `section` 이름 주석
+- [x] **커밋** `docs: Supabase 퍼널 쿼리를 체험 모달에서 /apply 기준으로 교체`
 
 ## 6. 검증 — spec 「검증」
 
-- [ ] `npm run build` · `npm run lint` · `npm test`
-- [ ] grep 0건 · 로컬 `/?r=test` CTA href 5개 · `/apply` 끝까지 진행하며 `events` POST 확인 · `skip` 경로
+- [x] `npm run build` · `npm run lint` · `npm test`
+- [x] grep 0건 · 로컬 `/?r=test` CTA href 5개 · `/apply` 끝까지 진행하며 `events` POST 확인 · `skip` 경로 — 2026-09-12 headless Chromium에서 `window.fetch`를 가로채 `events` 본문을 모았다(`/api/claims`는 스텁). ok/skip/fail(unsupported_type·analyze_failed)·fallback docs·apply_error(db_error)까지 확인. 참고: dev(StrictMode)에서는 기타/모름의 동기 fallback 분기가 effect 2회로 `apply_docs`가 두 번 찍힌다 — 프로덕션은 1회
 - [ ] Vercel 프리뷰 — 새로고침 · 지운 API 404 · 남은 API 정상
-- [ ] 스크린샷 1440 · 768 · 390 + 하단 CTA → `docs/spec/SSH-545/landing-*.png`
-- [ ] **커밋** `docs: SSH-545 검증 기록·스크린샷`
+- [x] 스크린샷 1440 · 768 · 390 + 하단 CTA·푸터 1440 → `docs/spec/SSH-545/landing-*.png`
+- [x] **커밋** `docs: SSH-545 검증 기록·스크린샷`
 
 ## 7. Figma 랜딩 시안 동기화 — spec 7절
 
