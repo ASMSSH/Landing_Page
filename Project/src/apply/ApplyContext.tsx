@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import { applyReducer, initialApplyState, type ApplyAction, type ApplyState } from './state';
+import { useStepHistory } from './useStepHistory';
 
 interface ApplyContextValue {
   state: ApplyState;
@@ -31,7 +32,7 @@ interface ApplyContextValue {
   /**
    * 신청 1건의 멱등 키 — POST /api/claims 본문의 client_id. 서버(server/claims.ts)는 같은 값이 다시 오면 insert 대신
    * 이미 접수된 접수번호를 돌려준다. 15초 타임아웃 뒤 「다시 시도」가 같은 신청을 두 번 접수하는 것을 막는다 (SSH-544).
-   * reducer 상태(initialApplyState)는 상수라 거기 두면 reset 뒤에도 같은 값이 남는다 — 「처음으로」 뒤의 새 신청이 이전
+   * reducer 상태(initialApplyState)는 상수라 거기 두면 reset 뒤에도 같은 값이 남는다 — reset 뒤의 새 신청이 이전
    * 접수번호를 돌려받는 사고. 그래서 Provider가 들고 reset에서만 새로 만든다.
    * 실패 뒤 S4로 돌아가 내용을 고치고 다시 보내도 같은 값이 간다 — 서버는 그 행의 내용을 갱신하고 접수번호를 유지한다.
    */
@@ -67,7 +68,7 @@ export function ApplyProvider({ children }: { children: ReactNode }) {
     setPreviewState(url);
   }, []);
 
-  // reset(S6 「처음으로」)이면 사진도 같이 지우고, 멱등 키도 새로 만든다
+  // reset(접수 완료에서 브라우저 뒤로가기 — useStepHistory)이면 사진도 같이 지우고, 멱등 키도 새로 만든다
   const dispatch = useCallback<Dispatch<ApplyAction>>(
     (action) => {
       rawDispatch(action);
@@ -81,6 +82,10 @@ export function ApplyProvider({ children }: { children: ReactNode }) {
 
   // 페이지를 떠날 때 object URL 해제
   useEffect(() => () => setReceiptPreview(null), [setReceiptPreview]);
+
+  // 브라우저 뒤로가기 ↔ 단계 연동 (SSH-547). 여기서 부르는 이유: 상태와 감싼 dispatch(reset이 사진·멱등 키도 지우는)가 둘 다 있는
+  // 유일한 자리다. 전송 중(submitting)엔 「← 이전」·프로그레스처럼 뒤로가기도 잠근다
+  useStepHistory(state.step, dispatch, submitting);
 
   return (
     <ApplyContext.Provider value={{ state, dispatch, receiptPreview, setReceiptPreview, submitting, setSubmitting, clientId }}>

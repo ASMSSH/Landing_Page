@@ -4,7 +4,9 @@ import { track } from '../../lib/analytics';
 import { useApply } from '../ApplyContext';
 
 // S6 접수 완료 — Figma S6. 헤딩·ApplyActions 없이 자기 레이아웃이다(프로그레스는 5개 전부 done·잠금, 레일은 그대로).
-// 접수번호는 S5 전송 성공 시 서버가 준 값(state.receiptNo). 「처음으로」는 reset — 입력·동의·사진 object URL이 함께 비워진다.
+// 접수번호는 S5 전송 성공 시 서버가 준 값(state.receiptNo).
+// 「홈으로」는 랜딩(/)으로 전체 이동한다(2026-09-12 요청, SSH-547). 처음엔 reset으로 빈 1단계를 보여 줬는데, 접수를 마친 사람이
+// 갈 곳은 새 신청이 아니라 홈이다. 브라우저 뒤로가기는 reset 뒤 빈 1단계에 선다 — useStepHistory. reset은 그 경로가 쓴다.
 // 진행 상태 조회 기능은 없다(위키 ④ — 앱 유도도 없음). 담당자가 문자로 세 번 알린다.
 
 const NEXT_STEPS = [
@@ -15,7 +17,7 @@ const NEXT_STEPS = [
 ] as const;
 
 export default function StepDone() {
-  const { state, dispatch } = useApply();
+  const { state } = useApply();
   return (
     <section className="apply-done" aria-labelledby="apply-done-title">
       <div className="apply-done-head">
@@ -63,9 +65,9 @@ export default function StepDone() {
 
       <div className="apply-done-foot">
         <span className="apply-step-count">접수 완료</span>
-        <button type="button" className="btn apply-btn-ghost" onClick={() => dispatch({ type: 'reset' })}>
-          처음으로
-        </button>
+        <a className="btn apply-btn-ghost" href="/">
+          홈으로
+        </a>
       </div>
     </section>
   );
