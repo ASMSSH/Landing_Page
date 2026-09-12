@@ -85,8 +85,15 @@ popstate 규칙 — `resolvePopstate(e, 현재 단계, 잠금)`:
 | ⑥ | e < 현재 == 6 | `reset` 후 `history.go(-e)` — 랜딩으로 나간다 |
 
 훅은 "현재 항목이 가리키는 단계"를 ref 하나로 기억한다. popstate로 단계가 바뀌면 그 ref를 먼저 맞춰 두어 상태 변화 효과가
-`pushState`/`go`를 또 하지 않는다. 순수 함수 둘 — `planStepChange(항목 단계, 다음 단계)` → `push | go(Δ) | 없음`,
-`resolvePopstate(e, 현재, 잠금)` → `{ 항목 단계?, 액션?, go? }` — 를 `node:test`로 검증한다(위 표의 행마다 1건 이상).
+`pushState`/`go`를 또 하지 않는다. 순수 함수 셋 — `planStepChange(항목 단계, 다음 단계)` → `push | go(Δ) | 없음`,
+`resolvePopstate(e, 현재, 잠금)` → `{ 항목 단계?, 액션?, go?, 도착 단계? }`, `takeExpectedArrival(큐, e)` — 를 `node:test`로
+검증한다(위 표의 행마다 1건 이상).
+
+**우리가 건 `go`의 도착은 규칙에 태우지 않는다 (AI 리뷰 P2, 2026-09-12).** `history.go`는 비동기라 도착 popstate가 오기 전에
+단계가 또 바뀔 수 있다 — 「← 이전」 연타면 5→4(go 대기)→3(go 대기) 뒤 첫 popstate(항목 4)가 현재(3)보다 커서 규칙 ④에 걸려
+한 번 더 걷고 2에 도착했다. 훅은 자기가 건 `go`의 도착 항목 단계를 큐에 넣어 두고, 큐 머리와 맞는 popstate는 항목 단계만
+기억하고 끝낸다. 맞지 않으면 큐를 비우고(기대 모델이 어긋난 것 — 무시된 `go` 등) 규칙을 처음부터 적용한다. 페이지를 나가는
+`go`(⑥)는 도착 popstate가 없으니 큐에 넣지 않는다.
 
 ### 2. 훅 — `src/apply/useStepHistory.ts`, `ApplyProvider`에서 호출
 
@@ -137,6 +144,7 @@ popstate 규칙 — `resolvePopstate(e, 현재 단계, 잠금)`:
 - [x] S6에서 back → 랜딩. S6 「홈으로」 → 랜딩(`/`). 랜딩에서 forward로 돌아오면 빈 1단계(접수번호·입력 없음)
 - [x] 3단계에서 새로고침 → 1단계. back 첫 번째는 옛 항목이 규칙 ④로 걷혀 1단계 그대로, 두 번째에 랜딩
 - [x] 콘솔 에러 없음
+- [x] 「← 이전」 연타(두 클릭 사이 0·4·12ms) → 5단계에서 3단계, 2로 넘어가지 않음 (AI 리뷰 P2 반영 뒤)
 - [x] Vercel 프리뷰(번들 해시가 로컬 빌드와 동일)에서 3→2→1→랜딩 · S6 back → 랜딩 · forward → 빈 1단계 확인. 모바일 스와이프 백은 실기기 미확인
 - [x] 스크린샷: UI 변경은 S6 버튼 라벨뿐 — `apply-done-1440.png` · `apply-done-768.png` · `apply-done-390.png`
 
