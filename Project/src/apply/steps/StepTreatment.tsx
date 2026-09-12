@@ -17,7 +17,7 @@ import { TREATMENT_FIELD_ORDER, fieldId } from './treatmentFields';
 // S1 진료 정보 등록. 헤딩·업로드 카드·폼·액션 행을 이 컴포넌트가 조립한다 (spec 5절 —
 // 단계 컴포넌트가 헤딩과 액션 행을 소유한다. S3·S4~S6도 같은 방식).
 //
-// 영수증 사진 흐름: 파일 선택 → imageToDataUrl(축소) → /api/analyze-receipt → receiptToTreatment →
+// 영수증 사진 흐름: 파일 선택 또는 카드에 드롭(SSH-553) → imageToDataUrl(축소) → /api/analyze-receipt → receiptToTreatment →
 // setTreatment patch + receiptRead. 파일·dataURL은 이 함수 안에서만 살고 상태·스토리지에 넣지 않는다 (위키 ⑪-③).
 // 「사진 보기」용 object URL만 Provider 메모리에 둔다(ApplyContext.receiptPreview).
 
@@ -113,6 +113,7 @@ export default function StepTreatment() {
         previewUrl={receiptPreview}
         onPick={openPicker}
         onView={() => setPhotoOpen(true)}
+        onDrop={(file) => void handleFile(file)}
       />
       {/* capture 속성은 넣지 않는다 — 안드로이드에서 갤러리 선택이 막힌다 */}
       <input
