@@ -1,10 +1,7 @@
 // 필요서류(청구 유형별) 조회 핸들러 — 서버 전용 (브라우저에서 import 금지).
-// 사전알람(server/notion.ts)과 동일 패턴. Notion "보험사 서류 정리" 데이터소스를
-// 청구유형/보험사로 query 해서 화면용 ClaimDocumentGuide 를 만든다.
-//
-// 사전알람 DB와 필요서류 DB는 서로 다른 데이터소스이므로 env 도 별도로 둔다.
-//   - 사전알람:   NOTION_SUBSCRIBE_DATA_SOURCE_ID  (server/notion.ts)
-//   - 필요서류:   NOTION_DOCS_DATA_SOURCE_ID  (이 파일)
+// Notion "보험사 서류 정리" 데이터소스를 청구유형/보험사로 query 해서 화면용 ClaimDocumentGuide 를 만든다.
+// 노션을 부르는 유일한 서버 로직이다 — 사전 알림(server/notion.ts)은 SSH-545에서 제거됐다.
+//   - 필요서류:   NOTION_TOKEN + NOTION_DOCS_DATA_SOURCE_ID
 
 const NOTION_VERSION = '2025-09-03';
 
@@ -57,7 +54,7 @@ export interface DocumentsResult {
   body: ClaimDocumentGuide | { ok: false; error: string; message?: string };
 }
 
-/** "삼성화재 위풍당당" - 회사명("삼성화재") 정규화 (server/notion.ts와 동일 규칙) */
+/** "삼성화재 위풍당당" - 회사명("삼성화재") 정규화 */
 function normalizeInsurer(value: string): string {
   const trimmed = value.trim();
   if (!trimmed) return '';

@@ -120,13 +120,18 @@ export default function StepConsent() {
     abortRef.current = controller;
     setFailed(false);
     setSubmitting(true);
+    // 퍼널 트래킹 apply_submit → apply_done | apply_error (위키 ⑨, SSH-545). props에 접수번호·입력값은 넣지 않는다.
+    // error는 submitClaim이 던지는 코드(network_error · 서버 error 코드 · claim_submit_failed)
+    track('apply_submit');
     submitClaim(toClaimPayload(state, getRefCode(), clientId), controller.signal)
       .then(({ receiptNo }) => {
+        track('apply_done');
         dispatch({ type: 'setReceiptNo', receiptNo });
         dispatch({ type: 'goto', step: 6 });
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (controller.signal.aborted) return;
+        track('apply_error', { error: error instanceof Error ? error.message.slice(0, 80) : 'unknown' });
         setFailed(true);
       })
       .finally(() => {

@@ -1,5 +1,5 @@
 // Vercel 서버리스 함수 — 프로덕션 /api/claims 엔드포인트 (대리청구 신청 접수, POST).
-// 로직은 재사용 가능한 createClaim()에 위임하고, 여기선 요청 파싱/응답 변환만 (api/subscribe.ts와 같은 모양).
+// 로직은 재사용 가능한 createClaim()에 위임하고, 여기선 요청 파싱/응답 변환만 (api/claim-documents.ts와 같은 모양).
 // 런타임(Vercel)에선 컴파일 결과가 .js이므로 import도 .js로 작성 (nodenext 규칙).
 //
 // SUPABASE_SECRET_KEY는 여기(서버)에서만 읽는다 — VITE_ 접두사가 없어 브라우저 번들에 들어가지 않는다.

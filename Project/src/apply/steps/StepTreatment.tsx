@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { track } from '../../lib/analytics';
 import { ANALYZE_FAILED_MESSAGE, analyzeReceiptWithGemini } from '../../lib/geminiAnalyze';
 import ApplyActions from '../ApplyActions';
 import { useApply } from '../ApplyContext';
 import StepHeading from '../StepHeading';
 import Toast from '../Toast';
-import { ACCEPTED_MIME_TYPES, imageToDataUrl } from '../imageToDataUrl';
+import { ACCEPTED_MIME_TYPES, ImageTooLargeError, UnsupportedImageError, imageToDataUrl } from '../imageToDataUrl';
 import { receiptToTreatment } from '../receiptToTreatment';
 import type { Treatment } from '../state';
 import { stepDef } from '../steps';
@@ -23,6 +24,13 @@ import { TREATMENT_FIELD_ORDER, fieldId } from './treatmentFields';
 
 const OCR_DONE_DESCRIPTION = '영수증에서 읽은 내용이에요. 확인하고 틀린 곳은 고쳐 주세요';
 const OCR_EMPTY_MESSAGE = '영수증에서 읽을 수 있는 내용이 없었어요. 직접 입력해 주세요';
+
+// 트래킹 apply_ocr의 fail 원인 (위키 ⑨ ok/fail/skip에 원인만 얹었다, SSH-545). 파일 내용·오류 문구는 보내지 않는다
+function ocrFailReason(error: unknown): string {
+  if (error instanceof UnsupportedImageError) return 'unsupported_type';
+  if (error instanceof ImageTooLargeError) return 'too_large';
+  return 'analyze_failed';
+}
 
 export default function StepTreatment() {
   const { state, dispatch, receiptPreview, setReceiptPreview } = useApply();
@@ -67,6 +75,7 @@ export default function StepTreatment() {
       if (Object.keys(patch).length === 0) {
         setStatus(wasRead ? 'done' : 'idle');
         setToast(OCR_EMPTY_MESSAGE);
+        track('apply_ocr', { result: 'fail', reason: 'empty' });
         return;
       }
       dispatch({ type: 'setTreatment', patch });
@@ -74,11 +83,13 @@ export default function StepTreatment() {
       setReceiptPreview(URL.createObjectURL(file));
       if (submittedRef.current) setErrors(validateTreatment({ ...treatmentRef.current, ...patch }, today));
       setStatus('done');
+      track('apply_ocr', { result: 'ok' });
     } catch (error) {
       if (controller.signal.aborted) return;
       // 실패해도 이전에 읽은 사진·값은 그대로 — 카드만 이전 상태로
       setStatus(wasRead ? 'done' : 'idle');
       setToast(error instanceof Error && error.message ? error.message : ANALYZE_FAILED_MESSAGE);
+      track('apply_ocr', { result: 'fail', reason: ocrFailReason(error) });
     }
   };
 
@@ -97,6 +108,8 @@ export default function StepTreatment() {
       document.getElementById(fieldId(first))?.focus();
       return;
     }
+    // 영수증 없이 직접 적고 넘어가는 경우 — OCR을 건너뛴 것으로 기록한다
+    if (!state.receiptRead) track('apply_ocr', { result: 'skip' });
     dispatch({ type: 'next' });
   };
 

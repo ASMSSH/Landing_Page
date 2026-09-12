@@ -1,7 +1,6 @@
 // 브라우저에서 /api/claim-documents(서버 server/documents.ts)를 부르는 얇은 클라이언트.
 // 응답 타입은 서버 ClaimDocumentGuide와 같은 모양이다. 서버 파일을 import하지 않는 이유는
-// tsconfig.app.json이 src만 보기 때문이다 (SSH-543 spec 「배경」과 같은 이유). src/data/resultDocs.ts에도
-// 같은 타입이 있지만 그 파일은 체험 모달용이라 SSH-545에서 mvp와 함께 지워질 후보다.
+// tsconfig.app.json이 src만 보기 때문이다 (SSH-543 spec 「배경」과 같은 이유).
 
 import type { ClaimType } from './claimType.ts';
 

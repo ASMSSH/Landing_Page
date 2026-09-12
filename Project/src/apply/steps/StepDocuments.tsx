@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react';
+import { track } from '../../lib/analytics';
 import { fetchClaimDocumentsOrGeneral } from '../../lib/claimDocuments';
 import { inferClaimTypeFromText } from '../../lib/claimType';
 import ApplyActions from '../ApplyActions';
@@ -53,6 +54,16 @@ function DocsSkeleton() {
       </div>
     </div>
   );
+}
+
+// 트래킹 apply_docs (위키 ⑨, SSH-545) — 스냅샷이 확정되는 세 자리(조회 불가·성공·실패)에서 한 번씩. 보험사명은 8개 중 하나라 개인정보가 아니다
+function trackDocs(snapshot: RequiredDocsSnapshot): RequiredDocsSnapshot {
+  track('apply_docs', {
+    insurer: snapshot.insurer,
+    docs_count: snapshot.hospitalIssued.length + snapshot.selfPrepared.length,
+    fallback: snapshot.fallback,
+  });
+  return snapshot;
 }
 
 function fallbackNote(insurer: string): string {
@@ -143,17 +154,17 @@ export default function StepDocuments() {
     if (snapshot) return;
     // 기타/모름·빈 보험사는 서버가 항상 404라 묻지 않는다 (spec 「배경」)
     if (!canLookupDocs(insurer)) {
-      dispatch({ type: 'setRequiredDocs', docs: fallbackRequiredDocs(insurer, claimType) });
+      dispatch({ type: 'setRequiredDocs', docs: trackDocs(fallbackRequiredDocs(insurer, claimType)) });
       return;
     }
     const controller = new AbortController();
     // 그 유형 행이 없으면(404) 같은 보험사의 질병(통원) 서류로 한 번 더 — 노션에 예방/검진 행이 없는 보험사가 있다
     fetchClaimDocumentsOrGeneral(claimType, insurer, controller.signal)
-      .then((guide) => dispatch({ type: 'setRequiredDocs', docs: toRequiredDocsSnapshot(guide, insurer, claimType) }))
+      .then((guide) => dispatch({ type: 'setRequiredDocs', docs: trackDocs(toRequiredDocsSnapshot(guide, insurer, claimType)) }))
       .catch(() => {
         // StrictMode 1회차·언마운트로 취소된 요청은 무시한다. 그 외 실패(404·501·502·네트워크·타임아웃)는 fallback
         if (controller.signal.aborted) return;
-        dispatch({ type: 'setRequiredDocs', docs: fallbackRequiredDocs(insurer, claimType) });
+        dispatch({ type: 'setRequiredDocs', docs: trackDocs(fallbackRequiredDocs(insurer, claimType)) });
       });
     return () => controller.abort();
   }, [snapshot, insurer, claimType, dispatch]);

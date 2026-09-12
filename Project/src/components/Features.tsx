@@ -1,5 +1,6 @@
-import { useMvp } from '../mvp/MvpContext';
 import Icon, { type IconName } from './icons';
+import { getRefCode, track } from '../lib/analytics';
+import { applyHref } from '../lib/route';
 
 type Tone = 'primary' | 'secondary' | 'success';
 
@@ -11,7 +12,6 @@ const STEPS: { icon: IconName; tone: Tone; title: string; desc: string }[] = [
 ];
 
 export default function Features() {
-  const { open } = useMvp();
   return (
     <section id="features" className="features">
       <div className="wrap">
@@ -72,7 +72,7 @@ export default function Features() {
           ))}
         </div>
         <div className="center-cta">
-          <button className="btn btn-sage" onClick={open}>체험해보기 🐾</button>
+          <a href={applyHref(getRefCode())} className="btn btn-primary" onClick={() => track('cta_click', { cta: 'features_apply' })}>무료로 청구 맡기기 🐾</a>
         </div>
       </div>
     </section>
