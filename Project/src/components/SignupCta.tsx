@@ -5,17 +5,11 @@ import { track } from '../lib/analytics';
 import { useOtp } from '../lib/useOtp';
 import OtpPanel from './OtpPanel';
 import { INSTAGRAM_URL, PRIVACY_URL } from '../data/links';
+import { INSURERS, insurerLabel } from '../data/insurers';
 
-const INSURER_OPTIONS = [
-  '메리츠화재 펫퍼민트',
-  'DB손해보험 펫블리',
-  'KB손해보험 금쪽같은 펫보험',
-  '삼성화재 위풍당당',
-  '현대해상 굿앤굿우리펫',
-  '카카오페이손해보험 펫보험',
-  '마이브라운 펫보험',
-  '기타 / 모름',
-];
+// 보험사 목록은 data/insurers.ts 하나에서 온다 (SSH-543에서 중복 배열 제거).
+// 「기타 / 모름」만 insurerLabel의 「공통 기준」 대신 원래 라벨을 유지한다 — 사전 신청 데이터 값이 바뀌지 않게.
+const INSURER_OPTIONS = INSURERS.map((ins) => (ins.company === '기타 / 모름' ? ins.company : insurerLabel(ins)));
 
 type Status = 'idle' | 'submitting' | 'done' | 'error';
 

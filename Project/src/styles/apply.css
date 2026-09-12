@@ -1,0 +1,348 @@
+/* /apply 셸 전용 스타일. 토큰·.wrap·.btn·.field는 index.css 것을 그대로 쓴다.
+   레이아웃 규칙은 Figma 반응형 데모(1640-1327):
+   컨테이너 max 1040, 좌우 여백 최소 32 · ≤1024 메인 축소(레일 328 유지) · ≤768 1열 · ≤480 모바일 압축 */
+
+.apply-page { min-height:100dvh; display:flex; flex-direction:column; }
+.apply-container { width:100%; max-width:calc(1040px + 64px); margin:0 auto; padding:40px 32px 48px; display:flex; flex-direction:column; gap:28px; }
+
+/* ---------- Nav (apply variant) ---------- */
+.nav-help { font-size:14px; font-weight:600; color:var(--text-secondary); white-space:nowrap; transition:color .15s; }
+.nav-help:hover { color:var(--primary-600); }
+
+/* ---------- Page header ---------- */
+.apply-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.apply-head-copy { display:flex; flex-direction:column; gap:4px; }
+.apply-title { font-size:26px; line-height:1.2; color:var(--text-primary); }
+.apply-subtitle { font-size:15px; color:var(--text-secondary); }
+
+/* ---------- Progress ---------- */
+.apply-progress { list-style:none; margin:0; padding:0; display:flex; align-items:center; }
+.apply-step { display:flex; align-items:center; flex:1 1 0; min-width:0; }
+.apply-step:first-child { flex:0 0 auto; }
+.apply-step-line { flex:1 1 0; height:2px; margin:0 12px; border-radius:2px; background:var(--border); }
+.apply-step.done .apply-step-line, .apply-step.active .apply-step-line { background:var(--primary-500); }
+.apply-step-node { display:inline-flex; align-items:center; gap:8px; flex:0 0 auto; background:none; padding:0; color:inherit; font:inherit; }
+button.apply-step-node { cursor:pointer; border-radius:999px; }
+button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
+.apply-step-circle { width:26px; height:26px; border-radius:999px; display:inline-grid; place-items:center; flex-shrink:0; font-family:var(--font-display); font-size:14px; background:var(--surface); color:var(--text-tertiary); border:1.5px solid var(--border); }
+.apply-step.done .apply-step-circle, .apply-step.active .apply-step-circle, .apply-step-circle.active { background:var(--primary-500); color:#fff; border-color:var(--primary-500); }
+.apply-step-label { font-size:14px; font-weight:600; color:var(--text-tertiary); white-space:nowrap; }
+.apply-step.active .apply-step-label { color:var(--text-primary); font-weight:700; }
+.apply-step.done .apply-step-label { color:var(--text-secondary); }
+
+/* ---------- Body: 2열 ---------- */
+.apply-body { display:grid; grid-template-columns:minmax(0, 680px) 328px; justify-content:space-between; gap:32px; align-items:start; }
+.apply-main { display:flex; flex-direction:column; gap:20px; min-width:0; }
+.apply-rail { display:flex; flex-direction:column; gap:16px; min-width:0; }
+
+/* ---------- Step heading ---------- */
+.apply-step-heading { display:flex; flex-direction:column; gap:8px; }
+.apply-step-heading-row { display:flex; align-items:center; gap:10px; }
+.apply-step-title { font-family:var(--font-display); font-size:20px; color:var(--text-primary); }
+.apply-step-desc { font-size:15px; color:var(--text-secondary); }
+
+/* ---------- Panels ---------- */
+.apply-panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:24px; }
+
+/* ---------- Rail cards ---------- */
+.apply-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); padding:20px; display:flex; flex-direction:column; gap:12px; }
+.apply-card-title { font-size:15px; font-weight:700; color:var(--text-primary); }
+.apply-summary-list { margin:0; display:flex; flex-direction:column; gap:12px; }
+.apply-summary-row { display:flex; flex-direction:column; gap:2px; }
+.apply-summary-row dt { font-size:12px; color:var(--text-tertiary); }
+.apply-summary-row dd { margin:0; font-size:15px; font-weight:600; color:var(--text-primary); overflow-wrap:anywhere; }
+.apply-summary-row dd.empty { color:var(--text-tertiary); font-weight:400; }
+.apply-help { background:var(--success-50); border-color:var(--success-100); }
+.apply-help-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+.apply-help-list li { display:flex; align-items:flex-start; gap:8px; font-size:13px; line-height:1.5; color:var(--text-secondary); }
+.apply-help-list svg { flex-shrink:0; margin-top:3px; color:var(--success-700); }
+.apply-help-list a { color:var(--success-700); font-weight:700; text-decoration:underline; text-underline-offset:2px; }
+
+/* ---------- Actions ---------- */
+/* SSH-548: 각 단계가 .apply-main의 마지막 자식으로 렌더하므로, 본문이 뷰포트를 넘칠 때만 열 안에서 화면 아래에 붙는다(sticky).
+   짧은 단계는 흐름 자리 그대로다. 배경은 Nav와 같은 레시피(크림 82% + 블러) — 붙어서 본문 위를 지날 때만 보인다.
+   768 이하 1열은 아래 미디어 쿼리가 화면 아래 고정 바로 덮어쓴다 */
+.apply-actions { display:flex; align-items:center; justify-content:space-between; gap:16px;
+  position:sticky; bottom:0; z-index:10; padding:8px 0 12px;
+  background:color-mix(in srgb, var(--bg-app) 82%, transparent); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+/* --apply-bar-h = 액션 행(고정 바)의 높이. ApplyActions가 ResizeObserver로 실측해 <html> 인라인에 쓰고, 아래 상수는 그 전 폴백이다.
+   검증 실패로 오류 칸에 focus()가 갈 때 붙은 행이 그 칸을 덮지 않게 그만큼 스크롤 여백을 둔다 — 액션 행이 있을 때만 */
+:root { --apply-bar-h:68px; }
+html:has(.apply-actions) { scroll-padding-bottom:var(--apply-bar-h); }
+.apply-step-count { font-size:15px; color:var(--text-secondary); }
+.apply-actions-btns { display:flex; align-items:center; gap:12px; flex-shrink:0; }
+.apply-actions-btns .btn { width:auto; white-space:nowrap; flex-shrink:0; }
+.apply-btn-ghost { padding:10px 20px; font-size:15px; background:var(--surface); color:var(--text-primary); border:1.5px solid var(--border); }
+.apply-btn-ghost:hover { border-color:var(--neutral-300); }
+.apply-btn-ghost:disabled { cursor:default; opacity:.5; }
+.apply-btn-next { padding:14px 26px; font-size:16px; }
+.apply-btn-next:disabled { cursor:default; opacity:.5; box-shadow:none; }
+
+/* ---------- S1: 영수증 업로드 카드 (SSH-543) ---------- */
+.apply-upload { display:flex; align-items:center; gap:16px; padding:18px 20px; border:1.5px dashed var(--primary-300); border-radius:var(--radius-md); background:var(--primary-50); }
+.apply-upload.is-done { border-style:solid; border-color:var(--success-300); background:var(--success-50); }
+/* 파일을 끌어 카드 위에 올린 동안 — is-done(실선·초록)보다 뒤에 둬서 덮는다 (SSH-553) */
+.apply-upload.is-dragover { border-style:dashed; border-color:var(--primary-500); background:var(--primary-100); }
+.apply-upload.is-dragover .apply-upload-title { color:var(--primary-600); }
+.apply-upload-icon { width:48px; height:48px; border-radius:999px; background:var(--surface); display:grid; place-items:center; flex-shrink:0; color:var(--text-primary); }
+.apply-upload.is-done .apply-upload-icon { color:var(--success-700); }
+.apply-upload-copy { display:flex; flex-direction:column; gap:4px; flex:1 1 0; min-width:0; }
+.apply-upload-title { font-size:16px; font-weight:700; color:var(--primary-600); }
+.apply-upload.is-done .apply-upload-title { color:var(--text-primary); }
+.apply-upload-sub { font-size:13px; line-height:1.5; color:var(--text-secondary); }
+.apply-upload-btn { padding:11px 22px; font-size:15px; background:var(--secondary-500); color:var(--text-primary); flex-shrink:0; white-space:nowrap; }
+.apply-upload-btn:hover { background:var(--secondary-600); }
+.apply-upload-btn:disabled { cursor:default; opacity:.6; }
+.apply-upload .apply-btn-ghost { flex-shrink:0; white-space:nowrap; }
+.apply-upload-btns { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.apply-btn-white { background:var(--neutral-0); }
+/* 읽은 뒤: 사진 썸네일 + 체크 배지 (Figma S1-a) */
+.apply-upload-thumb { position:relative; width:56px; height:56px; flex-shrink:0; padding:0; border-radius:10px; overflow:visible; background:var(--neutral-100); border:1px solid var(--border); display:grid; place-items:center; color:var(--text-primary); cursor:pointer; }
+/* 절대 위치로 고정 — grid 셀에 두면 이미지 원본 크기로 셀이 늘어나 상자를 넘친다 */
+.apply-upload-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:9px; display:block; }
+.apply-upload-badge { position:absolute; top:-5px; right:-5px; width:18px; height:18px; border-radius:999px; background:var(--success-500); color:var(--neutral-0); display:grid; place-items:center; border:2px solid var(--success-50); }
+.apply-spinner { width:22px; height:22px; border-radius:999px; border:3px solid var(--primary-100); border-top-color:var(--primary-500); animation:apply-spin .8s linear infinite; }
+@keyframes apply-spin { to { transform:rotate(360deg); } }
+
+/* ---------- S1: 폼 ---------- */
+.apply-form { display:flex; flex-direction:column; gap:18px; }
+.apply-form-title { font-size:15px; font-weight:700; color:var(--text-primary); }
+.apply-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px 20px; align-items:start; }
+.apply-form-full { grid-column:1 / -1; }
+.apply-field { display:flex; flex-direction:column; gap:6px; min-width:0; }
+.apply-field-label { font-size:13px; font-weight:700; color:var(--text-primary); }
+.apply-field .field { flex:0 0 auto; width:100%; height:52px; min-height:52px; padding:0 18px; }
+.apply-field input[type="date"].field { appearance:none; -webkit-appearance:none; display:flex; align-items:center; }
+.apply-field-hint, .apply-field-error { margin:0; font-size:12px; line-height:1.45; }
+.apply-field-hint { color:var(--text-tertiary); }
+.apply-field-error { color:var(--error-700); font-weight:600; }
+.apply-field.has-error .field { border-color:var(--error-500); }
+
+/* ---------- S1: 사진 보기 모달 (Figma S1-c) ---------- */
+.apply-dialog-backdrop { position:fixed; inset:0; z-index:60; background:color-mix(in srgb, var(--neutral-900) 50%, transparent); display:flex; align-items:center; justify-content:center; padding:24px; }
+.apply-dialog { width:min(560px, 100%); max-height:calc(100dvh - 48px); overflow:auto; background:var(--surface); border-radius:var(--radius-md); padding:24px; display:flex; flex-direction:column; gap:16px; box-shadow:var(--shadow-card); }
+.apply-dialog-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.apply-dialog-title { font-size:16px; font-weight:700; color:var(--text-primary); }
+.apply-dialog-close { background:none; padding:4px 8px; font-size:16px; font-weight:700; color:var(--text-tertiary); cursor:pointer; border-radius:8px; }
+.apply-dialog-close:hover { color:var(--text-primary); }
+.apply-dialog-image { background:var(--neutral-100); border:1px solid var(--border); border-radius:14px; min-height:240px; max-height:60vh; display:grid; place-items:center; overflow:hidden; }
+.apply-dialog-image img { max-width:100%; max-height:60vh; object-fit:contain; display:block; }
+.apply-dialog-image-fallback { display:flex; flex-direction:column; align-items:center; gap:10px; padding:32px 24px; text-align:center; font-size:13px; line-height:1.5; color:var(--text-tertiary); }
+.apply-dialog-note { margin:0; font-size:12px; line-height:1.5; color:var(--text-secondary); }
+.apply-dialog-btns { display:flex; justify-content:flex-end; gap:12px; }
+.apply-dialog-btns .btn { width:auto; white-space:nowrap; }
+
+/* ---------- 토스트 ---------- */
+.apply-toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); z-index:50; max-width:min(92vw, 480px); padding:12px 18px; border-radius:var(--radius-sm); background:var(--neutral-900); color:var(--neutral-0); font-size:14px; line-height:1.45; box-shadow:var(--shadow-card); }
+
+/* ---------- S2: 보험사 그리드 ---------- */
+.apply-insurance { display:flex; flex-direction:column; gap:20px; }
+.apply-insurers { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:12px; }
+.apply-insurer { display:flex; flex-direction:column; align-items:flex-start; gap:4px; padding:14px 12px; min-height:72px; text-align:left; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-sm); cursor:pointer; font:inherit; color:inherit; transition:border-color .15s, background .15s; }
+.apply-insurer:hover { border-color:var(--primary-300); }
+.apply-insurer.is-selected { background:var(--primary-100); border-color:var(--primary-500); }
+.apply-insurer-name { font-size:14px; font-weight:700; letter-spacing:-0.3px; color:var(--text-primary); overflow-wrap:anywhere; }
+.apply-insurer-product { font-size:12px; color:var(--text-secondary); overflow-wrap:anywhere; }
+.apply-insurer.is-selected .apply-insurer-product { color:var(--primary-700); }
+.apply-note { display:flex; align-items:flex-start; gap:8px; margin:0; padding:12px 16px; border-radius:var(--radius-sm); background:var(--neutral-100); font-size:13px; line-height:1.5; color:var(--text-secondary); }
+.apply-note svg { flex-shrink:0; margin-top:2px; color:var(--text-tertiary); }
+/* S4 안내 카드 — Figma 변수 tint/info (SSH-486) */
+.apply-note.is-info { background:var(--tint-info); color:var(--on-tint-info); }
+
+/* ---------- S3: 필요 서류 (SSH-473) ---------- */
+/* 로더 카드 — Figma S3-0. 스피너 원은 S1 업로드 카드의 .apply-upload-icon을 그대로 쓴다 */
+.apply-docs-loader { display:flex; flex-direction:column; align-items:center; gap:8px; padding:40px 24px; text-align:center; border-radius:var(--radius-md); background:var(--primary-50); }
+.apply-docs-loader .apply-upload-icon { width:56px; height:56px; margin-bottom:8px; }
+.apply-docs-loader-title { margin:0; font-size:17px; font-weight:700; color:var(--primary-600); }
+.apply-docs-loader-sub { margin:0; font-size:13px; line-height:1.5; color:var(--text-secondary); }
+/* 스켈레톤 — 결과 패널과 같은 2열 자리 */
+.apply-docs-skeleton-line { display:block; height:12px; border-radius:999px; background:var(--neutral-100); animation:apply-docs-pulse 1.4s ease-in-out infinite; }
+.apply-docs-skeleton-line.is-title { width:45%; height:14px; margin-bottom:4px; }
+.apply-docs-skeleton-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 18px; border:1px solid var(--border); border-radius:var(--radius-sm); }
+.apply-docs-skeleton-row .apply-docs-skeleton-line { flex:1 1 0; max-width:60%; }
+.apply-docs-skeleton-row .apply-docs-skeleton-line.is-badge { flex:0 0 52px; max-width:none; }
+@keyframes apply-docs-pulse { 0%, 100% { background:var(--neutral-100); } 50% { background:var(--neutral-200); } }
+/* 요약 배너 — sage. 담당자 안내(fallback)는 앰버 */
+.apply-docs-summary { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 20px; border-radius:var(--radius-sm); background:var(--success-50); border:1px solid var(--success-100); }
+.apply-docs-summary.is-fallback { background:var(--secondary-50); border-color:var(--secondary-100); }
+.apply-docs-summary-copy { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.apply-docs-summary-title { margin:0; font-size:15px; font-weight:700; color:var(--text-primary); }
+.apply-docs-summary-sub { margin:0; font-size:13px; line-height:1.5; color:var(--text-secondary); }
+.apply-docs-retry { align-self:flex-start; margin-top:6px; padding:8px 16px; font-size:14px; }
+/* 배지 — 행(병원 발급 / 보험사 양식)과 배너(보험사 기준 / 기본 안내) */
+.apply-docs-badge { flex-shrink:0; font-size:12px; font-weight:700; padding:4px 10px; border-radius:999px; white-space:nowrap; }
+.apply-docs-badge.is-hospital { background:var(--primary-100); color:var(--primary-700); }
+.apply-docs-badge.is-self { background:var(--secondary-100); color:var(--secondary-700); }
+.apply-docs-badge.is-source { background:var(--secondary-100); color:var(--secondary-900); }
+.apply-docs-summary:not(.is-fallback) .apply-docs-badge.is-source { background:var(--success-100); color:var(--success-700); }
+/* 2열 목록 — Figma S3 Doc Card */
+.apply-docs-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:20px 24px; align-items:start; }
+.apply-docs-col { display:flex; flex-direction:column; gap:10px; min-width:0; }
+.apply-docs-col-title { margin:0; font-size:14px; font-weight:700; color:var(--text-primary); }
+.apply-docs-rows { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+.apply-docs-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--neutral-0); }
+.apply-docs-row-name { font-size:14px; font-weight:600; line-height:1.4; color:var(--text-primary); overflow-wrap:anywhere; }
+.apply-docs-empty { padding:14px 18px; font-size:14px; color:var(--text-tertiary); border:1px dashed var(--border); border-radius:var(--radius-sm); }
+/* 프로모션 무료 카드 — 앰버 */
+.apply-docs-promo { display:flex; align-items:flex-start; gap:12px; padding:16px 20px; border-radius:var(--radius-sm); background:var(--secondary-50); border:1px solid var(--secondary-100); }
+.apply-docs-promo-icon { font-size:20px; line-height:1.2; flex-shrink:0; }
+.apply-docs-promo-title { margin:0 0 4px; font-size:15px; font-weight:700; color:var(--text-primary); }
+.apply-docs-promo-sub { margin:0; font-size:13px; line-height:1.5; color:var(--text-secondary); }
+
+/* ---------- S5: 동의 (SSH-486) ---------- */
+/* 마스터 행 — Figma S5 「모두 동의합니다」. 코랄 테두리, 체크되면 연코랄 배경 */
+.apply-consent-all { display:flex; align-items:center; gap:12px; padding:16px 20px; border:1.5px solid var(--primary-300); border-radius:var(--radius-sm); background:var(--surface); cursor:pointer; transition:background .15s, border-color .15s; }
+.apply-consent-all.is-checked { background:var(--primary-50); border-color:var(--primary-500); }
+.apply-consent-all-label { font-size:16px; font-weight:700; color:var(--text-primary); }
+/* 개별 5행 — 패널 안 행 구분선 */
+.apply-consent-list { list-style:none; margin:0; padding:0 20px; }
+.apply-consent-row { display:flex; align-items:center; gap:12px; padding:16px 0; border-top:1px solid var(--border); }
+.apply-consent-row:first-child { border-top:0; }
+.apply-consent-label { flex:1 1 0; min-width:0; font-size:15px; font-weight:600; color:var(--text-primary); cursor:pointer; overflow-wrap:anywhere; }
+.apply-consent-required { color:var(--primary-600); font-weight:700; white-space:nowrap; }
+.apply-consent-view { flex-shrink:0; background:none; padding:6px 8px; font-size:14px; font-weight:700; color:var(--primary-600); cursor:pointer; border-radius:8px; text-decoration:underline; text-underline-offset:3px; }
+.apply-consent-view:hover { background:var(--primary-50); }
+/* 커스텀 체크 — 원형 22px, 체크 시 코랄 채움 + 흰 체크 */
+.apply-consent-check { appearance:none; -webkit-appearance:none; flex-shrink:0; width:22px; height:22px; margin:0; border:1.5px solid var(--neutral-300); border-radius:999px; background:var(--neutral-0); display:inline-grid; place-items:center; cursor:pointer; transition:background .15s, border-color .15s; }
+.apply-consent-check::after { content:""; width:6px; height:10px; margin-top:-2px; border:solid var(--neutral-0); border-width:0 2.5px 2.5px 0; transform:rotate(45deg); opacity:0; }
+.apply-consent-check:checked { background:var(--primary-500); border-color:var(--primary-500); }
+.apply-consent-check:checked::after { opacity:1; }
+.apply-consent-check:focus-visible { outline:2px solid var(--primary-300); outline-offset:2px; }
+.apply-consent-note { margin:0; font-size:13px; line-height:1.55; color:var(--text-tertiary); }
+/* 전송 실패 배너 — Figma 없음(spec 결정 6). S3 담당자 안내 배너와 같은 앰버 톤 */
+.apply-consent-error { display:flex; flex-direction:column; gap:6px; padding:16px 20px; border-radius:var(--radius-sm); background:var(--secondary-50); border:1px solid var(--secondary-100); }
+.apply-consent-error-title { margin:0; font-size:15px; font-weight:700; color:var(--text-primary); }
+.apply-consent-error-sub { margin:0; font-size:13px; line-height:1.5; color:var(--text-secondary); }
+.apply-consent-error-btns { display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+.apply-consent-error-btns .btn { width:auto; white-space:nowrap; }
+.apply-consent-error-retry { padding:10px 20px; font-size:15px; box-shadow:none; }
+.apply-consent-error-btns .apply-btn-ghost { padding:9px 16px; font-size:14px; }
+
+/* ---------- S5-a: 동의 전문 팝업 (SSH-486) ---------- */
+/* .apply-dialog-backdrop/.apply-dialog(S1-c)를 그대로 쓰고, 머리·발 고정 + 본문만 스크롤로 바꾼다 */
+.apply-dialog.apply-consent-dialog { width:min(720px, 100%); padding:0; gap:0; overflow:hidden; }
+.apply-consent-doc-head { display:flex; flex-direction:column; gap:8px; padding:20px 24px 16px; border-bottom:1px solid var(--border); }
+.apply-consent-doc-head-row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.apply-consent-doc-chip { align-self:flex-start; padding:5px 10px; border-radius:999px; background:var(--primary-50); color:var(--primary-600); font-size:12px; font-weight:700; }
+.apply-consent-doc-title { font-family:var(--font-display); font-size:20px; color:var(--text-primary); }
+.apply-consent-doc-meta { margin:0; font-size:13px; color:var(--text-secondary); }
+.apply-consent-doc-scroll { flex:1 1 auto; min-height:0; overflow:auto; padding:20px 24px; display:flex; flex-direction:column; gap:16px; overscroll-behavior:contain; }
+.apply-consent-doc-scroll:focus { outline:none; }
+.apply-consent-doc-body { display:flex; flex-direction:column; gap:12px; font-size:14px; line-height:1.65; color:var(--text-secondary); }
+.apply-consent-doc-body h3 { margin:10px 0 0; font-size:15px; font-weight:700; color:var(--text-primary); }
+.apply-consent-doc-body h3:first-child { margin-top:0; }
+.apply-consent-doc-body p { margin:0; }
+.apply-consent-doc-body strong { color:var(--text-primary); font-weight:700; }
+.apply-consent-doc-body ol, .apply-consent-doc-body ul { margin:0; padding-left:22px; display:flex; flex-direction:column; gap:6px; }
+.apply-consent-doc-body table { width:100%; border-collapse:collapse; font-size:13px; line-height:1.5; }
+.apply-consent-doc-body th, .apply-consent-doc-body td { padding:10px 12px; border:1px solid var(--border); text-align:left; vertical-align:top; overflow-wrap:anywhere; }
+.apply-consent-doc-body th { background:var(--neutral-100); color:var(--text-primary); font-weight:700; white-space:nowrap; }
+.apply-consent-doc-warn { display:flex; align-items:flex-start; gap:8px; margin:0; padding:12px 16px; border-radius:var(--radius-sm); background:var(--secondary-50); border:1px solid var(--secondary-100); font-size:13px; line-height:1.5; color:var(--secondary-900); }
+.apply-consent-doc-foot { padding:14px 24px 20px; border-top:1px solid var(--border); background:var(--surface); }
+
+/* ---------- S6: 접수 완료 (SSH-486) ---------- */
+.apply-done { display:flex; flex-direction:column; gap:20px; padding:0; }
+.apply-done-head { display:flex; flex-direction:column; align-items:center; gap:10px; padding-top:8px; text-align:center; }
+.apply-done-icon { width:64px; height:64px; border-radius:999px; background:var(--success-500); color:var(--neutral-0); display:grid; place-items:center; margin-bottom:6px; }
+.apply-done-title { font-family:var(--font-display); font-size:22px; color:var(--text-primary); }
+.apply-done-sub { margin:0; font-size:15px; line-height:1.5; color:var(--text-secondary); }
+.apply-done-receipt { display:flex; flex-direction:column; align-items:center; gap:6px; padding:24px 20px; border-radius:var(--radius-md); background:var(--primary-50); border:1px solid var(--primary-100); text-align:center; }
+.apply-done-receipt-label { font-size:13px; font-weight:700; color:var(--primary-600); }
+.apply-done-receipt-no { font-family:var(--font-display); font-size:34px; line-height:1.2; color:var(--primary-600); letter-spacing:0.5px; overflow-wrap:anywhere; }
+.apply-done-receipt-hint { font-size:13px; color:var(--text-secondary); }
+.apply-done-steps { list-style:none; margin:16px 0 0; padding:0; display:flex; flex-direction:column; }
+.apply-done-step { position:relative; display:flex; align-items:flex-start; gap:16px; padding-bottom:28px; }
+.apply-done-step:last-child { padding-bottom:4px; }
+/* 번호 원 사이 세로선 — 마지막 항목 제외 */
+.apply-done-step:not(:last-child)::before { content:""; position:absolute; left:19px; top:40px; bottom:0; width:2px; background:var(--border); }
+.apply-done-step-num { width:40px; height:40px; flex-shrink:0; border-radius:999px; border:2px solid; display:grid; place-items:center; font-family:var(--font-display); font-size:16px; background:var(--surface); }
+.apply-done-step-num.tone-primary { border-color:var(--primary-300); color:var(--primary-600); background:var(--primary-50); }
+.apply-done-step-num.tone-secondary { border-color:var(--secondary-300); color:var(--secondary-700); background:var(--secondary-50); }
+.apply-done-step-num.tone-success { border-color:var(--success-300); color:var(--success-700); background:var(--success-50); }
+.apply-done-step-copy { display:flex; flex-direction:column; gap:4px; padding-top:6px; min-width:0; }
+.apply-done-step-title { margin:0; font-family:var(--font-display); font-size:16px; color:var(--text-primary); }
+.apply-done-step-desc { margin:0; font-size:14px; line-height:1.5; color:var(--text-secondary); }
+.apply-done-insta { width:100%; padding:16px 24px; font-size:16px; background:var(--secondary-500); color:var(--text-primary); }
+.apply-done-insta:hover { background:var(--secondary-600); }
+.apply-done-note { margin:0; font-size:13px; line-height:1.5; color:var(--text-tertiary); }
+.apply-done-foot { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.apply-done-foot .btn { width:auto; padding:12px 28px; font-size:16px; }
+
+/* ---------- Footer ---------- */
+.apply-foot { margin-top:auto; padding:24px 32px 32px; background:none; text-align:center; font-size:13px; color:var(--text-tertiary); }
+.apply-foot a { color:inherit; text-decoration:underline; text-underline-offset:2px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width:1024px) {
+  .apply-body { grid-template-columns:minmax(0, 1fr) 328px; }
+}
+@media (max-width:768px) {
+  .apply-body { grid-template-columns:1fr; }
+  .apply-rail { order:2; }
+  .apply-main { order:1; }
+  .apply-form-grid { grid-template-columns:1fr; }
+  .apply-insurers { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  .apply-docs-grid { grid-template-columns:1fr; }
+  /* SSH-548: 1열에서는 액션 행을 화면 아래 고정 바로(모바일 Figma Actions Bar). 좌우 패딩은 컨테이너와 같다(32 · ≤480 18).
+     바가 있을 때만(:has) 푸터·토스트를 바 높이(--apply-bar-h, 실측값·폴백 72/66)만큼 올린다. S6는 액션 행이 없다.
+     z-index 40: 토스트 50 · 다이얼로그 60 아래. safe-area는 viewport-fit=cover가 없는 지금 메타에선 0이다 */
+  :root { --apply-bar-h:72px; }
+  .apply-actions { position:fixed; left:0; right:0; bottom:0; z-index:40; padding:10px 32px calc(10px + env(safe-area-inset-bottom)); border-top:1px solid var(--border); }
+  .apply-page:has(.apply-actions) .apply-foot { padding-bottom:calc(var(--apply-bar-h) + 16px); }
+  .apply-page:has(.apply-actions) .apply-toast { bottom:calc(var(--apply-bar-h) + 16px); }
+}
+@media (max-width:480px) {
+  :root { --apply-bar-h:66px; }
+  .apply-actions { padding-left:18px; padding-right:18px; }
+  .apply-container { padding:24px 18px 36px; gap:22px; }
+  .apply-title { font-size:22px; }
+  /* 프로그레스 압축 — 원 22px, 현재 단계 라벨만 (모바일 시안 1544-658) */
+  .apply-step-line { margin:0 6px; }
+  .apply-step-circle { width:22px; height:22px; font-size:12px; }
+  .apply-step-label { display:none; }
+  .apply-step.active .apply-step-label { display:inline; }
+  .apply-step-node { gap:6px; }
+  .apply-step-heading-row .apply-step-circle { width:26px; height:26px; font-size:14px; }
+  .apply-actions { flex-wrap:wrap; }
+  .apply-actions-btns { margin-left:auto; }
+  .apply-btn-next { padding:12px 20px; font-size:15px; }
+  .apply-docs-loader { padding:32px 18px; }
+  .apply-docs-summary { flex-direction:column; align-items:flex-start; }
+  .apply-foot { padding:20px 18px 28px; }
+  /* 업로드 카드는 세로로 — 모바일 시안(1544-658) */
+  .apply-upload { flex-direction:column; align-items:center; text-align:center; padding:22px 18px; }
+  .apply-upload-btn, .apply-upload .apply-btn-ghost { width:100%; }
+  .apply-upload-btns { width:100%; }
+  .apply-upload-btns .btn { flex:1 1 0; }
+  .apply-panel { padding:18px; }
+  .apply-toast { bottom:16px; }
+  /* S5·S5-a·S6 (SSH-486) */
+  .apply-consent-all { padding:14px 16px; }
+  .apply-consent-list { padding:0 16px; }
+  .apply-consent-row { gap:10px; padding:14px 0; }
+  .apply-consent-error-btns { flex-direction:column; align-items:stretch; }
+  .apply-consent-error-btns .btn { width:100%; }
+  /* 표를 세로 카드로 — 열 제목은 td[data-label]에서 */
+  .apply-consent-doc-body table, .apply-consent-doc-body tbody, .apply-consent-doc-body tr, .apply-consent-doc-body td { display:block; width:100%; }
+  .apply-consent-doc-body thead { display:none; }
+  .apply-consent-doc-body tr { border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; }
+  .apply-consent-doc-body tr + tr { margin-top:10px; }
+  .apply-consent-doc-body td { border:0; border-top:1px solid var(--border); padding:10px 12px; }
+  .apply-consent-doc-body td:first-child { border-top:0; }
+  .apply-consent-doc-body td::before { content:attr(data-label); display:block; margin-bottom:3px; font-size:12px; font-weight:700; color:var(--text-primary); }
+  .apply-dialog.apply-consent-dialog { max-height:calc(100dvh - 40px); padding:0; gap:0; }
+  .apply-consent-doc-head { padding:16px 18px 12px; }
+  .apply-consent-doc-scroll { padding:16px 18px; }
+  .apply-consent-doc-foot { padding:12px 18px 18px; }
+  .apply-done-receipt-no { font-size:28px; }
+  .apply-done-step-num { width:34px; height:34px; font-size:14px; }
+  .apply-done-step:not(:last-child)::before { left:16px; top:34px; }
+  .apply-done-step { gap:12px; padding-bottom:22px; }
+  /* 사진 보기는 아래에서 올라오는 시트로 (Figma 모바일 S1-c) */
+  .apply-dialog-backdrop { align-items:flex-end; padding:0; }
+  .apply-dialog { width:100%; max-height:calc(100dvh - 40px); border-radius:var(--radius-md) var(--radius-md) 0 0; padding:18px 18px 24px; gap:14px; }
+  .apply-dialog-image { min-height:200px; max-height:52vh; }
+  .apply-dialog-image img { max-height:52vh; }
+  .apply-dialog-btns { flex-direction:column-reverse; }
+  .apply-dialog-btns .btn { width:100%; }
+}

@@ -4,6 +4,8 @@
   --secondary-50:#FFF7E8; --secondary-100:#FFEBC4; --secondary-300:#FFD588; --secondary-500:#FFB84D; --secondary-600:#F09E22; --secondary-700:#B9760F; --secondary-900:#5B3A00;
   --success-50:#F1FAF4; --success-100:#E4F3EA; --success-300:#A9DBC0; --success-500:#7FC29B; --success-600:#4E9E77; --success-700:#3C7D5E; --success-900:#234A38;
   --error-100:#FBDBDB; --error-500:#E5484D; --error-700:#A82228;
+  /* Figma 변수 tint/info · on-tint/info — S4 안내 카드(SSH-486) */
+  --tint-info:#D6E6F5; --on-tint-info:#305A8A;
   /* Neutrals / ink */
   --neutral-0:#FFFFFF; --neutral-50:#FFFDF8; --neutral-100:#FBF3E8; --neutral-200:#EAD9C4; --neutral-300:#D9C3A9; --neutral-400:#A38F7D; --neutral-500:#8A7462; --neutral-600:#6B5647; --neutral-700:#574433; --neutral-900:#453528;
   --bg-app:#FFF6EA; --surface:#FFFDF8; --border:#EAD9C4;
@@ -230,7 +232,6 @@ footer .wm { font-family:var(--font-display); font-size:20px; color:var(--bg-app
 .modal-brand { display:flex; align-items:center; gap:8px; }
 .modal-brand .paw { width:28px; height:28px; border-radius:999px; background:var(--primary-500); display:grid; place-items:center; font-size:14px; }
 .modal-brand .nm { font-family:var(--font-display); font-size:16px; }
-.beta-badge { background:var(--primary-50); color:var(--primary-600); font-size:10px; font-weight:700; letter-spacing:0.5px; padding:3px 8px; border-radius:999px; }
 .modal-close { width:32px; height:32px; border-radius:999px; background:var(--neutral-100); color:var(--text-secondary); font-size:16px; display:grid; place-items:center; }
 .modal-close:hover { background:var(--border); }
 
