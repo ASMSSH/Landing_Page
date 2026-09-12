@@ -6,8 +6,8 @@
 
 - [x] `docs/spec/SSH-547/spec.md` — 배경·범위 4절·범위 밖·검증·1차 리뷰 결정
 - [x] `docs/spec/SSH-547/tasks.md`
-- [ ] **커밋** `docs: SSH-547 spec·tasks 작성`
-- [ ] **Draft PR 생성** — `/apply 브라우저 뒤로가기를 단계 되돌리기로(SSH-547)`, base `dev`.
+- [x] **커밋** `docs: SSH-547 spec·tasks 작성`
+- [x] **Draft PR 생성** — `/apply 브라우저 뒤로가기를 단계 되돌리기로(SSH-547)`, base `dev`, #36.
       2026-09-12 사용자가 Draft와 구현을 한 번에 요청 — 1차 리뷰 없이 아래 1~3을 같은 브랜치에서 잇는다
 
 ## 1. 항목 모델 — spec 1절
