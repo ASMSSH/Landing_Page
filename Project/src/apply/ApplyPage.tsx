@@ -13,6 +13,7 @@ import StepInsurance from './steps/StepInsurance';
 import StepTreatment from './steps/StepTreatment';
 import type { ApplyStep } from './state';
 import { useApplyMeta } from './useApplyMeta';
+import { track } from '../lib/analytics';
 import '../styles/apply.css';
 
 // 단계 본문. 각 단계가 헤딩·액션 행까지 자기가 그린다(SSH-543 spec 5절). 6은 접수 완료(SSH-486).
@@ -33,6 +34,11 @@ function ApplyShell() {
   // 모바일에선 다음 단계 첫 화면이 헤딩 대신 액션 행·요약 카드였다 (SSH-548)
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [state.step]);
+  // 퍼널 트래킹 apply_step (위키 ⑨, SSH-545). 단계에 들어설 때마다 — 마운트의 1, 다음·이전·프로그레스·뒤로가기, 제출 성공의 6 전부.
+  // 스크롤 복귀와 같은 의존성이지만 따로 둔다 — 하나는 화면, 하나는 로그. 되돌아간 단계도 다시 찍히므로 세션당 단계별 수는 SQL에서 distinct로 센다
+  useEffect(() => {
+    track('apply_step', { step: state.step });
   }, [state.step]);
   // S1 업로드 카드 밖(폼·레일·여백)에 사진을 놓으면 브라우저가 이미지를 새 탭으로 연다 — 페이지 전체에서 막는다 (SSH-553).
   // ApplyShell은 /apply에서만 마운트되므로 랜딩에는 걸리지 않는다. 카드가 이미 preventDefault한 이벤트(defaultPrevented)는
