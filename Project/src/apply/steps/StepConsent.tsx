@@ -17,8 +17,9 @@ import ConsentDialog from './ConsentDialog';
 // (처음엔 Figma S5-a대로 본문 자리를 통째로 바꿨는데, 닫기가 맨 아래라 불편하다는 피드백으로 팝업으로 바꿨다 — 2026-09-10)
 //
 // 뒤로가기: 전문을 열 때 history.pushState 한 엔트리를 넣어 브라우저 back이 /apply를 떠나지 않고 전문만 닫게 한다.
-// 「닫기」·✕·배경 클릭·Esc는 전부 history.back()이라 엔트리가 남지 않는다. 전문이 열린 채 언마운트되면(「처음으로」 등)
-// cleanup에서 그 엔트리를 걷는다. 닫혀 있을 때의 popstate는 무시한다 — 단계 단위 back은 SSH-547이 맡는다.
+// 「닫기」·✕·배경 클릭·Esc는 전부 history.back()이라 엔트리가 남지 않는다. 전문이 열린 채 언마운트되면(페이지 이탈 등)
+// cleanup에서 그 엔트리를 걷는다. 닫혀 있을 때의 popstate는 무시한다 — 단계 단위 back은 useStepHistory(SSH-547)가 맡고,
+// 그쪽은 applyStep이 없는 이 엔트리를 무시한다.
 //
 // 전송: 5개 전부 체크돼야 「신청하기」가 켜진다. 전송 중(Provider의 submitting)엔 「신청하기」·「← 이전」·프로그레스가 전부 잠기고
 // 라벨은 「전송 중…」. 성공이면 접수번호를 상태에 넣고 6단계로(reducer가 접수번호 없이는 6으로 못 가게 막는다).
@@ -93,7 +94,7 @@ export default function StepConsent() {
   }, []);
 
   // 언마운트: 진행 중인 전송을 끊고 잠금을 풀며, 전문이 열린 채면 pushState로 넣은 엔트리를 걷는다.
-  // 전송 중엔 이동이 잠겨 있어 여기 오는 길은 「처음으로」(reset)·페이지 이탈뿐이다
+  // 전송 중엔 이동(뒤로가기 포함)이 잠겨 있어 여기 오는 길은 제출 성공(goto 6)·페이지 이탈뿐이다
   useEffect(
     () => () => {
       abortRef.current?.abort();
