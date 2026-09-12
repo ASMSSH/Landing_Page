@@ -12,29 +12,29 @@
 
 ## 1. 항목 모델 — spec 1절
 
-- [ ] `src/apply/stepHistory.ts` — `toHistoryState` · `readEntryStep` · `planStepChange` · `resolvePopstate`
-- [ ] `src/apply/stepHistory.test.ts` — 규칙 표 ①~⑥ + 단계 오름/내림/같음
-- [ ] **커밋** `feat: /apply 단계 history 항목 모델과 popstate 규칙 추가`
+- [x] `src/apply/stepHistory.ts` — `toHistoryState` · `readEntryStep` · `planStepChange` · `resolvePopstate`
+- [x] `src/apply/stepHistory.test.ts` — 규칙 표 ①~⑥ + 단계 오름/내림/같음
+- [x] **커밋** `feat: /apply 단계 history 항목 모델과 popstate 규칙 추가`
 
 ## 2. 훅·연결 — spec 2절
 
-- [ ] `src/apply/useStepHistory.ts` — 마운트 replaceState · popstate 리스너 · step 변화 push/go
-- [ ] `src/apply/ApplyContext.tsx` — `useStepHistory(state.step, dispatch, submitting)` 호출
-- [ ] `src/apply/steps/StepConsent.tsx` — 주석의 "SSH-547이 맡는다" → `useStepHistory`로
-- [ ] **커밋** `feat: /apply 브라우저 뒤로가기가 이전 단계로 가게 history 연동`
+- [x] `src/apply/useStepHistory.ts` — 마운트 replaceState · popstate 리스너 · step 변화 push/go
+- [x] `src/apply/ApplyContext.tsx` — `useStepHistory(state.step, dispatch, submitting)` 호출
+- [x] `src/apply/steps/StepConsent.tsx` — 주석의 "SSH-547이 맡는다" → `useStepHistory`로
+- [x] **커밋** `feat: /apply 브라우저 뒤로가기가 이전 단계로 가게 history 연동`
 
 ## 3. S6 「홈으로」 — spec 3절
 
-- [ ] `src/apply/steps/StepDone.tsx` — 「처음으로」 버튼 → 「홈으로」 링크(`/`)
-- [ ] **커밋** `feat: 접수 완료 「처음으로」를 랜딩으로 가는 「홈으로」로 변경`
+- [x] `src/apply/steps/StepDone.tsx` — 「처음으로」 버튼 → 「홈으로」 링크(`/`)
+- [x] **커밋** `feat: 접수 완료 「처음으로」를 랜딩으로 가는 「홈으로」로 변경`
 
 ## 4. 검증 — spec 「검증」
 
-- [ ] `npm run build` · `npm run lint` · `npm test`
-- [ ] 로컬 동선 8건 (headless Chromium)
+- [x] `npm run build` · `npm run lint` · `npm test`
+- [x] 로컬 동선 9건 (headless Chromium, S6는 `/api/claims` mock) — spec 「검증」
 - [ ] Vercel 프리뷰 동선
-- [ ] 스크린샷 S6 1440 · 768 · 390 → `docs/spec/SSH-547/apply-done-*.png`
-- [ ] **커밋** `docs: SSH-547 검증 기록·스크린샷`
+- [x] 스크린샷 S6 1440 · 768 · 390 → `docs/spec/SSH-547/apply-done-*.png`
+- [x] **커밋** `docs: SSH-547 검증 기록·스크린샷`
 
 ## 5. 마무리
 

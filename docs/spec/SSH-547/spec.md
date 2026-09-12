@@ -125,16 +125,20 @@ popstate 규칙 — `resolvePopstate(e, 현재 단계, 잠금)`:
 
 ## 검증
 
-- [ ] `npm run build` · `npm run lint` · `npm test` (`stepHistory.test.ts` 포함)
-- [ ] 로컬 `/apply?r=test`: 1→2→3 뒤 브라우저 back → 2단계, 입력값 유지 → back → 1단계 → back → 랜딩(`/`)
-- [ ] 「← 이전」으로 3→2 뒤 브라우저 back 한 번에 1단계 (history가 상태를 따라왔다)
-- [ ] 프로그레스로 4→1 뒤 브라우저 back 한 번에 랜딩
-- [ ] 앞으로가기(forward)는 단계를 바꾸지 않는다
-- [ ] S5 동의 전문 열고 back → 전문만 닫힘, 단계 그대로 (SSH-486 동작 유지)
-- [ ] S6에서 back → 랜딩. S6 「홈으로」 → 랜딩. 랜딩에서 forward로 돌아오면 빈 1단계(접수번호·입력 없음)
-- [ ] 3단계에서 새로고침 → 1단계. back 첫 번째는 옛 항목이 규칙 ④로 걷혀 1단계 그대로, 두 번째에 랜딩
+2026-09-12 로컬(`npm run dev`, headless Chromium)에서 확인. S6는 `/api/claims`를 페이지 안에서 mock해(실제 접수·슬랙 알림 없이) 갔다.
+
+- [x] `npm run build` · `npm run lint`(경고 2건은 기존 것) · `npm test` 91건 (`stepHistory.test.ts` 9건 포함)
+- [x] 로컬 `/apply?r=test`: 1→2→3 뒤 브라우저 back → 2단계, 입력값 유지 → back → 1단계(병원 이름 남아 있음) → back → 랜딩(`/`)
+- [x] 「← 이전」으로 2→1 뒤 브라우저 back 한 번에 랜딩 (history가 상태를 따라왔다)
+- [x] 프로그레스로 4→1 뒤 브라우저 back 한 번에 랜딩
+- [x] 앞으로가기(forward)는 단계를 바꾸지 않는다 — 1단계에서 forward 뒤에도 1단계, `history.state`는 `{ applyStep: 1 }`로 되돌아온다
+- [x] S5 동의 전문 열고 back → 전문만 닫힘, 5단계 그대로 (SSH-486 동작 유지, 전문 항목 `{ applyConsent }`는 무시됨)
+- [x] S5 전송 중 back → 5단계로 되돌아오고 「전송 중…」 유지 (규칙 ②)
+- [x] S6에서 back → 랜딩. S6 「홈으로」 → 랜딩(`/`). 랜딩에서 forward로 돌아오면 빈 1단계(접수번호·입력 없음)
+- [x] 3단계에서 새로고침 → 1단계. back 첫 번째는 옛 항목이 규칙 ④로 걷혀 1단계 그대로, 두 번째에 랜딩
+- [x] 콘솔 에러 없음
 - [ ] Vercel 프리뷰에서 위 동선 (모바일 스와이프 백은 실기기)
-- [ ] 스크린샷: UI 변경은 S6 버튼 라벨뿐 — 1440 · 768 · 390 S6 한 장씩
+- [x] 스크린샷: UI 변경은 S6 버튼 라벨뿐 — `apply-done-1440.png` · `apply-done-768.png` · `apply-done-390.png`
 
 ## 1차 리뷰 결정 (2026-09-12)
 
