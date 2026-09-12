@@ -1,3 +1,5 @@
+import { refCodeFromSearch } from './route';
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const ENDPOINT =
@@ -59,7 +61,8 @@ export function getRefCode(): string | null {
   try {
     const stored = sessionStorage.getItem(REF_KEY);
     if (stored !== null) return stored || null;
-    const r = new URLSearchParams(location.search).get('r')?.slice(0, 32) ?? '';
+    // ?r= 없으면 utm_source를 유입 코드로 (route.ts#refCodeFromSearch, SSH-545). 첫 진입에 한 번 정해 세션 동안 유지한다
+    const r = refCodeFromSearch(location.search) ?? '';
     sessionStorage.setItem(REF_KEY, r);
     return r || null;
   } catch {

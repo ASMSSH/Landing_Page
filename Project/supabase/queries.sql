@@ -1,6 +1,7 @@
 -- 랜딩·/apply 지표 쿼리 (Supabase SQL Editor에서 실행). 이벤트 이름은 src/lib/analytics.ts와 src/apply/*의 track() 호출이 정본이다.
 -- 2026-09-12(SSH-545)부터: 체험 모달(mvp_*)·사전 알림(signup_submit·otp_*) 이벤트는 더 오지 않고, 전환은 /apply의 apply_done이다.
 --   section_view·click의 section 값 'signup'(사전 알림 섹션)은 같은 날부터 'cta'(하단 CTA 섹션)다.
+--   같은 날부터 ?r= 없이 utm_source만 있는 유입은 utm_source 값이 ref_code로도 들어간다(analytics.ts#getRefCode). 아래 channel 쿼리의 '광고: ' 분기는 그 전 데이터용.
 
 select
   case

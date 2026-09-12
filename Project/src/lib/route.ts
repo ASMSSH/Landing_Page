@@ -15,3 +15,14 @@ export function applyHref(refCode: string | null): string {
   const code = refCode?.trim();
   return code ? `${APPLY_PATH}?r=${encodeURIComponent(code)}` : APPLY_PATH;
 }
+
+/**
+ * URL 쿼리에서 유입 코드를 뽑는다. `?r=<코드>`가 정식이고, 없으면 `utm_source`를 대신 쓴다 (SSH-545) —
+ * 피켓·인쇄물처럼 `utm_source=picket`으로 이미 뿌린 링크도 events·claims·슬랙 알림에 같은 코드로 남게.
+ * 둘 다 없거나 비어 있으면 null. 32자에서 자른다(events.ref_code 관례).
+ */
+export function refCodeFromSearch(search: string): string | null {
+  const params = new URLSearchParams(search);
+  const code = (params.get('r') || params.get('utm_source') || '').trim().slice(0, 32);
+  return code || null;
+}
