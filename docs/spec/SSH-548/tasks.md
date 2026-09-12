@@ -7,7 +7,7 @@
 - [x] `docs/spec/SSH-548/spec.md` — 배경·왜 하이브리드인가·범위 4절·범위 밖·검증·1차 리뷰 결정
 - [x] `docs/spec/SSH-548/tasks.md`
 - [x] **커밋** `docs: SSH-548 spec·tasks 작성`
-- [ ] **Draft PR 생성** — `/apply 액션 행을 모바일 고정 바·데스크톱 열 sticky로 화면 안에 두기(SSH-548)`, base `dev`.
+- [x] **Draft PR 생성** — `/apply 액션 행을 모바일 고정 바·데스크톱 열 sticky로 화면 안에 두기(SSH-548)`, base `dev`, #37.
       2026-09-12 사용자가 Figma 확정 뒤 구현까지 요청 — 1차 리뷰 없이 아래 1~3을 같은 브랜치에서 잇는다
 
 ## 1. 데스크톱 열 안 sticky — spec 1절
