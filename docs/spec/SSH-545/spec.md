@@ -186,6 +186,6 @@ export function applyHref(refCode: string | null): string
 - [x] `grep -rn "mvp\|otp\|subscribe\|tesseract\|사전 신청\|체험해보기\|베타" src api server index.html` — 0건(주석·역사 서술 제외)
 - [x] 로컬 `/?r=test` → 5개 CTA의 `href`가 전부 `/apply?r=test` · `/`(코드 없음) → `/apply`
 - [x] 로컬 `/apply` 끝까지 진행하며 개발자 도구 Network의 `events` POST 본문에 `apply_step` 1~6·`apply_ocr`·`apply_docs`·`apply_submit`·`apply_done`이 보이고 props에 개인정보가 없다. OCR 없이 S2로 가면 `apply_ocr skip`
-- [ ] Vercel 프리뷰 — `/`·`/apply?r=test` 새로고침, `/api/subscribe`·`/api/request-otp`가 404, `/api/claim-documents`·`/api/claims`는 정상
+- [x] Vercel 프리뷰 — `/`·`/apply?r=test` 새로고침, `/api/subscribe`·`/api/request-otp`가 404, `/api/claim-documents`·`/api/claims`는 정상
 - [x] 랜딩 1440 · 768 · 390 스크린샷(Hero 첫 화면) + 하단 CTA·푸터 1440 → `docs/spec/SSH-545/`
-- [ ] Figma 랜딩 시안 동기화(7절)
+- [x] Figma 랜딩 시안 동기화(7절) — 데스크톱·모바일 프레임 텍스트 12개 + Features 버튼 변형

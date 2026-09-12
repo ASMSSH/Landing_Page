@@ -46,13 +46,13 @@
 
 - [x] `npm run build` · `npm run lint` · `npm test`
 - [x] grep 0건 · 로컬 `/?r=test` CTA href 5개 · `/apply` 끝까지 진행하며 `events` POST 확인 · `skip` 경로 — 2026-09-12 headless Chromium에서 `window.fetch`를 가로채 `events` 본문을 모았다(`/api/claims`는 스텁). ok/skip/fail(unsupported_type·analyze_failed)·fallback docs·apply_error(db_error)까지 확인. 참고: dev(StrictMode)에서는 기타/모름의 동기 fallback 분기가 effect 2회로 `apply_docs`가 두 번 찍힌다 — 프로덕션은 1회
-- [ ] Vercel 프리뷰 — 새로고침 · 지운 API 404 · 남은 API 정상
+- [x] Vercel 프리뷰 — 새로고침 · 지운 API 404 · 남은 API 정상 (2026-09-12: `/?r=test`·`/apply?r=test` 200, `/api/subscribe`·`/api/request-otp` 404, `/api/claim-documents` 200, 번들 해시가 로컬 빌드와 일치)
 - [x] 스크린샷 1440 · 768 · 390 + 하단 CTA·푸터 1440 → `docs/spec/SSH-545/landing-*.png`
 - [x] **커밋** `docs: SSH-545 검증 기록·스크린샷`
 
 ## 7. Figma 랜딩 시안 동기화 — spec 7절
 
-- [ ] Hero 칩·노트 · Features 버튼 · Second CTA 캡션 · Footer 링크 · FAQ 5·6번
+- [x] Hero 칩·노트 · Features 버튼 · Second CTA 캡션 · Footer 링크 · FAQ 5·6번 — 2026-09-12 「Landing / Desktop」·「Landing / Mobile」 두 프레임에서 텍스트 12개 교체, Features 버튼 인스턴스 Style Sage→Primary(이름 `Apply Button (mid)`), 섹션 메모에 반영 기록. 남은 「베타」·「체험해보기」·「문의하기」 0
 
 ## 8. 마무리
 
