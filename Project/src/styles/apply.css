@@ -66,6 +66,10 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 .apply-actions { display:flex; align-items:center; justify-content:space-between; gap:16px;
   position:sticky; bottom:0; z-index:10; padding:8px 0 12px;
   background:color-mix(in srgb, var(--bg-app) 82%, transparent); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+/* --apply-bar-h = 액션 행(고정 바)의 높이. ApplyActions가 ResizeObserver로 실측해 <html> 인라인에 쓰고, 아래 상수는 그 전 폴백이다.
+   검증 실패로 오류 칸에 focus()가 갈 때 붙은 행이 그 칸을 덮지 않게 그만큼 스크롤 여백을 둔다 — 액션 행이 있을 때만 */
+:root { --apply-bar-h:68px; }
+html:has(.apply-actions) { scroll-padding-bottom:var(--apply-bar-h); }
 .apply-step-count { font-size:15px; color:var(--text-secondary); }
 .apply-actions-btns { display:flex; align-items:center; gap:12px; flex-shrink:0; }
 .apply-actions-btns .btn { width:auto; white-space:nowrap; flex-shrink:0; }
