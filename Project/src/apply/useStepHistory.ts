@@ -7,7 +7,7 @@ import { planStepChange, readEntryStep, resolvePopstate, takeExpectedArrival, to
  *
  * - 마운트: 지금 항목을 `{ applyStep: 1 }`로 덮는다 — 새로고침하면 상태는 1인데 항목엔 옛 단계가 남아 있다
  * - 단계가 오르면 pushState(URL은 그대로), 내리면(「← 이전」·프로그레스·reset) history.go로 항목을 걷는다
- * - popstate: 그 항목의 단계로 goto. 접수 완료(6)에서는 reset 뒤 단계 수만큼 걷어 랜딩으로 나간다. 앞으로가기·전송 중은 되돌린다
+ * - popstate: 그 항목의 단계로 goto. 접수 완료(6)에서는 reset 뒤 항목 [1]까지 걷어 빈 1단계에 선다. 앞으로가기·전송 중은 되돌린다
  *
  * `entryRef`는 "지금 history 항목이 가리키는 단계". popstate로 단계를 바꿀 때는 이 값을 먼저 맞춰 두어야
  * 뒤이은 단계 변화 효과가 pushState/go를 또 하지 않는다.

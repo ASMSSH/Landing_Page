@@ -6,7 +6,7 @@ import { useApply } from '../ApplyContext';
 // S6 접수 완료 — Figma S6. 헤딩·ApplyActions 없이 자기 레이아웃이다(프로그레스는 5개 전부 done·잠금, 레일은 그대로).
 // 접수번호는 S5 전송 성공 시 서버가 준 값(state.receiptNo).
 // 「홈으로」는 랜딩(/)으로 전체 이동한다(2026-09-12 요청, SSH-547). 처음엔 reset으로 빈 1단계를 보여 줬는데, 접수를 마친 사람이
-// 갈 곳은 새 신청이 아니라 홈이다. 브라우저 뒤로가기도 같은 곳(랜딩)으로 나간다 — useStepHistory. reset은 그 경로가 쓴다.
+// 갈 곳은 새 신청이 아니라 홈이다. 브라우저 뒤로가기는 reset 뒤 빈 1단계에 선다 — useStepHistory. reset은 그 경로가 쓴다.
 // 진행 상태 조회 기능은 없다(위키 ④ — 앱 유도도 없음). 담당자가 문자로 세 번 알린다.
 
 const NEXT_STEPS = [

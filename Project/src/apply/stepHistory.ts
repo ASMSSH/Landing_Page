@@ -42,7 +42,7 @@ export function planStepChange(entryStep: ApplyStep, nextStep: ApplyStep): StepC
  * popstate 처리 계획.
  * - `entryStep`: 도착한 항목이 가리키는 단계를 훅이 기억하게 하는 값 — 뒤이은 상태 변화가 push/go를 또 하지 않게
  * - `go`: 걷을 항목 수. `goArrivesAt`은 그 traversal이 도착할 항목의 단계 — 훅이 기대 큐에 넣어 두고 그 popstate는 규칙에 태우지 않는다
- *   (아래 takeExpectedArrival). 페이지를 나가는 go(⑥)는 도착 popstate가 없으니 `goArrivesAt`이 없다
+ *   (아래 takeExpectedArrival)
  */
 export interface PopstatePlan {
   entryStep?: ApplyStep;
@@ -84,9 +84,17 @@ export function resolvePopstate(entry: ApplyStep | null, current: ApplyStep, loc
   if (entry === current) return { entryStep: entry };
   // ④ 앞으로가기, 또는 새로고침 뒤 남은 옛 항목 — 되돌린다. 앞 단계로 건너뛰는 건 reducer도 막는다
   if (entry > current) return { go: current - entry, goArrivesAt: current };
-  // ⑥ 접수 완료(6)는 종착 — 되돌아가 「신청하기」를 또 누르면 중복 접수다. 새 신청으로 비우고 단계 수만큼 걷어 /apply 앞(랜딩)으로 나간다.
-  //    reset을 먼저 하는 이유: 항목 수가 어긋나 페이지 안에 남더라도 빈 1단계(새 멱등 키)여야 한다
-  if (current === DONE_STEP) return { entryStep: 1, action: { type: 'reset' }, go: -entry };
+  // ⑥ 접수 완료(6)는 종착 — 되돌아가 「신청하기」를 또 누르면 중복 접수다. 새 신청으로 비우고(reset) 항목 [1]까지 걷어 빈 1단계에 선다.
+  //    랜딩으로 나가는 길은 「홈으로」(StepDone)다. 처음엔 go(-e)로 /apply 앞 항목(랜딩)까지 나가려 했는데, DM 링크를 새 탭·인앱
+  //    브라우저로 열면 /apply가 탭의 첫 항목이라 그 항목이 없고 go가 조용히 무시됐다(AI 리뷰 P3). [1]은 우리가 쌓은 항목이라 어떤 진입이든 있다
+  if (current === DONE_STEP) {
+    const plan: PopstatePlan = { entryStep: 1, action: { type: 'reset' } };
+    if (entry > 1) {
+      plan.go = 1 - entry;
+      plan.goArrivesAt = 1;
+    }
+    return plan;
+  }
   // ⑤ 뒤로 — 그 단계로. prev가 아니라 goto라 두 항목을 한 번에 건너뛴 경우도 맞다
   return { entryStep: entry, action: { type: 'goto', step: entry } };
 }

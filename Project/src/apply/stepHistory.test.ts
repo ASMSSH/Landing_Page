@@ -49,16 +49,18 @@ test('popstate ⑤ 뒤로는 그 단계로 goto — 두 항목을 건너뛰어�
   assert.deepEqual(resolvePopstate(1, 4, false), { entryStep: 1, action: { type: 'goto', step: 1 } });
 });
 
-test('popstate ⑥ 접수 완료에서 뒤로가기는 reset 후 단계 수만큼 걷어 나간다', () => {
-  assert.deepEqual(resolvePopstate(5, 6, false), { entryStep: 1, action: { type: 'reset' }, go: -5 });
-  assert.deepEqual(resolvePopstate(1, 6, false), { entryStep: 1, action: { type: 'reset' }, go: -1 });
+test('popstate ⑥ 접수 완료에서 뒤로가기는 reset 후 항목 [1]까지 걷어 빈 1단계에 선다', () => {
+  assert.deepEqual(resolvePopstate(5, 6, false), { entryStep: 1, action: { type: 'reset' }, go: -4, goArrivesAt: 1 });
+  assert.deepEqual(resolvePopstate(2, 6, false), { entryStep: 1, action: { type: 'reset' }, go: -1, goArrivesAt: 1 });
+  // 이미 [1]에 도착했으면 go(0)을 부르지 않는다 — go(0)은 새로고침이다
+  assert.deepEqual(resolvePopstate(1, 6, false), { entryStep: 1, action: { type: 'reset' } });
 });
 
 test('popstate — 항목 단계를 기억하면 뒤이은 상태 변화가 push·go를 또 하지 않는다', () => {
   // 뒤로가기로 3→2: 훅이 entryStep=2를 먼저 기억하고 goto 2를 dispatch → 상태 2 → planStepChange(2, 2)는 없음
   const plan = resolvePopstate(2, 3, false);
   assert.equal(planStepChange(plan.entryStep!, 2), null);
-  // S6 뒤로가기: entryStep=1 기억 + reset → 상태 1 → planStepChange(1, 1)는 없음 (go(-e)는 popstate 계획이 이미 한다)
+  // S6 뒤로가기: entryStep=1 기억 + reset → 상태 1 → planStepChange(1, 1)는 없음 (go(1-e)는 popstate 계획이 이미 한다)
   const done = resolvePopstate(4, 6, false);
   assert.equal(planStepChange(done.entryStep!, 1), null);
 });
