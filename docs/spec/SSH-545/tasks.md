@@ -8,7 +8,8 @@
 - [x] `docs/spec/SSH-545/spec.md` — 배경(왜 「무료 이용 기간」인가 · 왜 `applyHref`가 순수 함수인가 · 왜 Footer 처리방침 · 왜 FAQ) · 범위 8절 · 범위 밖 · 검증
 - [x] `docs/spec/SSH-545/tasks.md`
 - [x] **커밋** `docs: SSH-545 spec·tasks 작성`
-- [ ] **Draft PR 생성** — `랜딩 CTA 통일·구 기능 제거 + /apply 트래킹 5개(SSH-545)`, base `dev`
+- [x] **Draft PR 생성** — #39 `랜딩 CTA 통일·구 기능 제거 + /apply 트래킹 5개(SSH-545)`, base `dev`.
+      2026-09-12 사용자가 「545 부분도 구현해줘」로 Draft 직후 구현까지 요청 — SSH-553과 같이 1차 리뷰 없이 아래 1~5를 같은 브랜치에서 잇는다
 
 ## 1. `applyHref` — spec 1절
 
