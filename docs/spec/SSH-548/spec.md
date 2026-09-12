@@ -65,7 +65,7 @@ Figma 1440×900 데모도 그렇게 맞췄다.
 ```css
 .apply-actions {
   position: sticky; bottom: 0; z-index: 10;              /* 카드(0)·토스트(50) 사이 */
-  padding: 8px 0 12px; margin-bottom: -12px;             /* Figma 행 57 = 8 + 49. 붙었을 때 배경이 버튼 아래까지 덮게 */
+  padding: 8px 0 12px;                                   /* Figma 행 57 = 8 + 49. 아래 12는 붙었을 때 배경이 버튼 아래까지 덮게 */
   background: color-mix(in srgb, var(--bg-app) 82%, transparent);
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
 }
@@ -83,12 +83,10 @@ Figma 1440×900 데모도 그렇게 맞췄다.
   :root { --apply-bar-h: 72px; }                         /* 10 + 48(주 버튼) + 10 + 안전 여백 */
   .apply-actions {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;   /* 토스트 50 · 다이얼로그 60 아래 */
-    margin: 0; padding: 10px 32px calc(10px + env(safe-area-inset-bottom));
-    border-top: 1px solid var(--border);
-    background: color-mix(in srgb, var(--bg-app) 82%, transparent); backdrop-filter: blur(12px);
+    padding: 10px 32px calc(10px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);                 /* 배경·블러는 1절 규칙이 그대로 남는다 */
   }
-  .apply-page:has(.apply-actions) .apply-container { padding-bottom: calc(var(--apply-bar-h) + 24px); }
-  .apply-page:has(.apply-actions) .apply-foot { padding-bottom: calc(var(--apply-bar-h) + 16px); }
+  .apply-page:has(.apply-actions) .apply-foot { padding-bottom: calc(var(--apply-bar-h) + 16px); }   /* 페이지 끝은 푸터라 여기만 올리면 된다 */
   .apply-page:has(.apply-actions) .apply-toast { bottom: calc(var(--apply-bar-h) + 16px); }
   html:has(.apply-actions) { scroll-padding-bottom: var(--apply-bar-h); }
 }
@@ -153,7 +151,7 @@ useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [state.st
 - [x] 390: 토스트 computed bottom 82px(바 65 + 16, 바 위) · 동의 전문 시트 backdrop z 60이 바(z 40) 위를 덮음. 1440은 바 z 10
 - [x] S5 전송 실패 상태에서 바 안 「← 이전」·「신청하기」 그대로 · 전송 중 비활성은 SSH-486 코드 그대로(이번 변경 없음)
 - [x] 콘솔 에러 없음
-- [ ] Vercel 프리뷰(새로고침 포함)
+- [x] Vercel 프리뷰(새로고침 포함): 390 고정 바 779~844 · S1→S2 뒤 scrollY 0 · 새로고침 뒤 1단계 정상 · 1440 sticky 832~900 · 콘솔 에러 없음
 - [x] 스크린샷 S1 첫 화면 `apply-actions-1440.png` · `apply-actions-768.png` · `apply-actions-390.png`
 - [ ] 모바일 실기기(iOS Safari·Android Chrome) 키보드 올라올 때 바·포커스 칸 — **미확인**(실기기 없음)
 

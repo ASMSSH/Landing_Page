@@ -29,7 +29,7 @@
 
 - [x] `npm run build` · `npm run lint` · `npm test`
 - [x] 로컬 동선(headless Chromium) 1440 · 768 · 390 — spec 「검증」 항목
-- [ ] Vercel 프리뷰
+- [x] Vercel 프리뷰
 - [x] 스크린샷 S1 1440 · 768 · 390 → `docs/spec/SSH-548/apply-actions-*.png`
 - [x] **커밋** `docs: SSH-548 검증 기록·스크린샷`
 
