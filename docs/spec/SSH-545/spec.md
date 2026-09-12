@@ -112,7 +112,8 @@ export function applyHref(refCode: string | null): string
 - 주석 정리(코드 변경 없음): `server/documents.ts`·`server/claims.ts`·`src/lib/claimDocuments.ts`·`src/lib/claimType.ts`의 "`server/notion.ts`와 같은 패턴"·"resultDocs는 SSH-545에서" 같은 **사라진 파일을 가리키는 문장**만 고친다
 - `src/index.css` — `/* ---------- Second CTA ---------- */` 블록의 `.mvp-strip`·`.signup-*`·`.field-row`·`.field*`·`.otp-*`·`.privacy`,
   `/* ---------- MVP Modal ---------- */`부터 `.mbtn` 블록 끝까지, 반응형의 `.signup-box`·`.field-row`·`.field-2`·`.insurer-grid`·모달 블록 전부 삭제.
-  `.field` 계열도 랜딩에서 쓰는 곳이 없어진다(`/apply`는 `.apply-field`·`.apply-input`을 쓴다) — 같이 지운다. `@keyframes pop`·`spin`도 사용처가 없어져 삭제.
+  **`.field`·`.field::placeholder`·`.field:focus`·`.field:disabled`는 남긴다** — `/apply`의 `TreatmentForm`·`ApplicantForm`·`StepInsurance`가 `className="field"`로 쓰고 `apply.css`가 그 위에 높이·오류 보더를 덧씌운다(`CLAUDE.md` 공용 클래스). 사전 알림 폼 전용 `.field-row`·`select.field`와 모달의 `.field-block`·`.field-2`·`.field-hint`만 지운다. `@keyframes pop`·`spin`도 사용처가 없어져 삭제.
+  (처음 커밋에서 `.field` 본체까지 지웠다가 `/apply` 입력 스타일이 빠진 것을 AI 리뷰 반영 중 발견해 되살렸다 — 아래 검증 참고)
   **랜딩 섹션 클래스는 손대지 않는다**(원래 안 쓰이던 `.p-card`·`.pill` 등도 이 티켓 범위가 아니다)
 
 ### 4. `/apply` 트래킹 5개 — 위키 ⑨
@@ -183,7 +184,7 @@ export function applyHref(refCode: string | null): string
 
 ## 검증
 
-2차 AI 리뷰(2026-09-12, 1회): P1·P2 없음. P3 — `CLAUDE.md` 공용 클래스 표기에서 `.field` 제거(반영). P4 — 위 한 문장에 640↓ CTA 노출 주석(반영).
+2차 AI 리뷰(2026-09-12, 1회): P1·P2 없음. P3 — `CLAUDE.md` 공용 클래스 표기에서 `.field` 제거 → **반영하지 않음**: 확인해 보니 `/apply` 폼이 `.field`를 쓰고 있어 CSS를 되살리고 `CLAUDE.md`는 그대로 둔다(PR Point 6번 정정). P4 — 위 한 문장에 640↓ CTA 노출 주석(반영).
 
 - [x] `npm run build` · `npm run lint` · `npm test` (route 3건 추가, claimType 1건 삭제 — 95건)
 - [x] `grep -rn "mvp\|otp\|subscribe\|tesseract\|사전 신청\|체험해보기\|베타" src api server index.html` — 0건(주석·역사 서술 제외)

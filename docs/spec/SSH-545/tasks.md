@@ -29,7 +29,7 @@
 - [x] `git rm` — `src/mvp/` · `components/OtpPanel.tsx` · `components/SignupCta.tsx`(2절 커밋에서) · `lib/useOtp.ts` · `lib/ocrFields.ts` · `lib/receiptSVG.ts` · `data/examples.ts` · `data/resultDocs.ts` · `App.css` · `api/subscribe.ts` · `api/request-otp.ts` · `api/verify-otp.ts` · `server/notion.ts` · `server/otp.ts`
 - [x] `vite.config.ts` `subscribeApi`·`otpApi` 삭제 · `npm uninstall tesseract.js` · `.env.example` 3개 삭제
 - [x] `src/lib/claimType.ts` `inferClaimType` + 테스트 삭제 · `analytics.ts` `mvp_modal` 분기 · 주석 정리(`claimDocuments.ts`·`server/documents.ts`·`server/claims.ts`)
-- [x] `src/index.css` 모달·OTP·폼·`.field` 블록 삭제 (반응형 포함)
+- [x] `src/index.css` 모달·OTP·폼 블록 삭제 (반응형 포함). `.field` 본체는 `/apply`가 써서 남긴다(되살림)
 - [x] **커밋** `chore: 체험 모달·OTP·사전 알림 서버리스와 tesseract 의존성 제거`
 
 ## 4. `/apply` 트래킹 5개 — spec 4절
@@ -56,7 +56,7 @@
 
 ## 8. 마무리
 
-- [x] PR 본문 갱신(`/pr`) → `/pr-review` 별도 서브에이전트 → 1회 등록(P1·P2 없음. P3 1건: `CLAUDE.md` 「웹 스택 규칙」이 지운 `.field`를 공용 클래스로 적어 둠 → 반영. P4 1건: spec 한 문장에 640↓ Nav·Footer CTA 숨김 주석 → 반영). 두 번째 리뷰 등록 전엔 사람 확인
+- [x] PR 본문 갱신(`/pr`) → `/pr-review` 별도 서브에이전트 → 1회 등록(P1·P2 없음. P3 1건: `CLAUDE.md` 「웹 스택 규칙」이 지운 `.field`를 공용 클래스로 적어 둠 → 확인 결과 `/apply` 폼이 `.field`를 쓰고 있었다. CSS를 되살리고(`fix:` 커밋) `CLAUDE.md`는 원래대로. P4 1건: spec 한 문장에 640↓ Nav·Footer CTA 숨김 주석 → 반영). 두 번째 리뷰 등록 전엔 사람 확인
 - [ ] 사람 몫(spec 6절)을 보고 — 프리뷰 3명 신청 확인 · Vercel env 3개 삭제 · Ready 전환 · Jira 검토 중 · 머지 · `dev → main` · 홍보 링크 교체
 
 ## 하지 않는 것

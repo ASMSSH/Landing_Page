@@ -95,8 +95,7 @@ CI(`web-ci.yml`)는 위 `lint` · `build` · `test`를 **같은 명령으로** �
 
 - **라우터 라이브러리를 쓰지 않는다.** 페이지는 `/`와 `/apply` 둘이고 `src/lib/route.ts`의 `pathname` 분기로 가른다.
   단계(S1~S6)는 `/apply` 안의 상태이지 URL이 아니다
-- **스타일** — `src/index.css`의 토큰(`--primary-500`, `--radius-md` …)·공용 클래스(`.wrap` `.btn`)를 재사용한다. 폼 입력은 `src/styles/apply.css`의
-  `.apply-field`·`.apply-input`(랜딩의 `.field`는 사전 알림 폼과 함께 SSH-545에서 지웠다).
+- **스타일** — `src/index.css`의 토큰(`--primary-500`, `--radius-md` …)·공용 클래스(`.wrap` `.btn` `.field`)를 재사용한다.
   기능 전용 CSS는 별도 파일(`src/styles/<기능>.css`)에 **접두사 클래스**(`apply-…`)로. 색·간격을 하드코딩하지 않는다
 - **상태** — 순수 reducer(`src/apply/state.ts` 패턴, React 의존 없음) + Context Provider. 순수 함수는 `node:test`로 테스트한다.
   테스트 파일(`*.test.ts`)은 `tsconfig.app.json`에서 빼고 `tsconfig.node.json`에 넣는다 — `tsc -b`가 타입 검사한다
