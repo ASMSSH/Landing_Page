@@ -199,9 +199,7 @@ function initClickCapture(): void {
       const section = el.closest('section[id]');
       props.section = section
         ? section.id
-        : el.closest('.modal')
-          ? 'mvp_modal'
-          : el.closest('header')
+        : el.closest('header')
             ? 'nav'
             : el.closest('footer')
               ? 'footer'

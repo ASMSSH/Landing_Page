@@ -1,14 +1,15 @@
-import { useMvp } from '../mvp/MvpContext';
-import { track } from '../lib/analytics';
-import { APPLY_PATH } from '../lib/route';
+import { getRefCode, track } from '../lib/analytics';
+import { applyHref } from '../lib/route';
+
+// 랜딩 Hero — Figma 「Hero Copy」. CTA는 「무료로 청구 맡기기」 하나뿐이다 (체험 모달 버튼은 SSH-545에서 모달과 함께 제거).
+// 문안의 「무료 이용 기간」은 /apply 헤더와 같은 표현 — 「베타」는 SSH-553에서 뺐다.
 
 export default function Hero() {
-  const { open } = useMvp();
   return (
     <section className="hero">
       <div className="wrap hero-inner">
         <div className="hero-copy">
-          <span className="eyebrow">🐾 출시 준비 중 — 사전 알림 신청받아요</span>
+          <span className="eyebrow">🐾 무료 이용 기간 · 병원 서류는 저희가 대신 받아요</span>
           <h1>
             복잡한 펫보험 청구,
             <br />
@@ -16,10 +17,9 @@ export default function Hero() {
           </h1>
           <p className="sub">영수증 한 장만 올리면, 서류 준비부터 보험금 청구까지 알아서 끝내드려요.</p>
           <div className="cta-row">
-            <a href={APPLY_PATH} className="btn btn-primary" onClick={() => track('cta_click', { cta: 'hero_apply' })}>무료로 청구 맡기기 🐾</a>
-            <button className="btn btn-sage" onClick={() => { track('cta_click', { cta: 'hero_try' }); open(); }}>체험해보기 🐾</button>
+            <a href={applyHref(getRefCode())} className="btn btn-primary" onClick={() => track('cta_click', { cta: 'hero_apply' })}>무료로 청구 맡기기 🐾</a>
           </div>
-          <p className="hero-note">🐶 출시되면 가장 먼저 알려드려요 · 출시 전 청구 대행도 무료로 체험 가능</p>
+          <p className="hero-note">🐶 로그인 없이 5분이면 끝나요 · 신청하면 24시간 안에 담당자가 연락드려요</p>
         </div>
 
         <div className="app-mock">

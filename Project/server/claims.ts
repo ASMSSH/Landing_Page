@@ -1,5 +1,5 @@
 // 대리청구 신청 접수 핸들러 — 서버 전용 (브라우저에서 import 금지).
-// Vite dev 미들웨어(vite.config.ts)와 Vercel 서버리스(api/claims.ts)가 같이 쓴다. server/notion.ts와 같은 모양.
+// Vite dev 미들웨어(vite.config.ts)와 Vercel 서버리스(api/claims.ts)가 같이 쓴다. server/documents.ts와 같은 모양.
 //
 // 흐름: 입력 검증 → (멱등 키로 기존 행 갱신) → 접수번호 BGN-YYMMDD-NN → Supabase insert → 슬랙 1통 → { ok, receipt_no }
 //
