@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Nav from '../components/Nav';
 import { ApplyProvider, useApply } from './ApplyContext';
 import ApplyHeader from './ApplyHeader';
@@ -27,6 +28,12 @@ function StepBody({ step }: { step: ApplyStep }) {
 function ApplyShell() {
   useApplyMeta();
   const { state } = useApply();
+  // 단계가 바뀌면 스크롤을 맨 위로 — 「다음」·「← 이전」·프로그레스·브라우저 뒤로가기(SSH-547) 전부 state.step을 바꾸므로 여기 한 곳이면 된다.
+  // 검증 실패로 단계가 안 바뀌면 스크롤도 안 움직인다(오류 칸이 보이는 자리 유지). 없으면 이전 단계의 스크롤 위치가 남아
+  // 모바일에선 다음 단계 첫 화면이 헤딩 대신 액션 행·요약 카드였다 (SSH-548)
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [state.step]);
   return (
     <div className="apply-page">
       <Nav variant="apply" />
