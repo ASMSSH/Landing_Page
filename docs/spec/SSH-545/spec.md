@@ -5,6 +5,7 @@
 프리뷰 3명 신청 확인 → `dev → main` 머지 → 프로덕션 확인 → 홍보 링크 교체는 **사람이 한다**(이 PR은 그 직전까지).
 
 > **이 PR이 남기는 것 한 문장**: `/?r=test`로 들어온 랜딩에서 Nav·Hero·Features·하단 CTA·Footer의 버튼이 전부 `/apply?r=test`로 가고,
+> (640↓에서는 Nav·Footer CTA가 기존 반응형 규칙대로 숨어 Hero·Features·하단 CTA 셋만 보인다)
 > 랜딩 어디에도 사전 신청 폼·전화번호 인증·「체험해보기」가 없으며, `/apply`를 끝까지 진행하면 Supabase `events`에
 > `apply_step`(1~6)·`apply_ocr`·`apply_docs`·`apply_submit`·`apply_done`이 한 세션으로 남는다.
 
@@ -181,6 +182,8 @@ export function applyHref(refCode: string | null): string
 | 유저 로깅 전반(SSH-475) | 백로그 |
 
 ## 검증
+
+2차 AI 리뷰(2026-09-12, 1회): P1·P2 없음. P3 — `CLAUDE.md` 공용 클래스 표기에서 `.field` 제거(반영). P4 — 위 한 문장에 640↓ CTA 노출 주석(반영).
 
 - [x] `npm run build` · `npm run lint` · `npm test` (route 3건 추가, claimType 1건 삭제 — 95건)
 - [x] `grep -rn "mvp\|otp\|subscribe\|tesseract\|사전 신청\|체험해보기\|베타" src api server index.html` — 0건(주석·역사 서술 제외)
