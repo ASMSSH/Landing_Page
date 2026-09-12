@@ -60,7 +60,12 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
 .apply-help-list a { color:var(--success-700); font-weight:700; text-decoration:underline; text-underline-offset:2px; }
 
 /* ---------- Actions ---------- */
-.apply-actions { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+/* SSH-548: 각 단계가 .apply-main의 마지막 자식으로 렌더하므로, 본문이 뷰포트를 넘칠 때만 열 안에서 화면 아래에 붙는다(sticky).
+   짧은 단계는 흐름 자리 그대로다. 배경은 Nav와 같은 레시피(크림 82% + 블러) — 붙어서 본문 위를 지날 때만 보인다.
+   768 이하 1열은 아래 미디어 쿼리가 화면 아래 고정 바로 덮어쓴다 */
+.apply-actions { display:flex; align-items:center; justify-content:space-between; gap:16px;
+  position:sticky; bottom:0; z-index:10; padding:8px 0 12px;
+  background:color-mix(in srgb, var(--bg-app) 82%, transparent); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
 .apply-step-count { font-size:15px; color:var(--text-secondary); }
 .apply-actions-btns { display:flex; align-items:center; gap:12px; flex-shrink:0; }
 .apply-actions-btns .btn { width:auto; white-space:nowrap; flex-shrink:0; }
