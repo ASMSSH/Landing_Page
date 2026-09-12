@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 
 const APPLY_META = {
   title: '대리청구 신청 · 보험찾개냥',
-  description: '영수증 한 장으로 펫보험 청구를 맡기세요. 베타 기간 무료, 로그인 없이 5분.',
+  description: '영수증 한 장으로 펫보험 청구를 맡기세요. 무료 이용 기간, 로그인 없이 5분.',
   url: 'https://www.boheomgaenyang.com/apply',
 };
 

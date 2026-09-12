@@ -1,4 +1,4 @@
-/* /apply 셸 전용 스타일. 토큰·.wrap·.btn·.field·.beta-badge는 index.css 것을 그대로 쓴다.
+/* /apply 셸 전용 스타일. 토큰·.wrap·.btn·.field는 index.css 것을 그대로 쓴다.
    레이아웃 규칙은 Figma 반응형 데모(1640-1327):
    컨테이너 max 1040, 좌우 여백 최소 32 · ≤1024 메인 축소(레일 328 유지) · ≤768 1열 · ≤480 모바일 압축 */
 
@@ -14,7 +14,6 @@
 .apply-head-copy { display:flex; flex-direction:column; gap:4px; }
 .apply-title { font-size:26px; line-height:1.2; color:var(--text-primary); }
 .apply-subtitle { font-size:15px; color:var(--text-secondary); }
-.apply-beta { margin-top:16px; font-size:11px; padding:4px 10px; }
 
 /* ---------- Progress ---------- */
 .apply-progress { list-style:none; margin:0; padding:0; display:flex; align-items:center; }
@@ -184,11 +183,11 @@ html:has(.apply-actions) { scroll-padding-bottom:var(--apply-bar-h); }
 .apply-docs-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--neutral-0); }
 .apply-docs-row-name { font-size:14px; font-weight:600; line-height:1.4; color:var(--text-primary); overflow-wrap:anywhere; }
 .apply-docs-empty { padding:14px 18px; font-size:14px; color:var(--text-tertiary); border:1px dashed var(--border); border-radius:var(--radius-sm); }
-/* 베타 무료 카드 — 앰버 */
-.apply-docs-beta { display:flex; align-items:flex-start; gap:12px; padding:16px 20px; border-radius:var(--radius-sm); background:var(--secondary-50); border:1px solid var(--secondary-100); }
-.apply-docs-beta-icon { font-size:20px; line-height:1.2; flex-shrink:0; }
-.apply-docs-beta-title { margin:0 0 4px; font-size:15px; font-weight:700; color:var(--text-primary); }
-.apply-docs-beta-sub { margin:0; font-size:13px; line-height:1.5; color:var(--text-secondary); }
+/* 프로모션 무료 카드 — 앰버 */
+.apply-docs-promo { display:flex; align-items:flex-start; gap:12px; padding:16px 20px; border-radius:var(--radius-sm); background:var(--secondary-50); border:1px solid var(--secondary-100); }
+.apply-docs-promo-icon { font-size:20px; line-height:1.2; flex-shrink:0; }
+.apply-docs-promo-title { margin:0 0 4px; font-size:15px; font-weight:700; color:var(--text-primary); }
+.apply-docs-promo-sub { margin:0; font-size:13px; line-height:1.5; color:var(--text-secondary); }
 
 /* ---------- S5: 동의 (SSH-486) ---------- */
 /* 마스터 행 — Figma S5 「모두 동의합니다」. 코랄 테두리, 체크되면 연코랄 배경 */
@@ -209,7 +208,7 @@ html:has(.apply-actions) { scroll-padding-bottom:var(--apply-bar-h); }
 .apply-consent-check:checked { background:var(--primary-500); border-color:var(--primary-500); }
 .apply-consent-check:checked::after { opacity:1; }
 .apply-consent-check:focus-visible { outline:2px solid var(--primary-300); outline-offset:2px; }
-.apply-consent-beta { margin:0; font-size:13px; line-height:1.55; color:var(--text-tertiary); }
+.apply-consent-note { margin:0; font-size:13px; line-height:1.55; color:var(--text-tertiary); }
 /* 전송 실패 배너 — Figma 없음(spec 결정 6). S3 담당자 안내 배너와 같은 앰버 톤 */
 .apply-consent-error { display:flex; flex-direction:column; gap:6px; padding:16px 20px; border-radius:var(--radius-sm); background:var(--secondary-50); border:1px solid var(--secondary-100); }
 .apply-consent-error-title { margin:0; font-size:15px; font-weight:700; color:var(--text-primary); }
@@ -297,7 +296,6 @@ html:has(.apply-actions) { scroll-padding-bottom:var(--apply-bar-h); }
   .apply-actions { padding-left:18px; padding-right:18px; }
   .apply-container { padding:24px 18px 36px; gap:22px; }
   .apply-title { font-size:22px; }
-  .apply-beta { margin-top:8px; }
   /* 프로그레스 압축 — 원 22px, 현재 단계 라벨만 (모바일 시안 1544-658) */
   .apply-step-line { margin:0 6px; }
   .apply-step-circle { width:22px; height:22px; font-size:12px; }

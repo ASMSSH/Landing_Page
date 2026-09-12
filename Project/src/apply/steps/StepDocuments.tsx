@@ -117,13 +117,13 @@ function DocsList({ snapshot }: { snapshot: RequiredDocsSnapshot }) {
   );
 }
 
-function DocsBetaCard() {
+function DocsPromoCard() {
   return (
-    <div className="apply-docs-beta">
-      <span className="apply-docs-beta-icon" aria-hidden="true">🎁</span>
+    <div className="apply-docs-promo">
+      <span className="apply-docs-promo-icon" aria-hidden="true">🎁</span>
       <div>
-        <p className="apply-docs-beta-title">베타 기간엔 대리 청구가 무료예요</p>
-        <p className="apply-docs-beta-sub">서류 발급부터 보험사 제출까지 담당자가 대신해요. 사본은 나중에 따로 받아요.</p>
+        <p className="apply-docs-promo-title">지금은 무료 프로모션 기간이에요</p>
+        <p className="apply-docs-promo-sub">대리 청구 비용 없이 서류 발급부터 보험사 제출까지 담당자가 대신해요. 사본은 나중에 따로 받아요.</p>
       </div>
     </div>
   );
@@ -169,7 +169,7 @@ export default function StepDocuments() {
         <>
           <DocsSummary snapshot={snapshot} onRetry={retry} />
           <DocsList snapshot={snapshot} />
-          <DocsBetaCard />
+          <DocsPromoCard />
         </>
       ) : (
         <>
