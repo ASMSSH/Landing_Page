@@ -92,9 +92,11 @@
 ```ts
 useEffect(() => {
   const block = (e: DragEvent) => {
-    if (e.defaultPrevented) return;          // 카드가 이미 받은 이벤트는 건드리지 않는다
+    // 카드가 이미 받은 이벤트는 건드리지 않는다. 파일 드래그(Files)만 막는다 — 텍스트·링크 드래그까지 막으면
+    // 폼 input에 텍스트를 끌어다 놓는 브라우저 기본 동작이 깨진다 (AI 리뷰 P3 반영)
+    if (e.defaultPrevented || !e.dataTransfer || !Array.from(e.dataTransfer.types).includes('Files')) return;
     e.preventDefault();
-    if (e.dataTransfer) e.dataTransfer.dropEffect = 'none';   // 카드 밖에서는 「놓을 수 없음」 커서
+    e.dataTransfer.dropEffect = 'none';      // 카드 밖에서는 「놓을 수 없음」 커서
   };
   window.addEventListener('dragover', block);
   window.addEventListener('drop', block);
@@ -104,6 +106,7 @@ useEffect(() => {
 
 - `ApplyShell`은 `/apply`에서만 마운트되므로 랜딩(`/`)에는 영향이 없다(티켓 "window 레벨은 `/apply`에서만")
 - 카드 핸들러가 `preventDefault`한 이벤트는 버블링으로 `window`까지 오지만 `defaultPrevented`라 건너뛴다 — 카드 위 `copy` 커서가 유지된다
+- **`Files` 드래그만 막는다** — AI 리뷰 P3(2026-09-12): 처음 구현은 드래그 종류를 가리지 않아 폼 `<input>`에 텍스트를 끌어다 놓는 브라우저 기본 동작이 깨졌다. 카드의 `hasFiles`와 같은 기준으로 맞췄다(2038618)
 
 ### 3. `/apply` 「베타」 제거 — 문구·클래스
 
