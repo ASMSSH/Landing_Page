@@ -12,35 +12,35 @@
 
 ## 1. 업로드 카드 드롭 영역 — spec 1절
 
-- [ ] `src/apply/steps/ReceiptUploadCard.tsx` — `onDrop` prop · 드래그 카운터(`useRef`) · `is-dragover` 클래스 · 「여기에 놓으세요」 문안 · `loading`이면 무시
-- [ ] `src/apply/steps/StepTreatment.tsx` — `onDrop={(file) => void handleFile(file)}`
-- [ ] `src/styles/apply.css` — `.apply-upload.is-dragover`
-- [ ] **커밋** `feat: /apply S1 업로드 카드에 영수증 사진을 끌어다 놓으면 파일 선택과 같은 경로로 읽기`
+- [x] `src/apply/steps/ReceiptUploadCard.tsx` — `onDrop` prop · 드래그 카운터(`useRef`) · `is-dragover` 클래스 · 「여기에 놓으세요」 문안 · `loading`이면 무시
+- [x] `src/apply/steps/StepTreatment.tsx` — `onDrop={(file) => void handleFile(file)}`
+- [x] `src/styles/apply.css` — `.apply-upload.is-dragover`
+- [x] **커밋** `feat: /apply S1 업로드 카드에 영수증 사진을 끌어다 놓으면 파일 선택과 같은 경로로 읽기`
 
 ## 2. 카드 밖 드롭 차단 — spec 2절
 
-- [ ] `src/apply/ApplyPage.tsx` — `ApplyShell`에 window `dragover`/`drop` 차단 효과(`defaultPrevented`면 통과)
-- [ ] **커밋** `feat: /apply 카드 밖에 사진을 놓아도 브라우저가 이미지를 열지 않게`
+- [x] `src/apply/ApplyPage.tsx` — `ApplyShell`에 window `dragover`/`drop` 차단 효과(`defaultPrevented`면 통과)
+- [x] **커밋** `feat: /apply 카드 밖에 사진을 놓아도 브라우저가 이미지를 열지 않게`
 
 ## 3. `/apply` 「베타」 제거 — spec 3절
 
-- [ ] `ApplyHeader.tsx` 부제·배지 · `ApplyFooter.tsx` · `ApplyRail.tsx` · `useApplyMeta.ts`
-- [ ] `steps/StepDocuments.tsx` `DocsPromoCard`·`apply-docs-promo*` · `steps/StepConsent.tsx` `apply-consent-note` · `steps/ConsentDialog.tsx`
-- [ ] `consents.ts` 주석 · `src/styles/apply.css`(`.apply-beta` 삭제 · 클래스 개명 · 1행 주석)
-- [ ] **커밋** `fix: /apply 「베타」 문구·BETA 배지를 무료 이용 기간·프로모션 안내로 교체`
+- [x] `ApplyHeader.tsx` 부제·배지 · `ApplyFooter.tsx` · `ApplyRail.tsx` · `useApplyMeta.ts`
+- [x] `steps/StepDocuments.tsx` `DocsPromoCard`·`apply-docs-promo*` · `steps/StepConsent.tsx` `apply-consent-note` · `steps/ConsentDialog.tsx`
+- [x] `consents.ts` 주석 · `src/styles/apply.css`(`.apply-beta` 삭제 · 클래스 개명 · 1행 주석)
+- [x] **커밋** `fix: /apply 「베타」 문구·BETA 배지를 무료 이용 기간·프로모션 안내로 교체`
 
 ## 4. 랜딩 `BETA` 배지 제거 — spec 4절
 
-- [ ] `src/mvp/MvpModal.tsx` 배지 한 줄 삭제 · `src/index.css` `.beta-badge` 삭제
-- [ ] **커밋** `fix: 랜딩 체험 모달의 BETA 배지 제거`
+- [x] `src/mvp/MvpModal.tsx` 배지 한 줄 삭제 · `src/index.css` `.beta-badge` 삭제
+- [x] **커밋** `fix: 랜딩 체험 모달의 BETA 배지 제거`
 
 ## 5. 검증 — spec 「검증」
 
-- [ ] `npm run build` · `npm run lint` · `npm test`
-- [ ] 로컬 동선(headless Chromium) — 드롭 성공·거부·카드 밖·`done` 재드롭 · 「베타」 grep 0
+- [x] `npm run build` · `npm run lint` · `npm test`
+- [x] 로컬 동선(headless Chromium) — 드롭 성공·거부·카드 밖·`done` 재드롭 · 「베타」 grep 0
 - [ ] Vercel 프리뷰
-- [ ] 스크린샷 S1 1440 · 768 · 390 + 1440 드래그 강조 → `docs/spec/SSH-553/apply-s1-*.png`
-- [ ] **커밋** `docs: SSH-553 검증 기록·스크린샷`
+- [x] 스크린샷 S1 1440 · 768 · 390 + 1440 드래그 강조 → `docs/spec/SSH-553/apply-s1-*.png`
+- [x] **커밋** `docs: SSH-553 검증 기록·스크린샷`
 
 ## 6. Figma 시안 동기화 — spec 5절
 

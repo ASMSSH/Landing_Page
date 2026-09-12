@@ -158,14 +158,17 @@ useEffect(() => {
 
 ## 검증
 
-- [ ] `npm run build` · `npm run lint` · `npm test`
-- [ ] 로컬 1440 — S1 카드에 JPG 드롭 → `is-dragover` 강조 → 「읽는 중」 → 폼 채워짐(「파일 선택」과 같은 결과). 자식 요소(버튼·문안) 위를
+- [x] `npm run build` · `npm run lint` · `npm test` (93건, 2026-09-12)
+- [x] 로컬 1440 — S1 카드에 JPG 드롭 → `is-dragover` 강조 → 「읽는 중」 → 폼 채워짐(「파일 선택」과 같은 결과). 자식 요소(버튼·문안) 위를
       지나도 강조가 깜빡이지 않음. 카드 밖(폼·레일)에 놓으면 아무 일 없음(새 탭 안 열림). `.txt` 드롭 → 「JPG·PNG·WEBP·HEIC 사진만 올릴 수 있어요」
       토스트. 「읽었어요」 상태에서 다시 드롭 → 새 사진으로 교체. 텍스트 드래그는 강조 없음
-- [ ] `grep -rni "베타\|beta" Project/src Project/index.html` → 주석의 「SSH-553에서 뺐다」 한 줄만
-- [ ] 랜딩 `/` 체험 모달 헤더에 배지 없음 · `/apply` 헤더·S3·S5·동의 모달·푸터에 「베타」 없음
+      — headless Chromium에서 합성 `DragEvent`+`DataTransfer`로 재현(2026-09-12). `/api/analyze-receipt`는 `window.fetch` 스텁으로 응답을
+      고정해 폼(병원·진료일·진료비)·레일까지 채워지는 것을 확인. 카드 밖 `drop`은 `defaultPrevented=true`·`dropEffect=none`·URL 유지.
+      실제 마우스 드래그(OS 파일 → 브라우저)는 헤드리스로 못 한다 — 프리뷰에서 사람이 한 번 확인
+- [x] `grep -rni "베타\|beta" Project/src Project/index.html` → 주석의 「SSH-553에서 뺐다」 한 줄만
+- [x] 랜딩 `/` 체험 모달 헤더에 배지 없음 · `/apply` 헤더·S3·S5·동의 모달·푸터에 「베타」 없음(S1→S5 동선으로 확인)
 - [ ] Vercel 프리뷰 (새로고침 포함)
-- [ ] 스크린샷 S1 1440 · 768 · 390(첫 진입 모습 — 헤더에 배지 없음) + 1440 드래그 강조 상태 1장 → `docs/spec/SSH-553/`
+- [x] 스크린샷 S1 1440 · 768 · 390(첫 진입 모습 — 헤더에 배지 없음) + 1440 드래그 강조 상태 1장 → `docs/spec/SSH-553/apply-s1-*.png`
 - [ ] Figma 시안 5절
 
 ## 1차 리뷰 결정 (2026-09-12)
