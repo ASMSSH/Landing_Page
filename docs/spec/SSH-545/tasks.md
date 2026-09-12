@@ -17,6 +17,8 @@
 - [x] **커밋** `feat: 유입 코드를 붙인 /apply 링크 헬퍼 applyHref 추가`
 - [x] `route.ts#refCodeFromSearch` — `?r=` 없으면 `utm_source`를 유입 코드로 · `analytics.ts#getRefCode`가 사용 · 테스트 2건 (2026-09-13 사용자 요청: `/?utm_source=picket` 신청도 `picket`으로 남게)
 - [x] **커밋** `feat: ?r= 없이 utm_source만 있는 유입도 유입 코드로 저장`
+- [x] `analytics.ts#getRefCode`·`getUtm` — URL에 코드가 있으면 세션 저장값을 덮어쓴다(같은 탭 재진입 시 빈 값이 굳던 문제, 2026-09-13 프리뷰 확인)
+- [x] **커밋** `fix: URL에 유입 코드가 있으면 세션에 굳은 값보다 우선하게`
 
 ## 2. 랜딩 CTA 통일 — spec 2절
 

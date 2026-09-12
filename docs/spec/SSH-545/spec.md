@@ -83,6 +83,9 @@ export function applyHref(refCode: string | null): string
   `analytics.ts#getRefCode`가 첫 진입에 이 값을 sessionStorage에 넣으므로 `/?utm_source=picket`으로 들어온 세션은 `events.ref_code`·CTA 링크(`/apply?r=picket`)·
   `claims.ref_code`·슬랙 알림 「유입 코드」에 전부 `picket`이 남는다. 그 전엔 `?r=`만 코드였고 utm은 `events`의 `utm_*` 컬럼에만 있었다.
   테스트 2건 추가(`route.test.ts`)
+- **URL의 코드가 세션 저장값을 덮어쓴다(2026-09-13)**: 원래 `getRefCode`는 첫 진입 값을 세션 동안 고정했다. 같은 탭에서 코드 없이 한 번 열었다가
+  나중에 코드 링크로 들어오면 빈 값이 굳어 CTA·신청에 코드가 안 붙었다(프리뷰에서 확인). 지금 URL에 코드가 있으면 그것을 쓰고 저장하며,
+  없는 페이지(`/apply` 내부 이동)에서는 저장값을 쓴다. `getUtm`도 같은 규칙. 같은 탭에서 코드가 바뀌면 마지막 코드가 남는다
 
 ### 2. 랜딩 CTA 통일 — 파일별 문안
 
