@@ -79,6 +79,10 @@ export function applyHref(refCode: string | null): string
 - `refCode`가 `null`·빈 문자열·공백이면 `'/apply'`. 아니면 `'/apply?r=' + encodeURIComponent(code)`
 - `route.test.ts`에 3건 — 코드 없음 / 코드 있음 / 인코딩이 필요한 코드(`a b` → `a%20b`)
 - 호출: `Nav`·`Hero`·`Features`·`ApplyCta`·`Footer`가 `applyHref(getRefCode())`. `getRefCode`는 `analytics.ts`에 이미 있다
+- **`utm_source` 폴백(2026-09-13 추가, 사용자 요청)**: `route.ts#refCodeFromSearch(search)` — `?r=`이 있으면 그것, 없으면 `utm_source`, 둘 다 없으면 null(32자 컷).
+  `analytics.ts#getRefCode`가 첫 진입에 이 값을 sessionStorage에 넣으므로 `/?utm_source=picket`으로 들어온 세션은 `events.ref_code`·CTA 링크(`/apply?r=picket`)·
+  `claims.ref_code`·슬랙 알림 「유입 코드」에 전부 `picket`이 남는다. 그 전엔 `?r=`만 코드였고 utm은 `events`의 `utm_*` 컬럼에만 있었다.
+  테스트 2건 추가(`route.test.ts`)
 
 ### 2. 랜딩 CTA 통일 — 파일별 문안
 
@@ -159,7 +163,7 @@ export function applyHref(refCode: string | null): string
 
 | 변경 | 파일 | 왜 이 티켓에 필요한가 |
 | --- | --- | --- |
-| 수정 | `src/lib/route.ts` · `route.test.ts` | `applyHref` (1절) |
+| 수정 | `src/lib/route.ts` · `route.test.ts` · `src/lib/analytics.ts` | `applyHref`·`refCodeFromSearch`(utm_source 폴백) (1절) |
 | 수정 | `src/components/Nav.tsx` · `Hero.tsx` · `Features.tsx` · `Footer.tsx` · `src/data/faq.ts` · `index.html` | CTA 통일·문안 (2절) |
 | 신규/삭제 | `src/components/ApplyCta.tsx` / `SignupCta.tsx` | 사전 알림 폼 → Second CTA (2절) |
 | 수정 | `src/App.tsx` | `MvpProvider`·`MvpModal` 제거, `ApplyCta` 연결 (3절) |
