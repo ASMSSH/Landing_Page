@@ -32,7 +32,7 @@
 
 - [x] `npm run build` · `npm run lint` · `npm test`
 - [x] 로컬 동선 9건 (headless Chromium, S6는 `/api/claims` mock) — spec 「검증」
-- [ ] Vercel 프리뷰 동선
+- [x] Vercel 프리뷰 동선
 - [x] 스크린샷 S6 1440 · 768 · 390 → `docs/spec/SSH-547/apply-done-*.png`
 - [x] **커밋** `docs: SSH-547 검증 기록·스크린샷`
 
