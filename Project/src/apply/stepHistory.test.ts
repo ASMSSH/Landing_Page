@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { planStepChange, readEntryStep, resolvePopstate, toHistoryState } from './stepHistory.ts';
+import { planStepChange, readEntryStep, resolvePopstate, takeExpectedArrival, toHistoryState } from './stepHistory.ts';
+import type { ApplyStep } from './state.ts';
 
 test('readEntryStep은 우리가 넣은 항목만 단계로 읽는다', () => {
   assert.equal(readEntryStep(toHistoryState(3)), 3);
@@ -28,8 +29,8 @@ test('popstate ① 우리 항목이 아니면 무시한다 (동의 전문 항목
 });
 
 test('popstate ② 전송 중엔 되돌린다', () => {
-  assert.deepEqual(resolvePopstate(4, 5, true), { go: 1 });
-  assert.deepEqual(resolvePopstate(6, 5, true), { go: -1 });
+  assert.deepEqual(resolvePopstate(4, 5, true), { go: 1, goArrivesAt: 5 });
+  assert.deepEqual(resolvePopstate(6, 5, true), { go: -1, goArrivesAt: 5 });
   assert.deepEqual(resolvePopstate(5, 5, true), { entryStep: 5 });
 });
 
@@ -38,9 +39,9 @@ test('popstate ③ 같은 단계 항목은 항목 단계만 기억한다 (UI가 
 });
 
 test('popstate ④ 앞으로가기·옛 항목은 현재 단계 항목으로 되돌린다', () => {
-  assert.deepEqual(resolvePopstate(3, 2, false), { go: -1 });
-  assert.deepEqual(resolvePopstate(5, 1, false), { go: -4 });
-  assert.deepEqual(resolvePopstate(6, 5, false), { go: -1 });
+  assert.deepEqual(resolvePopstate(3, 2, false), { go: -1, goArrivesAt: 2 });
+  assert.deepEqual(resolvePopstate(5, 1, false), { go: -4, goArrivesAt: 1 });
+  assert.deepEqual(resolvePopstate(6, 5, false), { go: -1, goArrivesAt: 5 });
 });
 
 test('popstate ⑤ 뒤로는 그 단계로 goto — 두 항목을 건너뛰어도 맞다', () => {
@@ -60,4 +61,41 @@ test('popstate — 항목 단계를 기억하면 뒤이은 상태 변화가 push
   // S6 뒤로가기: entryStep=1 기억 + reset → 상태 1 → planStepChange(1, 1)는 없음 (go(-e)는 popstate 계획이 이미 한다)
   const done = resolvePopstate(4, 6, false);
   assert.equal(planStepChange(done.entryStep!, 1), null);
+});
+
+test('takeExpectedArrival — 우리가 건 go의 도착 popstate는 큐 머리와 맞으면 소비하고, 아니면 큐를 비운다', () => {
+  const queue: ApplyStep[] = [4, 3];
+  assert.equal(takeExpectedArrival(queue, 4), true);
+  assert.deepEqual(queue, [3]);
+  assert.equal(takeExpectedArrival(queue, 2), false); // 기대(3)와 다른 항목 — 기대 모델이 어긋났다
+  assert.deepEqual(queue, []);
+  assert.equal(takeExpectedArrival(queue, 2), false); // 빈 큐면 항상 false
+  assert.equal(takeExpectedArrival([1], null), false);
+});
+
+test('「← 이전」 연타(AI 리뷰 P2) — 5→4→3으로 두 번 내리고 popstate가 늦게 와도 2로 넘어가지 않는다', () => {
+  // 훅의 흐름을 순수 함수로 재연: UI가 단계를 내릴 때마다 go를 걸고 도착 항목을 큐에 넣는다
+  const queue: ApplyStep[] = [];
+  let step: ApplyStep = 5;
+  let entry: ApplyStep = 5;
+  const uiPrev = () => {
+    step = (step - 1) as ApplyStep;
+    const plan = planStepChange(entry, step);
+    assert.deepEqual(plan, { kind: 'go', delta: -1 });
+    entry = step;
+    queue.push(step);
+  };
+  uiPrev();
+  uiPrev();
+  // 이제서야 popstate 두 개가 순서대로 도착한다 — 항목 4, 항목 3
+  for (const arrived of [4, 3] as const) {
+    if (takeExpectedArrival(queue, arrived)) continue; // 우리 것 — 규칙 ④(되돌림)를 타지 않는다
+    assert.fail(`항목 ${arrived}는 기대한 도착이어야 한다`);
+  }
+  assert.equal(step, 3);
+  assert.equal(entry, 3);
+  assert.deepEqual(queue, []);
+  // 그 뒤의 진짜 뒤로가기(항목 2)는 정상 규칙 ⑤로 간다
+  assert.equal(takeExpectedArrival(queue, 2), false);
+  assert.deepEqual(resolvePopstate(2, step, false), { entryStep: 2, action: { type: 'goto', step: 2 } });
 });

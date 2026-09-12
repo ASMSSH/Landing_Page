@@ -38,11 +38,35 @@ export function planStepChange(entryStep: ApplyStep, nextStep: ApplyStep): StepC
   return { kind: 'go', delta: nextStep - entryStep };
 }
 
-/** popstate 처리 계획. `entryStep`은 도착한 항목이 가리키는 단계를 훅이 기억하게 하는 값 — 뒤이은 상태 변화가 push/go를 또 하지 않게 */
+/**
+ * popstate 처리 계획.
+ * - `entryStep`: 도착한 항목이 가리키는 단계를 훅이 기억하게 하는 값 — 뒤이은 상태 변화가 push/go를 또 하지 않게
+ * - `go`: 걷을 항목 수. `goArrivesAt`은 그 traversal이 도착할 항목의 단계 — 훅이 기대 큐에 넣어 두고 그 popstate는 규칙에 태우지 않는다
+ *   (아래 takeExpectedArrival). 페이지를 나가는 go(⑥)는 도착 popstate가 없으니 `goArrivesAt`이 없다
+ */
 export interface PopstatePlan {
   entryStep?: ApplyStep;
   action?: ApplyAction;
   go?: number;
+  goArrivesAt?: ApplyStep;
+}
+
+/**
+ * 우리가 건 `history.go`의 도착 popstate인지 판정한다. 맞으면 큐에서 빼고 true — 훅은 항목 단계만 기억하고 규칙을 적용하지 않는다.
+ * 아니면 큐를 비우고 false — 기대와 다른 항목이 왔다는 건 기대 모델이 어긋난 것이라(무시된 go 등) 처음부터 다시 본다.
+ *
+ * 왜 필요한가(AI 리뷰 P2): `history.go`는 비동기라 「← 이전」을 popstate가 오기 전에 두 번 누르면 첫 popstate(항목 4)가 현재 단계(3)보다
+ * 커서 규칙 ④(앞으로가기 되돌림)에 걸려 go를 한 번 더 하고, 결국 5→3이 아니라 2에 도착했다. 큐가 그 popstate를 "우리 것"으로 소비한다.
+ * popstate는 traversal 순서대로 오므로 큐 머리와 비교하면 된다.
+ */
+export function takeExpectedArrival(queue: ApplyStep[], entry: ApplyStep | null): boolean {
+  if (queue.length === 0) return false;
+  if (queue[0] === entry) {
+    queue.shift();
+    return true;
+  }
+  queue.length = 0;
+  return false;
 }
 
 const NOTHING: PopstatePlan = {};
@@ -55,11 +79,11 @@ export function resolvePopstate(entry: ApplyStep | null, current: ApplyStep, loc
   // ① 우리 항목이 아니다(동의 전문 항목 등) — 무시
   if (entry === null) return NOTHING;
   // ② 전송 중 — 되돌린다
-  if (locked) return entry === current ? { entryStep: entry } : { go: current - entry };
+  if (locked) return entry === current ? { entryStep: entry } : { go: current - entry, goArrivesAt: current };
   // ③ 같은 단계 — UI가 걷은 항목에 도착한 것
   if (entry === current) return { entryStep: entry };
   // ④ 앞으로가기, 또는 새로고침 뒤 남은 옛 항목 — 되돌린다. 앞 단계로 건너뛰는 건 reducer도 막는다
-  if (entry > current) return { go: current - entry };
+  if (entry > current) return { go: current - entry, goArrivesAt: current };
   // ⑥ 접수 완료(6)는 종착 — 되돌아가 「신청하기」를 또 누르면 중복 접수다. 새 신청으로 비우고 단계 수만큼 걷어 /apply 앞(랜딩)으로 나간다.
   //    reset을 먼저 하는 이유: 항목 수가 어긋나 페이지 안에 남더라도 빈 1단계(새 멱등 키)여야 한다
   if (current === DONE_STEP) return { entryStep: 1, action: { type: 'reset' }, go: -entry };
