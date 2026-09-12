@@ -58,6 +58,14 @@
 블러)만으로도 본문 위를 지날 때 층이 읽힌다. 흐름 자리에서는 배경이 크림 위 크림이라 보이지 않는다. **보더 없이 배경+블러만.**
 Figma 1440×900 데모도 그렇게 맞췄다.
 
+### 바 높이는 실측한다 — AI 리뷰 P3 반영 (2026-09-12)
+
+처음 구현은 `--apply-bar-h`를 CSS 상수(768: 72 / ≤480: 66)로 두었다. 리뷰 지적: ≤480의 기존 `flex-wrap: wrap`이 바가 두 줄로 꺾이는 걸
+허용하므로(320 폭·글꼴 확대) 실제 높이와 예약 공간이 연결돼 있지 않다. **`ApplyActions`가 ResizeObserver로 자기 높이를 재서 `<html>` 인라인
+`--apply-bar-h`에 쓴다.** CSS 상수는 JS 전 폴백. 인라인이라 미디어 쿼리의 `:root` 값보다 우선하고, S6에서 언마운트되면 값을 지운다.
+같은 값으로 `html:has(.apply-actions) { scroll-padding-bottom }`을 **데스크톱에도** 건다 — 두 번째 지적: 검증 실패 시 단계 컴포넌트가 오류 칸에
+`focus()`를 거는데(SSH-543·486), 브라우저가 그 칸을 뷰포트 맨 아래에 맞추면 sticky 행이 그 칸을 덮었다.
+
 ## 범위
 
 ### 1. 데스크톱(769 이상) — `.apply-actions` 열 안 sticky, `src/styles/apply.css`
@@ -88,8 +96,10 @@ Figma 1440×900 데모도 그렇게 맞췄다.
   }
   .apply-page:has(.apply-actions) .apply-foot { padding-bottom: calc(var(--apply-bar-h) + 16px); }   /* 페이지 끝은 푸터라 여기만 올리면 된다 */
   .apply-page:has(.apply-actions) .apply-toast { bottom: calc(var(--apply-bar-h) + 16px); }
-  html:has(.apply-actions) { scroll-padding-bottom: var(--apply-bar-h); }
 }
+/* 전 폭 공통 — 리뷰 P3 반영 */
+:root { --apply-bar-h: 68px; }                            /* JS 실측 전 폴백 */
+html:has(.apply-actions) { scroll-padding-bottom: var(--apply-bar-h); }
 @media (max-width:480px) {
   :root { --apply-bar-h: 66px; }                         /* 주 버튼 12/20 → 44 */
   .apply-actions { padding-left: 18px; padding-right: 18px; }
@@ -122,9 +132,10 @@ useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [state.st
 | --- | --- |
 | `src/styles/apply.css` | 1·2절 — `.apply-actions` sticky/fixed, 바 있을 때 아래 여백·토스트 위치 |
 | `src/apply/ApplyPage.tsx` | 3절 — 단계 전환 스크롤 복귀 |
+| `src/apply/ApplyActions.tsx` | 바 높이 실측 → `--apply-bar-h` (리뷰 P3 반영) |
 | `docs/spec/SSH-548/*` | spec·tasks·스크린샷 |
 
-`ApplyActions.tsx`·단계 컴포넌트·reducer·테스트는 바뀌지 않는다.
+단계 컴포넌트·reducer·테스트는 바뀌지 않는다.
 
 ## 범위 밖 — 형제 티켓이 한다
 
@@ -153,6 +164,8 @@ useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [state.st
 - [x] 콘솔 에러 없음
 - [x] Vercel 프리뷰(새로고침 포함): 390 고정 바 779~844 · S1→S2 뒤 scrollY 0 · 새로고침 뒤 1단계 정상 · 1440 sticky 832~900 · 콘솔 에러 없음
 - [x] 스크린샷 S1 첫 화면 `apply-actions-1440.png` · `apply-actions-768.png` · `apply-actions-390.png`
+- [x] 리뷰 반영 뒤(2026-09-12): 320×568 S3 두 줄 바 104px → 변수 104px·푸터 padding 120px, 끝까지 내리면 푸터가 바 위 · S6 변수 제거·scroll-padding auto ·
+      1440×700 진료비만 비우고 「다음」 → 포커스 칸 bottom 342 < sticky 행 top 528(대조군 scroll-padding 0: 698 vs 632) · build·lint·test 93건
 - [ ] 모바일 실기기(iOS Safari·Android Chrome) 키보드 올라올 때 바·포커스 칸 — **미확인**(실기기 없음)
 
 참고: `html { scroll-behavior: smooth }`(index.css)라 검증 스크립트의 `scrollTo`는 `behavior: 'instant'`로 쟀다. 단계 전환 효과도 `instant`다.
