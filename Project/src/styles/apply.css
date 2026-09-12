@@ -278,13 +278,12 @@ button.apply-step-node:hover .apply-step-label { color:var(--primary-600); }
   .apply-insurers { grid-template-columns:repeat(2, minmax(0, 1fr)); }
   .apply-docs-grid { grid-template-columns:1fr; }
   /* SSH-548: 1열에서는 액션 행을 화면 아래 고정 바로(모바일 Figma Actions Bar). 좌우 패딩은 컨테이너와 같다(32 · ≤480 18).
-     --apply-bar-h는 바 높이(패딩 10×2 + 주 버튼) — 바가 있을 때만(:has) 푸터·토스트·포커스 스크롤을 그만큼 올린다. S6는 액션 행이 없다.
+     바가 있을 때만(:has) 푸터·토스트를 바 높이(--apply-bar-h, 실측값·폴백 72/66)만큼 올린다. S6는 액션 행이 없다.
      z-index 40: 토스트 50 · 다이얼로그 60 아래. safe-area는 viewport-fit=cover가 없는 지금 메타에선 0이다 */
   :root { --apply-bar-h:72px; }
   .apply-actions { position:fixed; left:0; right:0; bottom:0; z-index:40; padding:10px 32px calc(10px + env(safe-area-inset-bottom)); border-top:1px solid var(--border); }
   .apply-page:has(.apply-actions) .apply-foot { padding-bottom:calc(var(--apply-bar-h) + 16px); }
   .apply-page:has(.apply-actions) .apply-toast { bottom:calc(var(--apply-bar-h) + 16px); }
-  html:has(.apply-actions) { scroll-padding-bottom:var(--apply-bar-h); }
 }
 @media (max-width:480px) {
   :root { --apply-bar-h:66px; }
