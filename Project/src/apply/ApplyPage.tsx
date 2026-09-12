@@ -34,6 +34,24 @@ function ApplyShell() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [state.step]);
+  // S1 업로드 카드 밖(폼·레일·여백)에 사진을 놓으면 브라우저가 이미지를 새 탭으로 연다 — 페이지 전체에서 막는다 (SSH-553).
+  // ApplyShell은 /apply에서만 마운트되므로 랜딩에는 걸리지 않는다. 카드가 이미 preventDefault한 이벤트(defaultPrevented)는
+  // 건너뛰어 카드 위의 「복사」 커서가 유지되고, 그 밖에서는 「놓을 수 없음」 커서가 된다.
+  // 파일 드래그(types에 Files)만 막는다 — 텍스트·링크 드래그까지 막으면 폼 input에 텍스트를 끌어다 놓는 브라우저 기본 동작이
+  // 깨진다 (AI 리뷰 P3 반영, 2026-09-12). 카드 쪽 hasFiles와 같은 기준이다
+  useEffect(() => {
+    const block = (e: globalThis.DragEvent) => {
+      if (e.defaultPrevented || !e.dataTransfer || !Array.from(e.dataTransfer.types).includes('Files')) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'none';
+    };
+    window.addEventListener('dragover', block);
+    window.addEventListener('drop', block);
+    return () => {
+      window.removeEventListener('dragover', block);
+      window.removeEventListener('drop', block);
+    };
+  }, []);
   return (
     <div className="apply-page">
       <Nav variant="apply" />

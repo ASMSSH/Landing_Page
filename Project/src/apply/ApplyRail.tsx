@@ -49,7 +49,7 @@ function HelpCard() {
       <ul className="apply-help-list">
         <li><Icon name="check" size={14} strokeWidth={3} />병원에서 필요한 서류를 저희가 대신 받아드려요</li>
         <li><Icon name="check" size={14} strokeWidth={3} />신청하면 담당자가 24시간 안에 전화드려요</li>
-        <li><Icon name="check" size={14} strokeWidth={3} />베타 기간엔 대리 청구가 무료예요</li>
+        <li><Icon name="check" size={14} strokeWidth={3} />무료 이용 기간이라 대리 청구 비용이 없어요</li>
         <li>
           <Icon name="check" size={14} strokeWidth={3} />
           궁금한 건{' '}

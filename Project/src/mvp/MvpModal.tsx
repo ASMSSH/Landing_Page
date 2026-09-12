@@ -161,7 +161,6 @@ export default function MvpModal() {
           <div className="modal-brand">
             <span className="paw">🐾</span>
             <span className="nm">보험찾개냥 체험하기</span>
-            <span className="beta-badge">BETA</span>
           </div>
           <button className="modal-close" onClick={close} aria-label="닫기">
             ✕

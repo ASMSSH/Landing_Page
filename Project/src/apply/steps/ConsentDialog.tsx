@@ -105,7 +105,7 @@ export default function ConsentDialog({ doc, onClose }: ConsentDialogProps) {
           </div>
           <h2 id="apply-consent-doc-title" className="apply-consent-doc-title">{doc.title}</h2>
           <p className="apply-consent-doc-meta">
-            문안 버전 {CONSENT_VERSION} · {CONSENT_EFFECTIVE_DATE} 시행 · 베타(법률 검토 전)
+            문안 버전 {CONSENT_VERSION} · {CONSENT_EFFECTIVE_DATE} 시행 · 법률 검토 전
           </p>
         </div>
         <div ref={bodyRef} className="apply-consent-doc-scroll" tabIndex={-1}>
@@ -114,7 +114,7 @@ export default function ConsentDialog({ doc, onClose }: ConsentDialogProps) {
           </div>
           <p className="apply-consent-doc-warn">
             <span aria-hidden="true">⚠</span>
-            <span>베타 기간 문안이에요. 법률 검토 후 내용이 바뀔 수 있고, 바뀌면 문안 버전이 올라가요.</span>
+            <span>법률 검토 전 문안이에요. 검토 후 내용이 바뀔 수 있고, 바뀌면 문안 버전이 올라가요.</span>
           </p>
         </div>
         <div className="apply-dialog-btns apply-consent-doc-foot">

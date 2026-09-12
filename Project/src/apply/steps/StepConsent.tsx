@@ -12,7 +12,7 @@ import StepHeading from '../StepHeading';
 import { stepDef } from '../steps';
 import ConsentDialog from './ConsentDialog';
 
-// S5 동의 + 「신청하기」. 헤딩·마스터 행·개별 5행·베타 문구·(실패 배너)·액션 행을 조립한다.
+// S5 동의 + 「신청하기」. 헤딩·마스터 행·개별 5행·법률 검토 전 안내·(실패 배너)·액션 행을 조립한다.
 // 「보기」를 누르면 전문 팝업(ConsentDialog)을 연다 — 데스크톱 대화상자·모바일 시트. URL은 /apply 그대로다.
 // (처음엔 Figma S5-a대로 본문 자리를 통째로 바꿨는데, 닫기가 맨 아래라 불편하다는 피드백으로 팝업으로 바꿨다 — 2026-09-10)
 //
@@ -163,8 +163,8 @@ export default function StepConsent() {
           );
         })}
       </ul>
-      <p className="apply-consent-beta">
-        베타 서비스예요. 동의 문안은 법률 검토 전이며, 위임장은 병원 방문 때 종이로 받아요. 신청 즉시 담당자에게 알림이 가고
+      <p className="apply-consent-note">
+        동의 문안은 법률 검토 전이며, 위임장은 병원 방문 때 종이로 받아요. 신청 즉시 담당자에게 알림이 가고
         24시간 안에 연락드려요.
       </p>
       {failed && <SubmitError onRetry={submit} />}
