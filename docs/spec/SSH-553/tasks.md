@@ -38,7 +38,7 @@
 
 - [x] `npm run build` · `npm run lint` · `npm test`
 - [x] 로컬 동선(headless Chromium) — 드롭 성공·거부·카드 밖·`done` 재드롭 · 「베타」 grep 0
-- [ ] Vercel 프리뷰
+- [x] Vercel 프리뷰
 - [x] 스크린샷 S1 1440 · 768 · 390 + 1440 드래그 강조 → `docs/spec/SSH-553/apply-s1-*.png`
 - [x] **커밋** `docs: SSH-553 검증 기록·스크린샷`
 
