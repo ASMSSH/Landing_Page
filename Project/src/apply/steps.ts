@@ -1,0 +1,67 @@
+// /apply 5단계 정의. 프로그레스·단계 헤딩·액션 행이 전부 이 상수를 읽는다.
+// 각 단계 본문(S1~S6)은 형제 티켓이 채우고, 여기서는 이름·문구만 둔다.
+
+export type StepNumber = 1 | 2 | 3 | 4 | 5;
+
+export interface StepDef {
+  number: StepNumber;
+  key: 'treatment' | 'insurance' | 'documents' | 'applicant' | 'consent';
+  /** 프로그레스 바 라벨 */
+  label: string;
+  /** 단계 헤딩 제목 */
+  title: string;
+  /** 단계 헤딩 아래 한 줄 설명 */
+  description: string;
+  /** 액션 행 주 버튼 라벨 */
+  nextLabel: string;
+}
+
+export const STEPS: readonly StepDef[] = [
+  {
+    number: 1,
+    key: 'treatment',
+    label: '진료 정보',
+    title: '진료 정보 입력하기',
+    description: '영수증을 찍으면 병원·진료일·진료비를 읽어 드려요. 없으면 직접 입력해도 돼요',
+    nextLabel: '다음 →',
+  },
+  {
+    number: 2,
+    key: 'insurance',
+    label: '보험 선택',
+    title: '보험 선택',
+    description: '가입한 보험사를 골라 주세요. 없거나 모르면 「기타 / 모름」',
+    nextLabel: '필요 서류 확인 →',
+  },
+  {
+    number: 3,
+    key: 'documents',
+    label: '필요 서류',
+    title: '필요 서류',
+    // 로딩 중 문구. 결과가 오면 StepDocuments가 요약 한 줄(docsSummaryLine)로 바꾼다 (SSH-473)
+    description: '가입한 보험사 기준으로 필요한 서류를 찾고 있어요',
+    nextLabel: '무료로 대신 청구 맡기기 →',
+  },
+  {
+    number: 4,
+    key: 'applicant',
+    label: '신청 정보',
+    title: '신청 정보',
+    description: '로그인·인증 없이 신청해요. 담당자가 전화로 확인한 뒤 진행해요',
+    nextLabel: '다음 →',
+  },
+  {
+    number: 5,
+    key: 'consent',
+    label: '동의',
+    title: '동의',
+    description: '5개 모두 필수예요. 「보기」를 누르면 전문을 읽을 수 있어요',
+    nextLabel: '신청하기',
+  },
+];
+
+export const STEP_COUNT = STEPS.length;
+
+export function stepDef(step: number): StepDef | undefined {
+  return STEPS.find((s) => s.number === step);
+}

@@ -1,3 +1,5 @@
+import { refCodeFromSearch } from './route';
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const ENDPOINT =
@@ -38,15 +40,18 @@ function getVisitNumber(): number {
   }
 }
 
+// getRefCode와 같은 규칙: 지금 URL에 utm_*이 하나라도 있으면 그것으로 덮어쓰고, 없으면 세션에 저장된 값을 쓴다
 function getUtm(): Record<string, string> {
   try {
-    const stored = sessionStorage.getItem(UTM_KEY);
-    if (stored) return JSON.parse(stored);
     const params = new URLSearchParams(location.search);
     const utm: Record<string, string> = {};
     for (const k of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'] as const) {
       const v = params.get(k);
       if (v) utm[k] = v.slice(0, 100);
+    }
+    if (Object.keys(utm).length === 0) {
+      const stored = sessionStorage.getItem(UTM_KEY);
+      if (stored) return JSON.parse(stored);
     }
     sessionStorage.setItem(UTM_KEY, JSON.stringify(utm));
     return utm;
@@ -55,13 +60,23 @@ function getUtm(): Record<string, string> {
   }
 }
 
-function getRefCode(): string | null {
+/**
+ * 유입 코드. ?r= 없으면 utm_source (route.ts#refCodeFromSearch, SSH-545).
+ * 지금 URL에 코드가 있으면 그것이 이기고 sessionStorage에 덮어쓴다 — 코드 없는 페이지(/apply 내부 이동 등)에서는 저장된 값을 쓴다.
+ * 처음엔 "첫 진입 값을 세션 동안 고정"이었는데, 같은 탭에서 코드 없이 한 번 열었다가 나중에 코드 링크로 들어오면
+ * 빈 값이 굳어 CTA·신청에 코드가 안 붙었다(2026-09-13 프리뷰 확인). 같은 탭에서 코드가 바뀌면 마지막 코드가 남는다.
+ */
+export function getRefCode(): string | null {
   try {
+    const fromUrl = refCodeFromSearch(location.search);
+    if (fromUrl) {
+      sessionStorage.setItem(REF_KEY, fromUrl);
+      return fromUrl;
+    }
     const stored = sessionStorage.getItem(REF_KEY);
     if (stored !== null) return stored || null;
-    const r = new URLSearchParams(location.search).get('r')?.slice(0, 32) ?? '';
-    sessionStorage.setItem(REF_KEY, r);
-    return r || null;
+    sessionStorage.setItem(REF_KEY, '');
+    return null;
   } catch {
     return null;
   }
@@ -199,9 +214,7 @@ function initClickCapture(): void {
       const section = el.closest('section[id]');
       props.section = section
         ? section.id
-        : el.closest('.modal')
-          ? 'mvp_modal'
-          : el.closest('header')
+        : el.closest('header')
             ? 'nav'
             : el.closest('footer')
               ? 'footer'

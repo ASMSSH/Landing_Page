@@ -23,6 +23,10 @@ export interface GeminiEnv {
 
 export interface GeminiAnalysis {
   docType: string;
+  /** 영수증 상단의 병원 상호. 없으면 빈 문자열 (SSH-543, /apply S1 병원 이름) */
+  hospital: string;
+  /** 병원 주소 전체. 없으면 빈 문자열 (SSH-543, /apply S1 병원 주소) */
+  address: string;
   date: string;
   diag: string;
   cost: string;
@@ -42,6 +46,8 @@ const RESPONSE_SCHEMA = {
   type: 'OBJECT',
   properties: {
     docType: { type: 'STRING' },
+    hospital: { type: 'STRING' },
+    address: { type: 'STRING' },
     date: { type: 'STRING' },
     diag: { type: 'STRING' },
     cost: { type: 'STRING' },
@@ -53,6 +59,8 @@ const RESPONSE_SCHEMA = {
   },
   required: [
     'docType',
+    'hospital',
+    'address',
     'date',
     'diag',
     'cost',
@@ -69,6 +77,8 @@ const PROMPT = `
 이미지에 실제로 보이는 내용만 근거로 다음 정보를 추출하세요.
 
 - docType: "진료비 영수증", "진료비 세부내역서", "진단서/소견서" 중 가장 가까운 값
+- hospital: 문서 상단의 병원(동물병원) 상호를 적힌 그대로. 확인할 수 없으면 빈 문자열
+- address: 병원 주소가 적혀 있으면 전체 주소를 그대로. 없으면 빈 문자열
 - date: YYYY.MM.DD 형식. 확인할 수 없으면 빈 문자열
 - diag: 병명 또는 진료 내용. 문서에 없으면 빈 문자열
 - cost: 총 진료비를 천 단위 쉼표가 있는 숫자로 작성하고 "원"은 제외. 확인할 수 없으면 빈 문자열
@@ -110,6 +120,8 @@ function normalizeAnalysis(value: unknown): GeminiAnalysis | null {
 
   return {
     docType: allowedDocTypes.has(docType) ? docType : '진료비 영수증',
+    hospital: text(data.hospital),
+    address: text(data.address),
     date: text(data.date),
     diag: text(data.diag),
     cost: text(data.cost).replace(/\s*원$/, ''),

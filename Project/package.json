@@ -7,12 +7,12 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
+    "test": "node --test 'server/**/*.test.ts' 'src/**/*.test.ts'",
     "preview": "vite preview"
   },
   "dependencies": {
     "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "tesseract.js": "^7.0.0"
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
     "@types/node": "^24.13.2",
