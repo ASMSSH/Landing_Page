@@ -4,8 +4,8 @@
 
 ## 0. 문서 — 브랜치 `feat/SSH-573` (base: `dev`)
 - [x] spec.md · tasks.md
-- [ ] **커밋** `docs: SSH-573 spec·tasks 작성`
-- [ ] **Draft PR 생성 후 멈춘다** — `메타 픽셀 설치(SSH-573)`, base `dev`
+- [x] **커밋** `docs: SSH-573 spec·tasks 작성`
+- [x] **Draft PR 생성 후 멈춘다** — `메타 픽셀 설치(SSH-573)`, base `dev` → PR #40
 
 ## 1. 기본 픽셀 + 래퍼 — spec 1·2절
 - [ ] `Project/index.html` — `<head>` 끝에 기본 픽셀 스니펫 + noscript (ID `28502024599409299`)
