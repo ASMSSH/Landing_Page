@@ -3,6 +3,7 @@ import Icon from '../../components/icons';
 import { INSTAGRAM_URL } from '../../data/links';
 import { getRefCode, track } from '../../lib/analytics';
 import { submitClaim } from '../../lib/claims';
+import { pixelSubmitApplication } from '../../lib/metaPixel';
 import ApplyActions from '../ApplyActions';
 import { useApply } from '../ApplyContext';
 import { toClaimPayload } from '../claimPayload';
@@ -126,6 +127,9 @@ export default function StepConsent() {
     submitClaim(toClaimPayload(state, getRefCode(), clientId), controller.signal)
       .then(({ receiptNo }) => {
         track('apply_done');
+        // 메타 픽셀 SubmitApplication — 성공에서만(SSH-573). 실패·재시도에서 쏘면 신청 수가 뻥튀기되어
+        // 광고 최적화가 엉뚱한 방향으로 간다. S6은 별도 URL이 없어 새로고침 재발사도 없다
+        pixelSubmitApplication();
         dispatch({ type: 'setReceiptNo', receiptNo });
         dispatch({ type: 'goto', step: 6 });
       })
